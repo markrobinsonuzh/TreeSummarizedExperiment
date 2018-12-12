@@ -1,11 +1,37 @@
 Package: TreeSummarizedExperiment
 Type: Package
-Title: What the Package Does (Title Case)
+Title: TreeSummarizedExperiment
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Depends: R(>= 3.5.0), SummarizedExperiment
+License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
+Imports:
+    S4Vectors,
+    methods,
+    utils,
+    ape
+VignetteBuilder: knitr
+Suggests: ggtree, BiocStyle, knitr, rmarkdown
+RoxygenNote: 6.1.1
+Collate: 
+    'classValid.R'
+    'allClass.R'
+    'allGenerics.R'
+    'classAccessor.R'
+    'data.R'
+    'findAncestor.R'
+    'findOS.R'
+    'findSibling.R'
+    'isLeaf.R'
+    'matTree.R'
+    'nodeValue.R'
+    'shareNode.R'
+    'signalNode.R'
+    'toTree.R'
+    'toTreeSummarizedExperiment.R'
+    'transNode.R'
