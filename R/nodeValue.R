@@ -173,7 +173,7 @@ nodeValue.B <- function(data, fun = sum,
     nodeLab <- transNode(tree = tree, input = nodeA,
                          use.alias = FALSE, message = FALSE)
 
-    if (anyDuplicated(nodeLab)) {
+    if (anyDuplicated(nodeLab) | any(is.na(nodeLab))) {
         nodeLab_alias <- transNode(tree = tree, input = nodeA,
                                    use.alias = TRUE, message = FALSE)
         linkD <- DataFrame(nodeLab = nodeLab,
