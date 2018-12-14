@@ -91,6 +91,7 @@ it by using the function `rtree` from the package `r CRANpkg("ape")`. It's a
 `phylo` object.
 ```{r}
 # create a toy tree
+set.seed(1)
 toyTree <- rtree(5)
 class(toyTree)
 ```
@@ -203,8 +204,8 @@ assays(test4)[[1]]
 suppressPackageStartupMessages({
     library(phyloseq)})
 
+# load the phyloseq object
 data("GlobalPatterns")
-#GP <- toTreeSummarizedExperiment(data = GlobalPatterns)
 dat <- GlobalPatterns
 GP <- treeSummarizedExperiment(tree = phy_tree(dat),
                                assays = list(otu_table(dat)@.Data),
