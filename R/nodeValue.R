@@ -1,4 +1,3 @@
-
 # when data is a data frame or a matrix
 nodeValue.A <- function(data, fun = sum, tree,
                         level = NULL,
@@ -29,10 +28,10 @@ nodeValue.A <- function(data, fun = sum, tree,
 
     ## rename data with the alias of the node label
     rn <- rownames(data)
-    leafNum <- transNode(tree = tree, input = rn, message = FALSE)
-    leafLab_alias <- transNode(tree = tree, input = leafNum,
-                               use.alias = TRUE, message = FALSE)
-    rownames(data) <- leafLab_alias
+    # leafNum <- transNode(tree = tree, input = rn, message = FALSE)
+    # leafLab_alias <- transNode(tree = tree, input = leafNum,
+    #                            use.alias = TRUE, message = FALSE)
+    # rownames(data) <- leafLab_alias
 
     ## nodes
     emat <- tree$edge
@@ -48,13 +47,17 @@ nodeValue.A <- function(data, fun = sum, tree,
 
 
     ## generated data
-    desA <- findOS(tree = tree, ancestor = nodeA, only.Tip = TRUE,
-                   self.include = TRUE, use.alias = TRUE)
+    if (is.null(tree$cache)) {
+        desA <- findOS(tree = tree, ancestor = nodeA, only.Tip = TRUE,
+                       self.include = TRUE, use.alias = TRUE)
+    } else {
+        desA <- tree$cache[nodeA]
+    }
+
 
     valA <- lapply(seq_along(desA), FUN = function(x) {
         xx <- desA[[x]]
-        nx <- names(xx)
-        fx <- apply(data[nx, , drop = FALSE], 2, FUN = fun)
+        fx <- apply(data[rn %in% xx, , drop = FALSE], 2, FUN = fun)
 
         # print out the running process
         if (message) {
@@ -62,24 +65,25 @@ nodeValue.A <- function(data, fun = sum, tree,
                     "\r", appendLF = FALSE)
             flush.console()
         }
-       return(fx)
+        return(fx)
     })
 
     # output a matrix
     cNode <- do.call(rbind, valA)
     colnames(cNode) <- colnames(data)
+    rownames(cNode) <- nodeA
 
+    # lab <- transNode(tree = tree, input = nodeA,
+    #                  use.alias = FALSE, message = FALSE)
 
-    lab <- transNode(tree = tree, input = nodeA,
-                     use.alias = FALSE, message = FALSE)
     # if there are duplicated value the node label, use the alias of the node
     # labels as the row names
-    if (anyDuplicated(lab)) {
-        rownames(cNode) <- transNode(tree = tree, input = nodeA,
-                                     use.alias = TRUE, message = FALSE)
-    } else {
-        rownames(cNode) <- lab
-    }
+    # if (anyDuplicated(lab)) {
+    #     rownames(cNode) <- transNode(tree = tree, input = nodeA,
+    #                                  use.alias = TRUE, message = FALSE)
+    # } else {
+    #     rownames(cNode) <- lab
+    # }
 
     # output
     return(cNode)
@@ -123,8 +127,13 @@ nodeValue.B <- function(data, fun = sum,
     nN <- length(nodeA)
 
     # find the rows of descendants
-    desA <- findOS(tree = tree, ancestor = nodeA,
-                   only.Tip = TRUE, self.include = TRUE)
+    if (is.null(tree$cache)) {
+        desA <- findOS(tree = tree, ancestor = nodeA,
+                       only.Tip = TRUE, self.include = TRUE)
+    } else {
+        desA <- tree$cache[nodeA]
+    }
+
     leafRow <- lapply(desA, FUN = function(x) {
         xi <- match(x, lData$nodeNum)
         lData$rowID[xi]
