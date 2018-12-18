@@ -93,31 +93,30 @@ findOS <- function(tree,
         return(x)
     })
 
-    desA <- lapply(loc2, FUN = function(x) {
-        xx <- matN[x]
-        names(xx) <- matNN[x]
-        return(xx)
-    })
-
 
     # descendants: tips or leaves
     tipA <- unique(setdiff(mat[, 2], mat[, 1]))
 
-    # if self.include, the leaf has itself as the descendant
-    if (!self.include) {
-        desA <- lapply(seq_along(numA), FUN = function(x) {
-            setdiff(desA[[x]], numA[x])
-        })
-    }
+    desA <- lapply(seq_along(loc2), FUN = function(x) {
+        xx <- loc2[[x]]
+        y0 <- y <- matN[xx]
 
-    # if only.Tip, the descendant leaves are return and the descendant internal
-    # nodes are not
-    if (only.Tip) {
-        desA <- lapply(desA, FUN = function(x) {
-            intersect(x, tipA)
-        })
-    }
+        # if self.include, the leaf has itself as the descendant
+        if (!self.include) {
+         y <- setdiff(y, numA[x])
+         }
 
+        # only leaf nodes
+        if (only.Tip) {
+            y <- intersect(y, tipA)
+            }
+
+        # index those kept
+        ii <-  y0 %in% y
+        xi <- xx[ii, , drop = FALSE]
+        names(y) <- matNN[xi]
+        return(y)
+    })
 
     # final output (node number or label)
     names(desA) <- transNode(tree = tree, input = numA,
