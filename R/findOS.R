@@ -66,7 +66,7 @@ findOS <- function(tree,
             stop("Node ", numA,
                  " can't be found in the ",
                  deparse(substitute(tree)), "\n")
-            }
+        }
 
     }
 
@@ -84,8 +84,19 @@ findOS <- function(tree,
 
     })
 
+    matNN <- apply(matN, 2, FUN = function(x) {
+        xe <- x[!is.na(x)]
+        xx <- transNode(tree = tree, input = xe,
+                        use.alias = use.alias,
+                        message = FALSE)
+        x[!is.na(x)] <- xx
+        return(x)
+    })
+
     desA <- lapply(loc2, FUN = function(x) {
-        matN[x]
+        xx <- matN[x]
+        names(xx) <- matNN[x]
+        return(xx)
     })
 
 
@@ -108,19 +119,9 @@ findOS <- function(tree,
     }
 
 
-    # name the node number with the node label
-    desA <- lapply(desA, FUN = function(x) {
-        xx <- transNode(tree = tree, input = x,
-                        use.alias = use.alias,
-                        message = FALSE)
-        names(x) <- xx
-        return(x)
-    })
-
-
     # final output (node number or label)
     names(desA) <- transNode(tree = tree, input = numA,
-                            use.alias = use.alias,
-                            message = FALSE)
+                             use.alias = use.alias,
+                             message = FALSE)
     return(desA)
 }
