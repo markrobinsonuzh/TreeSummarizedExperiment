@@ -14,20 +14,26 @@
 #' R2 = c("B1", rep("B2", 4)),
 #' R3 = c("C1", "C2", "C3", "C3", "C4"))
 #'
+#' taxTab <- data.frame(R1 = rep("A", 5),
+#' R2 = c("B1", rep("B2", 4)),
+#' R3 = c(NA, "C2", "C3", NA, "C4"))
 #'
 #' tree <- toTree(data = taxTab)
 #'
 
 
-toTree <- function(data) {
+toTree <- function(data, cache = FALSE) {
 
     # input NA with the value in the previous level
-    data <- apply(data, 1, FUN = function(x) {
-        xx <- x[!is.na(x)]
-        x[is.na(x)] <- tail(xx, 1)
-        return(x)
-    })
-    data <- t(data)
+    if (any(is.na(data))) {
+        data <- apply(data, 1, FUN = function(x) {
+            xx <- x[!is.na(x)]
+            x[is.na(x)] <- paste(tail(xx, 1), NA, sep = " - ")
+            return(x)
+        })
+        data <- t(data)
+    }
+
 
     # add level
     datL1 <- lapply(seq_len(ncol(data)), FUN = function(x) {
@@ -38,18 +44,19 @@ toTree <- function(data) {
     datL2 <- do.call(cbind, datL1)
 
     # leaf nodes
-    # leaf <- apply(datL2, 1, FUN = function(x) {
-    #     #tail(x[x != "Unclassified"], 1)
-    #     tail(x[! is.na(x)], 1)
-    # })
-    # vleaf <- as.vector(leaf)
-    # vleaf <- unique(vleaf)
     vleaf <- rownames(data)
+
+    if (is.null(vleaf)) {
+        vleaf <- datL2[, ncol(datL2)]
+    }
+    if (is.null(vleaf)) {
+        stop("Not allow to use the same label for different leaf nodes. \n")
+    }
+
     if (any(vleaf != datL2[, ncol(datL2)])) {
         datL2 <- cbind(datL2, vleaf)
     }
 
-    # leaves
     numL <- seq_along(vleaf)
     names(numL) <- vleaf
 
@@ -95,5 +102,19 @@ toTree <- function(data) {
     treeList$edge.length <- rep(0.1, nrow(mat3))
     treeList$Nnode <- length(numI)
     class(treeList) <- "phylo"
+
+    # keep cache
+    node <- unique(as.vector(datL2))
+    desA <- lapply(node, FUN = function(x) {
+        xi <- which(datL2== x, arr.ind = TRUE)
+        ri <- xi[, "row"]
+        lvs <- datL2[ri, ncol(datL2)]
+        ln <- transNode(tree = treeList, input = lvs)
+        names(ln) <- lvs
+    })
+    names(desA) <- node
+
+    treeList$cache <- desA
+
     return(treeList)
 }
