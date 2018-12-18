@@ -184,15 +184,15 @@ linkData(taxLse)
 
 Aggregate to a specific level, e.g. R2.
 ```{r}
-# nodes that belong to R1 level
+# nodes that belong to R2 level
 lab <- c(taxTree$tip.label, taxTree$node.label)
 bi <- lab[grep("R2", lab)]
 test3 <- nodeValue(data = taxLse, fun = sum, level = bi)
 ```
 
-Aggregate to a specific node, e.g. C3.
+Aggregate to a specific node, e.g. C3 on level R3.
 ```{r}
-# the node labels
+# the node labels: level - node (connect both using " - ")
 test4 <- nodeValue(data = taxLse, fun = sum, level = "R3 - C3")
 assays(test4)[[1]]
 ```
