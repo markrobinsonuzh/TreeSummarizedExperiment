@@ -57,7 +57,8 @@ nodeValue.A <- function(data, fun = sum, tree,
 
     valA <- lapply(seq_along(desA), FUN = function(x) {
         xx <- desA[[x]]
-        fx <- apply(data[rn %in% xx, , drop = FALSE], 2, FUN = fun)
+        nx <- names(xx)
+        fx <- apply(data[rn %in% nx, , drop = FALSE], 2, FUN = fun)
 
         # print out the running process
         if (message) {
