@@ -32,12 +32,14 @@ toTree <- function(data, cache = FALSE) {
             xx <- data[, x]
             ii <- is.na(xx)
             if (sum(ii)) {
-                y <- data[ii, 1: (x-1), drop = FALSE]
+                y <- data[ii, 1: x, drop = FALSE]
                 uy <- apply(y, 1, FUN = function(x) {
                     xx <- x[!is.na(x)]
-                    tail(xx, 1)
+                    nax <- sum(is.na(x))
+                    paste(tail(xx, 1), NA, nax, sep = " - ")
                 })
-                xx[ii] <- paste(uy, NA, sep = " - ")
+                #xx[ii] <- paste(uy, NA, sep = " - ")
+                xx[ii] <- uy
             }
             return(xx)
           })
@@ -75,8 +77,9 @@ toTree <- function(data, cache = FALSE) {
     })
     datL2 <- do.call(cbind, datL1)
 
-    nodeI <- as.vector(datL2)
-    nodeI <- unique(nodeI)
+    #nodeI <- as.vector(datL2)
+    nodeI <- as.vector(t(datL2))
+    nodeI <- setdiff(nodeI, vleaf)
     numI <- length(numL) + seq_along(nodeI)
     names(numI) <- nodeI
 
@@ -111,8 +114,10 @@ toTree <- function(data, cache = FALSE) {
     treeList$tip.label <- names(numL)
     treeList$node.label <- names(numI)
     treeList$edge.length <- rep(0.1, nrow(mat3))
+    #treeList$edge.length <- runif(nrow(mat3))
     treeList$Nnode <- length(numI)
     class(treeList) <- "phylo"
+    attr(treeList, "order") <- "cladewise"
 
     # keep cache
     desA2 <- findOS(tree = treeList, ancestor = numI, only.Tip = TRUE)
