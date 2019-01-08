@@ -28,10 +28,7 @@ nodeValue.A <- function(data, fun = sum, tree,
 
     ## rename data with the alias of the node label
     rn <- rownames(data)
-    # leafNum <- transNode(tree = tree, input = rn, message = FALSE)
-    # leafLab_alias <- transNode(tree = tree, input = leafNum,
-    #                            use.alias = TRUE, message = FALSE)
-    # rownames(data) <- leafLab_alias
+
 
     ## nodes
     emat <- tree$edge
@@ -74,17 +71,17 @@ nodeValue.A <- function(data, fun = sum, tree,
     colnames(cNode) <- colnames(data)
     rownames(cNode) <- nodeA
 
-    # lab <- transNode(tree = tree, input = nodeA,
-    #                  use.alias = FALSE, message = FALSE)
+    lab <- transNode(tree = tree, input = nodeA,
+                     use.alias = FALSE, message = FALSE)
 
     # if there are duplicated value the node label, use the alias of the node
     # labels as the row names
-    # if (anyDuplicated(lab)) {
-    #     rownames(cNode) <- transNode(tree = tree, input = nodeA,
-    #                                  use.alias = TRUE, message = FALSE)
-    # } else {
-    #     rownames(cNode) <- lab
-    # }
+    if (anyDuplicated(lab)) {
+        rownames(cNode) <- transNode(tree = tree, input = nodeA,
+                                     use.alias = TRUE, message = FALSE)
+    } else {
+        rownames(cNode) <- lab
+    }
 
     # output
     return(cNode)
