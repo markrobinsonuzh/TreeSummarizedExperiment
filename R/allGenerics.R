@@ -121,4 +121,83 @@ setMethod("show", "treeSummarizedExperiment", function(object) {
 
 
 
+#' #' @keywords internal
+#' setGeneric("show", function(x) {
+#'     standardGeneric("show")
+#' })
 
+
+#' @keywords internal
+#' @importMethodsFrom S4Vectors show
+setMethod("show", "LinkDataFrame", function(object) {
+    x_class <- class(object)
+    left_len <- ncol(object@LinkData)
+    right_len <- ncol(object)
+
+    cat(x_class, " object with ",
+        left_len, " link data ", ifelse(left_len == 1L, "column", "columns"),
+        " and ",
+        right_len, " metadata ", ifelse(right_len == 1L, "column", "columns"),
+        ":\n", sep="")
+
+    out <- S4Vectors:::makePrettyMatrixForCompactPrinting(object,
+                                                          .nakedMatrix)
+    classX <- c(lapply(object@LinkData, class), list("|" = " "), lapply(object, class))
+    classX <- unlist(classX)
+
+    classinfo <- S4Vectors:::makeClassinfoRowForCompactPrinting(object, classX)
+    classinfo[1, "|"] <- ""
+
+    ## A sanity check, but this should never happen!
+    stopifnot(identical(colnames(classinfo), colnames(out)))
+
+    out <- rbind(classinfo, out)
+
+    print(out, quote=FALSE, right=TRUE, max=length(out))
+})
+
+#' @importFrom S4Vectors showAsCell
+#' @keywords internal
+.nakedMatrix <- function(x) {
+    x_mcols <- x
+    x_nmc <- ncol(x_mcols)
+    ans <- as.matrix(x@LinkData)
+    x_len <- max(nrow(x), nrow(ans))
+    if (x_nmc > 0L) {
+        tmp <- as.data.frame(lapply(x_mcols, showAsCell), optional=TRUE)
+        ans <- cbind(ans, `|`=rep.int("|", x_len), as.matrix(tmp))
+
+    } else {
+        ans <-  cbind(ans, `|`=rep.int("|", x_len))
+
+    }
+    ans
+}
+
+# .show_LinkDataFrame <- function(x){
+#
+#     x_class <- class(x)
+#     left_len <- ncol(x@LinkData)
+#     right_len <- ncol(x)
+#
+#     cat(x_class, " object with ",
+#         left_len, " link data ", ifelse(left_len == 1L, "column", "columns"),
+#         " and ",
+#         right_len, " metadata ", ifelse(right_len == 1L, "column", "columns"),
+#         ":\n", sep="")
+#
+#     out <- S4Vectors:::makePrettyMatrixForCompactPrinting(x,
+#                                                           .nakedMatrix)
+#     classX <- c(lapply(x@LinkData, class), list("|" = " "), lapply(x, class))
+#     classX <- unlist(classX)
+#
+#     classinfo <- S4Vectors:::makeClassinfoRowForCompactPrinting(x, classX)
+#     classinfo[1, "|"] <- ""
+#
+#     ## A sanity check, but this should never happen!
+#     stopifnot(identical(colnames(classinfo), colnames(out)))
+#
+#     out <- rbind(classinfo, out)
+#
+#     print(out, quote=FALSE, right=TRUE, max=length(out))
+# }

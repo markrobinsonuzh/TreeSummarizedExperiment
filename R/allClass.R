@@ -18,6 +18,35 @@ setOldClass("phylo")
 
 
 #-------------------------------------------------------------------------------
+#' LinkDataFrame: A S4 class extended from DataFrame
+#-------------------------------------------------------------------------------
+#' An S4 class LinkDataFrame
+#'
+#' The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} by
+#' adding one slot \code{LinkData}
+#' @importClassesFrom S4Vectors DataFrame
+#' @exportClass LinkDataFrame
+setClass("LinkDataFrame",
+         representation(LinkData = "DataFrame"),
+         contains = "DataFrame")
+
+#-------------------------------------------------------------------------------
+#' Construct a LinkDataFrame
+#-------------------------------------------------------------------------------
+#' Construct a LinkDataFrame object
+#'
+#' @param LinkData A \link[S4Vectors]{DataFrame-class}.
+#' @inheritParams SummarizedExperiment::SummarizedExperiment
+#' @importFrom S4Vectors DataFrame
+#' @export
+#' @return A LinkDataFrame object
+#'
+LinkDataFrame <- function(LinkData = NULL, ...) {
+    df <- DataFrame(...)
+    new("LinkDataFrame", df, LinkData = LinkData)
+}
+
+#-------------------------------------------------------------------------------
 # treeSummarizedExperiment
 #-------------------------------------------------------------------------------
 #' An S4 class treeSummarizedExperiment
@@ -230,3 +259,4 @@ treeSummarizedExperiment <- function(tree = NULL, linkData = NULL,
 
     return(tse)
 }
+
