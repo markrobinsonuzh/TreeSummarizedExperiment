@@ -1,115 +1,53 @@
 
 # -----------------------------------------------------------------------------
-### Accessors for treeSummarizedExperiment
+### Accessors for TreeSummarizedExperiment
 # -----------------------------------------------------------------------------
-#' @importMethodsFrom SummarizedExperiment assays
-#' @importFrom methods callNextMethod
-#' @rdname treeSummarizedExperiment-accessor
+
+#' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setMethod("assays", signature("treeSummarizedExperiment"),
-          function(x, use.nodeLab = FALSE, ..., withDimnames = FALSE){
-              out <- callNextMethod(x, withDimnames)
-
-              if (use.nodeLab) {
-                  nodeLab <- x@linkData$nodeLab
-                  if (any(duplicated(nodeLab))) {
-                      nodeLab <- x@linkData$nodeLab_alias
-                  }
-
-                  outR <- lapply(out, function(x) {
-                      rownames(x) <- nodeLab
-                      x
-                  })
-              } else {
-                  outR <- out
-              }
-              return(outR)
-          })
-
-
-#' @importMethodsFrom SummarizedExperiment rowData
-#' @importFrom methods callNextMethod
-#' @rdname treeSummarizedExperiment-accessor
-#' @export
-setMethod("rowData", "treeSummarizedExperiment",
-          function(x, use.names = TRUE, ...) {
-              vv <- callNextMethod()
-              cv <- unlist(lapply(vv, class))
-              isInternal <- cv == "internal_rowData"
-              vv[, !isInternal, drop = FALSE]
-          })
-
-#' @importMethodsFrom SummarizedExperiment "rowData<-"
-#' @importFrom methods callNextMethod
-#' @rdname treeSummarizedExperiment-accessor
-#' @export
-setMethod("rowData", "treeSummarizedExperiment",
-          function(x, ..., value) {
-              callNextMethod()
-          })
-
-#' @rdname treeSummarizedExperiment-accessor
-#' @export
-setGeneric("linkData", function(x) {
+setGeneric("linkData", function(x, onRow = TRUE) {
     standardGeneric("linkData")
 })
 
 
-#' @rdname treeSummarizedExperiment-accessor
+#' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setMethod("linkData", signature("treeSummarizedExperiment"),
-          function(x) {
-              x@linkData
+setMethod("linkData", signature("TreeSummarizedExperiment"),
+          function(x, onRow = TRUE) {
+              if (onRow) {
+                  rD <- rowData(x)
+                  rD@LinkData
+              } else {
+                  cD <- colData(x)
+                  cD@LinkData
+              }
           })
 
-#' @rdname treeSummarizedExperiment-accessor
+#' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("treeData", function(x) {
+setGeneric("treeData", function(x, onRow = TRUE) {
     standardGeneric("treeData")
 })
 
-#' @rdname treeSummarizedExperiment-accessor
+#' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setMethod("treeData", signature("treeSummarizedExperiment"),
-          function(x) {
-              x@treeData
-          })
+setMethod("treeData", signature("TreeSummarizedExperiment"),
+          function(x, onRow = TRUE) {
+              if (onRow) {
+                  tD <- x@treeData$rowTree
 
-#' @importFrom methods callNextMethod
-#' @importFrom SummarizedExperiment assays rowData colData
-#  @importFrom BiocGenerics normalize
-#' @importFrom S4Vectors metadata
-#' @rdname treeSummarizedExperiment-accessor
-#' @export
-setMethod("[", signature(x = "treeSummarizedExperiment"),
-          function(x, i, j){
-              # Subset the traditional slots from SummarizedExperiment
-              nx <- callNextMethod()
-
-              # new slot
-              linkD <- x@linkData
-              if (!missing(i)) {
-                  if (is.character(i)) {
-                      fmt <- paste0("<", class(x),
-                                    ">[i,] index out of bounds: %s")
-                      i <- SummarizedExperiment:::.SummarizedExperiment.charbound(
-                          i, rownames(x), fmt)}
-                  i <- as.vector(i)
-                  lk <- linkD[i, , drop = FALSE]
+              } else {
+                  tD <- x@treeData$colTree
               }
 
-              # update slots
-              final <- BiocGenerics:::replaceSlots(nx,
-                                                   linkData = lk)
-
-              return(final)
+              tD
           })
 
 
 #' @keywords internal
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SummarizedExperiment show
-setMethod("show", "treeSummarizedExperiment", function(object) {
+setMethod("show", "TreeSummarizedExperiment", function(object) {
     callNextMethod()
     cat(
         "treeData:", " a phylo \n",
@@ -120,13 +58,69 @@ setMethod("show", "treeSummarizedExperiment", function(object) {
 })
 
 
+# -----------------------------------------------------------------------------
+### Accessors for LinkDataFrame
+# -----------------------------------------------------------------------------
+#' @importFrom methods callNextMethod
+#' @rdname LinkDataFrame-accessor
+#' @export
+setMethod("[", signature(x = "LinkDataFrame"),
+          function(x, i, j){
 
-#' #' @keywords internal
-#' setGeneric("show", function(x) {
-#'     standardGeneric("show")
-#' })
+              # Subset the slots from DataFrame
+              nx <- callNextMethod(x, i, j, drop = FALSE)
+
+              # subset the new slot LinkData: only on rows
+              nc <- ncol(x@LinkData)
+              jj <- seq_len(nc)
+
+              y <- x@LinkData
+              ld <- callNextMethod(y, i, jj)
+
+              # update slots
+              final <- BiocGenerics:::replaceSlots(nx,
+                                                   LinkData = ld)
+
+              return(final)
+              })
+
+#' @importFrom methods callNextMethod
+#' @rdname LinkDataFrame-accessor
+#' @export
+setMethod("as.data.frame", "LinkDataFrame", function(x) {
+    nx <- callNextMethod(x)
+    y <- x@LinkData
+    nl <- callNextMethod(y)
+    final <- cbind(nl, nx)
+    return(final)
+})
 
 
+#' @importFrom methods callNextMethod
+#' @rdname LinkDataFrame-accessor
+#' @export
+setMethod("$", signature(x = "LinkDataFrame"),
+          function(x, name){
+              nx <- callNextMethod()
+              return(nx)
+ })
+
+#' @importFrom methods callNextMethod
+#' @rdname LinkDataFrame-accessor
+#' @export
+setMethod("$<-", signature(x = "LinkDataFrame"),
+          function(x, name, value){
+              nx <- callNextMethod()
+              # update slots
+              final <- BiocGenerics:::replaceSlots(nx,
+                                                   LinkData = x@LinkData)
+              return(final)
+          })
+
+#' The show method of the class \strong{LinkDataFrame} is modified based on the
+#' codes of the show method of the class \strong{"GPos"}. The original code
+#' could be found in the
+#' https://github.com/Bioconductor/GenomicRanges/blob/master/R/GPos-class.R
 #' @keywords internal
 #' @importMethodsFrom S4Vectors show
 setMethod("show", "LinkDataFrame", function(object) {
@@ -174,30 +168,3 @@ setMethod("show", "LinkDataFrame", function(object) {
     ans
 }
 
-# .show_LinkDataFrame <- function(x){
-#
-#     x_class <- class(x)
-#     left_len <- ncol(x@LinkData)
-#     right_len <- ncol(x)
-#
-#     cat(x_class, " object with ",
-#         left_len, " link data ", ifelse(left_len == 1L, "column", "columns"),
-#         " and ",
-#         right_len, " metadata ", ifelse(right_len == 1L, "column", "columns"),
-#         ":\n", sep="")
-#
-#     out <- S4Vectors:::makePrettyMatrixForCompactPrinting(x,
-#                                                           .nakedMatrix)
-#     classX <- c(lapply(x@LinkData, class), list("|" = " "), lapply(x, class))
-#     classX <- unlist(classX)
-#
-#     classinfo <- S4Vectors:::makeClassinfoRowForCompactPrinting(x, classX)
-#     classinfo[1, "|"] <- ""
-#
-#     ## A sanity check, but this should never happen!
-#     stopifnot(identical(colnames(classinfo), colnames(out)))
-#
-#     out <- rbind(classinfo, out)
-#
-#     print(out, quote=FALSE, right=TRUE, max=length(out))
-# }
