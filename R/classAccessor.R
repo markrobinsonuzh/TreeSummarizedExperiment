@@ -86,7 +86,8 @@ NULL
 #' for the class \strong{LinkDataFrame}.
 #'
 #' @param x A \code{LinkDataFrame} object
-#'
+#' @param i,j The row, column index to subset \code{x}.
+#' @param name The name of the column.
 #' @name LinkDataFrame-accessor
 #' @return Depends on the functions
 #'

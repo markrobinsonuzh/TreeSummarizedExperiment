@@ -52,11 +52,11 @@ setClass("LinkDataFrame",
 #-------------------------------------------------------------------------------
 #' Construct a LinkDataFrame object
 #'
-#' @param LinkData A \link[S4Vectors]{DataFrame-class}.
-#' @inheritParams SummarizedExperiment::SummarizedExperiment
+#' @param LinkData A \code{\link[S4Vectors]{DataFrame-class}}.
+#' @param ... All arguments accepted by \code{\link[S4Vectors]{DataFrame}}.
 #'
 #' @importFrom S4Vectors DataFrame
-#' @rdname LinkDataFrame-constructor
+#' @name LinkDataFrame-constructor
 #' @export
 #' @return A LinkDataFrame object
 #' @seealso \code{\link{LinkDataFrame-accessor}}
@@ -141,6 +141,37 @@ setClass("TreeSummarizedExperiment",
 #' @param colTree A phylo object that provides hiearchical information of
 #'   columns of assay tables.
 #' @inheritParams SummarizedExperiment::SummarizedExperiment
+#'
+#' @details The output TreeSummarizedExperiment object has very similar
+#'   structure as the
+#'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}. The
+#'   differences are summarized be as below.
+#'   \itemize{
+#'   \item \strong{treeData} A slot exists in \code{TreeSummarizedExperiment}
+#'   but not in \code{SummarizedExperiment}. It stores the tree structure(s)
+#'   that provide(s) hierarchical information of \code{assays} rows or columns
+#'   or both.
+#'   \item \strong{rowData} If a \code{phylo} object is available in the slot
+#'   \code{treeData} to provide the hiearchical information about the rows of
+#'   the \code{assays} table, the \code{rowData} would be a
+#'   \code{\link{LinkDataFrame-class}} instead of
+#'   \code{\link[S4Vectors]{DataFrame-class}}. The data on the right side of the
+#'   vertical line provides the link information between the \code{assays} rows
+#'   and the tree \code{phylo} object, and could be accessed via
+#'   \code{linkData}; The data on the left side is the original \code{rowData}
+#'   like \code{SummarizedExperiment} object.
+#'   \item \strong{colData} Similar to the explanaition for \strong{rowData} as
+#'   above.
+#'  }
+#'  More details about the \code{LinkDataFrame} in the \code{rowData} or
+#'  \code{colData}.
+#'  \itemize{
+#'  \item nodeLab The labels of nodes on the tree.
+#'  \item nodeLab\_alias The alias of node labels on the tree.
+#'  \item nodeNum The numbers of nodes on the tree.
+#'  \item isLeaf It indicates whether the node is a leaf node or internal node.
+#'  }
+#'
 #' @importFrom SummarizedExperiment SummarizedExperiment rowData
 #' @importFrom S4Vectors DataFrame
 #' @importFrom methods new is
@@ -153,6 +184,7 @@ setClass("TreeSummarizedExperiment",
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
 #'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
 #' @examples
+#'
 #' data("tinyTree")
 #'
 #' # the count table
@@ -217,121 +249,13 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     ## create the link data
     # the rows:
     if (isRow) {
-        rowLab <- rowData(se)$nodeLab
-        treeLab <- c(rowTree$tip.label, rowTree$node.label)
-
-        # (1) The rowLab should match with the node labels of the rowTree
-        if (!is.null(rowLab)) {
-            isIn <- rowLab %in% treeLab
-            isOut <- !isIn
-            if (sum(isOut) > 0) {
-                message(sum(isOut), "rows couldn't be matched to the tree and are removed. \n")}
-            se <- se[isIn, ]
-            rowLab <- rowData(se)$nodeLab
-        }
-
-        # (2) If the nodeLab doesn't exist, the rownames should be used instead
-        if (is.null(rowLab)) {
-            rowLab <- rownames(se)
-
-            if (is.null(rowLab)) {
-                stop("Either a nodeLab column or row names should be
-                     provided for row data \n.")
-            }
-
-            isIn <- rowLab %in% treeLab
-            isOut <- !isIn
-            if (sum(isOut) > 0) {
-                message(sum(isOut), "rows couldn't be matched to the tree and are removed. \n")}
-            se <- se[isIn, ]
-            rowLab <- rownames(se)
-        }
-
-        # create the link data
-        rowLink <- DataFrame(nodeLab = rowLab,
-                           nodeNum = transNode(tree = rowTree,
-                                               input = rowLab,
-                                               message = FALSE),
-                           isLeaf = rowLab %in% rowTree$tip.label)
-
-        # the column nodeLab_alias is created if a node label is used for
-        # different node numbers
-        isDn <- duplicated(rowLink$nodeNum)
-        isDl <- duplicated(rowLink$nodeLab)
-        if (any(isDn != isDl)) {
-            rowLink$nodeLab_alias <- transNode(tree = rowTree,
-                                             input = rowLink$nodeNum,
-                                             use.alias = TRUE)}
-
-        # create the rowData
-        rd <- rowData(se)
-        rd <- rd[, colnames(rd) != "nodeLab", drop = FALSE]
-        rowData(se) <- LinkDataFrame(LinkData = rowLink, rd)
-
-    } else {
-        rd <- rowData(se)
-        rowData(se) <- rd[, colnames(rd) != "nodeLab", drop = FALSE]
-
-        }
+        se <- .linkFun(tree = rowTree, se = se, onRow = TRUE)
+    }
 
 
     # the columns:
     if (isCol) {
-        colLab <- colData(se)$nodeLab
-        treeLab <- c(colTree$tip.label, colTree$node.label)
-
-        # (1) The colLab should match with the node labels of the colTree
-        if (!is.null(colLab)) {
-            isIn <- colLab %in% treeLab
-            isOut <- !isIn
-            if (sum(isOut) > 0) {
-                message(sum(isOut), "columns couldn't be matched to the tree and are removed. \n")}
-            se <- se[, isIn ]
-            colLab <- colData(se)$nodeLab
-        }
-
-        # (2) If the nodeLab doesn't exist, the rownames should be used instead
-        if (is.null(colLab)) {
-            colLab <- colnames(se)
-
-            if (is.null(colLab)) {
-                stop("Either a nodeLab column or row names should be
-                     provided for column data \n.")
-            }
-
-            isIn <- colLab %in% treeLab
-            isOut <- !isIn
-            if (sum(isOut) > 0) {
-                message(sum(isOut), "columns couldn't be matched to the tree and are removed. \n")}
-            se <- se[, isIn]
-            colLab <- colnames(se)
-        }
-
-        # create the link data
-        colLink <- DataFrame(nodeLab = colLab,
-                             nodeNum = transNode(tree = colTree,
-                                                 input = colLab,
-                                                 message = FALSE),
-                             isLeaf = colLab %in% colTree$tip.label)
-
-        # the column nodeLab_alias is created if a node label is used for
-        # different node numbers
-        isDn <- duplicated(colLink$nodeNum)
-        isDl <- duplicated(colLink$nodeLab)
-        if (any(isDn != isDl)) {
-            colLink$nodeLab_alias <- transNode(tree = colTree,
-                                               input = colLink$nodeNum,
-                                               use.alias = TRUE)}
-
-        # create the colData
-        cd <- colData(se)
-        cd <- cd[, colnames(cd) != "nodeLab", drop = FALSE]
-        colData(se) <- LinkDataFrame(LinkData = colLink, cd)
-
-    } else {
-        cd <- colData(se)
-        colData(se) <- cd[, colnames(cd) != "nodeLab", drop = FALSE]
-
+        se <- .linkFun(tree = colTree, se = se, onRow = FALSE)
     }
 
 
@@ -344,3 +268,96 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     return(tse)
 }
 
+# An internal function to create the link data and added to the rowData or
+# colData
+.linkFun <- function(tree, se, onRow = TRUE){
+
+    if (onRow) {
+        annDat <- rowData(se)
+    } else {
+        annDat <- colData(se)
+    }
+
+    kw <- ifelse(onRow, "row", "column")
+
+    # ------------------ labels from the tree ---------------------------------
+    # the labels and the alias of the labels
+    treeLab <- c(tree$tip.label, tree$node.label)
+    nodeA <- unique(as.vector(tree$edge))
+    treeLab_alias <- transNode(tree = tree, input = nodeA,
+                               use.alias = TRUE, message = FALSE)
+
+
+
+    # ------------------ labels from the assays table -------------------------
+    # The order to be used: nodeLab_alias > nodeLab > the row names
+    # nodeLab_alias
+    lab <- as.data.frame(annDat)$nodeLab_alias
+
+    # if nodeLab_alias is not available, use nodeLab
+    if (is.null(lab)) {
+        lab <- as.data.frame(annDat)$nodeLab
+    }
+
+    # if nodeLab_alias and nodeLab are not available, use the row names
+    if (is.null(lab)) {
+        lab <- rownames(annDat)
+        if (is.null(lab)) {
+            stop("Either a nodeLab column or the row names should be
+                 provided for ", kw ," data. \n")}
+        }
+
+    # decide whether treeLab or treeLab_alias should be used
+    sw1 <- startsWith(lab, "Node_")
+    sw2 <- startsWith(lab, "Leaf_")
+    sw <- all(sw1 | sw2)
+
+    # Match lab with the alias of the node labels on the tree
+    if (sw) {
+        isIn <- lab %in% treeLab_alias
+    } else {
+        isIn <- lab %in% treeLab
+    }
+
+    # Those with labels that don't match with the node labels of the tree are
+    # excluded
+    isOut <- !isIn
+    if (sum(isOut) > 0) {
+        message(sum(isOut), " ", kw,
+                "(s) couldn't be matched to the tree and are/is removed. \n")}
+
+    if (onRow) {
+        se <- se[isIn, ]
+    } else {
+        se <- se[, isIn]
+    }
+
+
+    # create the link data
+    labN <- lab[isIn]
+    nd <- transNode(tree = tree, input = labN, use.alias = FALSE,
+                    message = FALSE)
+    fLab <- transNode(tree = tree, input = nd, use.alias = FALSE,
+                      message = FALSE)
+    faLab <- transNode(tree = tree, input = nd, use.alias = TRUE,
+                       message = FALSE)
+    leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
+
+    linkD <- DataFrame(nodeLab = fLab,
+                       nodeLab_alias = faLab,
+                       nodeNum = nd,
+                       isLeaf = nd %in% leaf)
+
+
+    # create the rowData
+    rd <- annDat[isIn, ]
+    rd <- rd[, colnames(rd) != "nodeLab", drop = FALSE]
+
+    if (onRow) {
+        rowData(se) <- LinkDataFrame(LinkData = linkD, rd)
+    } else {
+        colData(se) <- LinkDataFrame(LinkData = linkD, rd)
+    }
+
+    return(se)
+    }

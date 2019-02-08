@@ -11,15 +11,25 @@ setGeneric("linkData", function(x, onRow = TRUE) {
 
 
 #' @rdname TreeSummarizedExperiment-accessor
+#' @importFrom methods is
 #' @export
 setMethod("linkData", signature("TreeSummarizedExperiment"),
           function(x, onRow = TRUE) {
               if (onRow) {
                   rD <- rowData(x)
-                  rD@LinkData
+
+                  # extract LinkData if LinkDataFrame, otherwise return NULL
+                  if (is(rD, "LinkDataFrame")) {
+                      rD@LinkData
+                  } else { NULL }
+
               } else {
                   cD <- colData(x)
-                  cD@LinkData
+
+                  # extract LinkData if LinkDataFrame, otherwise return NULL
+                  if (is(cD, "LinkDataFrame")) {
+                      cD@LinkData
+                  } else { NULL }
               }
           })
 
@@ -43,16 +53,66 @@ setMethod("treeData", signature("TreeSummarizedExperiment"),
               tD
           })
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("metaCol", function(x, onRow = TRUE) {
+    standardGeneric("metaCol")
+})
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @importFrom methods is
+#' @importFrom S4Vectors DataFrame
+#' @export
+setMethod("metaCol", signature("TreeSummarizedExperiment"),
+          function(x, onRow = TRUE) {
+              if (onRow) {
+
+                  rD <- rowData(x)
+                  if (is(rD, "LinkDataFrame")) {
+                      rD1 <- as.data.frame(rD)
+                      rD2 <- rD1[, colnames(rD1) %in% colnames(rD)]
+                      DataFrame(rD2)
+                  } else { rD }
+
+              } else {
+
+                  cD <- colData(x)
+                  if (is(cD, "LinkDataFrame")) {
+                      cD1 <- as.data.frame(cD)
+                      cD2 <- cD1[, colnames(cD1) %in% colnames(cD)]
+                      DataFrame(cD2)
+                  } else { cD }
+
+              }})
 #' @keywords internal
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SummarizedExperiment show
 setMethod("show", "TreeSummarizedExperiment", function(object) {
     callNextMethod()
+
+    rt <- treeData(object, onRow = TRUE)
+    ct <- treeData(object, onRow = FALSE)
+
+
+    if (is.null(rt)) {
+        msg1 <- ""
+        nt1 <- 0
+    } else {
+        msg1 <- "exists in rowData. \n"
+        nt1 <- 1
+        }
+
+    if (is.null(ct)) {
+        msg2 <- ""
+        nt2 <- 0
+    } else {
+        msg2 <- "exists in colData. \n"
+        nt2 <- 1
+        }
+
     cat(
-        "treeData:", " a phylo \n",
-        "linkData:", " a ", class(linkData(object)), " with ",
-        ncol(linkData(object)), " columns \n",
+        "treeData: ", nt1, " row tree; ", nt2, " column tree. \n",
+        "linkData: ", msg1, msg2,
         sep=""
     )
 })
@@ -91,7 +151,13 @@ setMethod("as.data.frame", "LinkDataFrame", function(x) {
     nx <- callNextMethod(x)
     y <- x@LinkData
     nl <- callNextMethod(y)
-    final <- cbind(nl, nx)
+
+    if (sum(dim(nx))) {
+        final <- cbind(nl, nx)
+    } else {
+        final <- nl
+    }
+
     return(final)
 })
 
