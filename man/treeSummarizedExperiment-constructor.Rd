@@ -28,7 +28,39 @@ a TreeSummarizedExperiment object
 \description{
 \code{TreeSummarizedExperiment} constructs a TreeSummarizedExperiment object.
 }
+\details{
+The output TreeSummarizedExperiment object has very similar
+  structure as the
+  \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}. The
+  differences are summarized be as below.
+  \itemize{
+  \item \strong{treeData} A slot exists in \code{TreeSummarizedExperiment}
+  but not in \code{SummarizedExperiment}. It stores the tree structure(s)
+  that provide(s) hierarchical information of \code{assays} rows or columns
+  or both.
+  \item \strong{rowData} If a \code{phylo} object is available in the slot
+  \code{treeData} to provide the hiearchical information about the rows of
+  the \code{assays} table, the \code{rowData} would be a
+  \code{\link{LinkDataFrame-class}} instead of
+  \code{\link[S4Vectors]{DataFrame-class}}. The data on the right side of the
+  vertical line provides the link information between the \code{assays} rows
+  and the tree \code{phylo} object, and could be accessed via
+  \code{linkData}; The data on the left side is the original \code{rowData}
+  like \code{SummarizedExperiment} object.
+  \item \strong{colData} Similar to the explanaition for \strong{rowData} as
+  above.
+ }
+ More details about the \code{LinkDataFrame} in the \code{rowData} or
+ \code{colData}.
+ \itemize{
+ \item nodeLab The labels of nodes on the tree.
+ \item nodeLab\_alias The alias of node labels on the tree.
+ \item nodeNum The numbers of nodes on the tree.
+ \item isLeaf It indicates whether the node is a leaf node or internal node.
+ }
+}
 \examples{
+
 data("tinyTree")
 
 # the count table

@@ -6,6 +6,8 @@
 \alias{linkData,TreeSummarizedExperiment-method}
 \alias{treeData}
 \alias{treeData,TreeSummarizedExperiment-method}
+\alias{metaCol}
+\alias{metaCol,TreeSummarizedExperiment-method}
 \alias{TreeSummarizedExperiment-accessor}
 \title{TreeSummarizedExperiment-accessors}
 \usage{
@@ -16,6 +18,10 @@ linkData(x, onRow = TRUE)
 treeData(x, onRow = TRUE)
 
 \S4method{treeData}{TreeSummarizedExperiment}(x, onRow = TRUE)
+
+metaCol(x, onRow = TRUE)
+
+\S4method{metaCol}{TreeSummarizedExperiment}(x, onRow = TRUE)
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
