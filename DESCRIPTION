@@ -21,12 +21,11 @@ RoxygenNote: 6.1.1
 Collate: 
     'classValid.R'
     'allClass.R'
+    'aggValue.R'
     'allGenerics.R'
     'classAccessor.R'
     'data.R'
-    'nodeValue.R'
     'toTree.R'
-    'toTreeSummarizedExperiment.R'
     'tree_findAncestor.R'
     'tree_findOS.R'
     'tree_findSibling.R'
