@@ -9,7 +9,11 @@
 #'   equals to the number of internal node, and each of its element stores the
 #'   descendant leaves.
 #'
+#' @details The last column is used as the leaf nodes if the row names of the
+#'   input \code{data} are not availabel; otherwise, the row names is used as
+#'   the leaf nodes.
 #' @importFrom utils head tail
+#' @importFrom dplyr arrange_all
 #' @return a phylo object
 #' @author Ruizhu HUANG
 #' @export
@@ -29,12 +33,14 @@
 
 toTree <- function(data, cache = FALSE) {
 
-    # change to matrix
+    # arrange data
     data <- as.matrix(data)
     data <- apply(data, 2, FUN = function(x) {
         x[x == "NA"] <- NA
         return(x)
     })
+
+    data <- arrange_all(data.frame(data, stringsAsFactors = FALSE))
     # input NA with the value in the previous level
     if (any(is.na(data))) {
         cn <- colnames(data)
@@ -47,9 +53,9 @@ toTree <- function(data, cache = FALSE) {
                 uy <- apply(y, 1, FUN = function(x) {
                     xx <- x[!is.na(x)]
                     nax <- sum(is.na(x))
-                    paste(tail(xx, 1), NA, nax, sep = " - ")
+                    paste(tail(xx, 1), NA, nax, sep = ":")
                 })
-                #xx[ii] <- paste(uy, NA, sep = " - ")
+                #xx[ii] <- paste(uy, NA, sep = ":")
                 xx[ii] <- uy
             }
             return(xx)
@@ -84,7 +90,7 @@ toTree <- function(data, cache = FALSE) {
     datL1 <- lapply(seq_len(nc), FUN = function(x) {
         xx <- data[, x]
         nam <- colnames(data)[x]
-        paste(nam, "-", xx)
+        paste(nam, xx, sep = ":")
     })
     datL2 <- do.call(cbind, datL1)
 

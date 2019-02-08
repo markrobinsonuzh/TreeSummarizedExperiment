@@ -24,18 +24,21 @@ checkTSE <- function(object){
     # -------------------------------------------------------------------------
     #  Tree should be a phylo object
     if (!is.null(object@treeData)) {
-        if (!inherits(object@treeData, "phylo")) {
-            msg <- cat("\n tree is not a phylo object")
+        treeD <- object@treeData
+        classD <- lapply(treeD, class)
+        classD <- unique(unlist(classD))
+        isP <- all(classD %in% c("phylo", "NULL"))
+        if (!isP) {
+            msg <- cat("\n treeData should be a list of phylo objects")
         }
 
         # The leaf nodes should have unique label.
-        tree <- object@treeData
-        tipLab <- tree$tip.label
-        isDp <- duplicated(tipLab)
-        anyDp <- any(isDp)
+        tipLab <- lapply(treeD, FUN = function(x) {x$tip.label})
+        isDp <- lapply(tipLab, FUN = function(x){any(duplicated(x))})
+        anyDp <- any(unlist(isDp))
+
         if (anyDp) {
-            msg <- cat("\n Different leaf nodes using the same label: ",
-                       head(tipLab[isDp])," \n")
+            msg <- cat("\n Duplicated labels are found in the tree. \n")
             errors <- c(errors, msg)
         }
     }
@@ -44,15 +47,15 @@ checkTSE <- function(object){
     # -------------------------------------------------------------------------
     # if the linkData exists, a column nodeLab_alias should be generated if
     # there are duplicated value in the nodeLab column
-    lk <- object@linkData
-    if (!is.null(lk)) {
-        if (anyDuplicated(lk$nodeLab)) {
-            if (is.null(lk$nodeLab_alias)) {
-                msg <- cat("\n Duplicated values in the column nodeLab. \n")
-                errors <- c(errors, msg)
-            }
-        }
-    }
+    # lk <- object@linkData
+    # if (!is.null(lk)) {
+    #     if (anyDuplicated(lk$nodeLab)) {
+    #         if (is.null(lk$nodeLab_alias)) {
+    #             msg <- cat("\n Duplicated values in the column nodeLab. \n")
+    #             errors <- c(errors, msg)
+    #         }
+    #     }
+    # }
 
     # -------------------------------------------------------------------------
     # Note : duplicated value in nodeLab column is allowed because we might

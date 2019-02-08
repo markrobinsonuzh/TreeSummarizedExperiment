@@ -6,27 +6,26 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-Depends: R(>= 3.5.0), SummarizedExperiment
+Depends: R(>= 3.5.0), SummarizedExperiment, S4Vectors
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
 Imports:
-    S4Vectors,
     methods,
     utils,
-    ape
+    ape,
+    dplyr
 VignetteBuilder: knitr
 Suggests: ggtree, BiocStyle, knitr, rmarkdown
 RoxygenNote: 6.1.1
 Collate: 
     'classValid.R'
     'allClass.R'
+    'aggValue.R'
     'allGenerics.R'
     'classAccessor.R'
     'data.R'
-    'nodeValue.R'
     'toTree.R'
-    'toTreeSummarizedExperiment.R'
     'tree_findAncestor.R'
     'tree_findOS.R'
     'tree_findSibling.R'

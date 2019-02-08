@@ -1,66 +1,122 @@
 
-# -----------------------------------------------------------------------------
-### Documentation of the accessor function
-### Function code is in the file allGenerics.R
-# -----------------------------------------------------------------------------
+# ============================================================================
+### The documentation of accessor functions
+### The corresponding codes are in the file allGenerics.R
+# ============================================================================
 
 # -----------------------------------------------------------------------------
-### treeSummarizedExperiment
+### TreeSummarizedExperiment
 # -----------------------------------------------------------------------------
-#' Accessor functions for treeSummarizedExperiment
+#' TreeSummarizedExperiment-accessors
 #'
-#' Accessor functions to extract different elements from
-#' \strong{treeSummarizedExperiment} object.
+#' All accessor functions that work on
+#' \code{\link[SummarizedExperiment]{SummarizedExperiment-class}} should work on
+#' \strong{TreeSummarizedExperiment}. Additionally, two new \code{linkData} and
+#' \code{treeData} accessor function are available for
+#' \strong{TreeSummarizedExperiment}.
 #'
-#' @param x A treeSummarizedExperiment object
-#' @param ... For assay, ... contains \code{use.nodeLab}, which is forwarded to
-#'   assays. For rowData, arguments passed through ... are forwarded to mcols.
-#' @param use.nodeLab A logical(1), indicating whether the rownames of assay
-#'   elements should use node labels (the column \code{nodeLab} in
-#'   \code{linkData} if there is not duplicated values; otherwise the column
-#'   \code{nodeLab_alias} in \code{linkData} is used.)
-#' @param withDimnames A logical(1), indicating whether dimnames should be
-#'   applied to extracted assay elements. Setting withDimnames=FALSE increases
-#'   the speed and memory efficiency with which assays are extracted.
-#'   withDimnames=TRUE in the getter assays<- allows efficient complex
-#'   assignments (e.g., updating names of assays, names(assays(x,
-#'   withDimnames=FALSE)) = ... is more efficient than names(assays(x)) = ...);
-#'   it does not influence actual assignment of dimnames to assays.
-#' @param value An object of a class specified in the S4 method signature or as
-#'   outlined in 'Details'.
-#' @param i,j The subscripts that can act to subset the rows and columns of
-#'   \code{x}, that is the matrix elements of assays.
-#' @name treeSummarizedExperiment-accessor
-#' @return Elements from \code{treeSummarizedExperiment}.
-#' @author Ruizhu HUANG
-#' @seealso \code{\link{treeSummarizedExperiment}}
-#'   \code{\link{treeSummarizedExperiment-accessor}}
+#' @param x A TreeSummarizedExperiment object
+#' @param onRow A logical(1) value, TRUE or FALSE. The default is TRUE. It
+#'   indicates the returned \code{treeData} or \code{linkData} is on rows (TRUE)
+#'   or columns (FALSE) of \code{assays} tables.
+#'
+#' @name TreeSummarizedExperiment-accessor
+#' @return Elements from \code{TreeSummarizedExperiment}.
+#' @seealso \code{\link{TreeSummarizedExperiment}}
 #'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
+#'
+#' @author Ruizhu HUANG
 #' @examples
-#' library(S4Vectors)
+#'
+#' # the assay table
 #' set.seed(1)
 #' y <- matrix(rnbinom(300,size=1,mu=10),nrow=10)
 #' colnames(y) <- paste(rep(LETTERS[1:3], each = 10), rep(1:10,3), sep = "_")
 #' rownames(y) <- tinyTree$tip.label
 #'
-#' rowInf <- DataFrame(nodeLab = rownames(y),
-#'                     var1 = sample(letters[1:3], 10, replace = TRUE),
+#' # the row data
+#' rowInf <- DataFrame(var1 = sample(letters[1:3], 10, replace = TRUE),
 #'                     var2 = sample(c(TRUE, FALSE), 10, replace = TRUE))
+#' # the column data
 #' colInf <- DataFrame(gg = factor(sample(1:3, 30, replace = TRUE)),
 #'                     group = rep(LETTERS[1:3], each = 10))
-#' toy_tse <- treeSummarizedExperiment(tree = tinyTree, rowData = rowInf,
+#'
+#' # the tree structure on the rows of assay tables
+#' data("tinyTree")
+#'
+#' # the tree structure on the columns of assay tables
+#' sampTree <- ape::rtree(30)
+#' sampTree$tip.label <- colnames(y)
+#'
+#' # create the TreeSummarizedExperiment object
+#' rowInf$nodeLab <- rownames(y)
+#' colInf$nodeLab <- colnames(y)
+#' toy_tse <- TreeSummarizedExperiment(assays = list(y),
+#'                                     rowData = rowInf,
 #'                                     colData = colInf,
-#'                                     assays = list(y, (2*y), 3*y))
-#' rowData(toy_tse)
-#' colData(toy_tse)
-#' metadata(toy_tse)
-#' linkData(toy_tse)
-#' assays(toy_tse)
+#'                                     rowTree = tinyTree,
+#'                                     colTree = sampTree)
+#'
+#' ## extract the rowData
+#' (rowD <- rowData(x = toy_tse))
+#'
+#' ## extract the colData
+#' (colD <- colData(x = toy_tse))
+#'
+#' ## extract the linkData
+#' # on rows
+#' (rowL <- linkData(x = toy_tse, onRow = TRUE))
+#' # on columns
+#' (colL <- linkData(x = toy_tse, onRow = FALSE))
+#'
+#'  ## extract the treeData
+#' # on rows
+#' (rowT <- treeData(x = toy_tse, onRow = TRUE))
+#' # on columns
+#' (colT <- treeData(x = toy_tse, onRow = FALSE))
+#'
 NULL
 
-
-# @param internal TRUE or FALSE. Only for \code{rowData}. If TRUE, the columns
-# with \code{int_rowData} class are visible; otherwise, they would be hiden.
-# These columns are usually result tables that users obtain from their
-# customized analysis and  are written back to the
-# \code{treeSummarizedExperiment} object that stores the original data.
+# -----------------------------------------------------------------------------
+### LinkDataFrame
+# -----------------------------------------------------------------------------
+#' LinkDataFrame-accessor
+#'
+#' This page lists the accesssor, coercion, subsetting and combining functions
+#' for the class \strong{LinkDataFrame}.
+#'
+#' @param x A \code{LinkDataFrame} object
+#' @param i,j The row, column index to subset \code{x}.
+#' @param name The name of the column.
+#' @name LinkDataFrame-accessor
+#' @return Depends on the functions
+#'
+#' @author Ruizhu HUANG
+#' @seealso \code{\link{LinkDataFrame-constructor}}
+#'   \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame}}
+#' @examples
+#'
+#' left <- DataFrame(left1 = 1:5, left2 = letters[1:5])
+#' right <- DataFrame(right1 = sample(letters[1:3], 5, replace = TRUE),
+#'                   right2 = sample(c(TRUE, FALSE), 5, replace = TRUE),
+#'                   right3 = 11:15)
+#'
+#' ld <- LinkDataFrame(LinkData = left, right)
+#'
+#' ## subset
+#' # by rows
+#' (ld1 <- ld[1:3, ])
+#' # by columns (only on the right side of the vertical line)
+#' (ld2 <- ld[, c(1, 3)])
+#' (ld3 <- ld[, c("right1", "right2")])
+#'
+#' ## add a new column (only on the right side of the vertical line)
+#' ld4 <- ld
+#' ld4$right4 <- 11:15
+#' ld4
+#'
+#' ## coercion
+#' (ld5 <- as.data.frame(ld))
+#'
+#'
+NULL
