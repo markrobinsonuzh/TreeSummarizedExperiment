@@ -201,7 +201,7 @@ the `SummarizedExperiment` class.
 (mdata <- metadata(tse))
 ```
 
-### Row data, column 
+### rowData, colData
 
 The row data and column data could be accessed via `rowData` and `colData`,
 respectively. This is also the same as the work on the `SummarizedExperiment`
@@ -459,5 +459,34 @@ We could coerce the `LinkDataFrame` class into a `data.frame` class as below.
 ld <- as.data.frame(rData)
 ld
 ```
+
+To construct a `LinkDataFrame` object, the function `LinkDataFrame` could be
+used.
+```{r}
+aa <- 1:4
+bb <- letters[aa]
+cc <- LETTERS[aa]
+
+# the right part
+rp <- DataFrame( name = cc)
+
+# the left part
+lp <- DataFrame(value = aa, class = bb)
+
+# construct the object
+df <- LinkDataFrame(LinkData = rp, lp)
+df
+```
+
+The right part of the `LinkDataFrame` could be directly accessed or changed. However, the left part is fixed once the object is built.
+
+```{r}
+df$value
+
+df[1, "value"] <- 11
+
+df$new <- rep("nn", nrow(df))
+```
+
 
 ## More about the small functions on the `phylo` object.
