@@ -9,9 +9,7 @@
 #'   equals to the number of internal node, and each of its element stores the
 #'   descendant leaves.
 #'
-#' @details The last column is used as the leaf nodes if the row names of the
-#'   input \code{data} are not availabel; otherwise, the row names is used as
-#'   the leaf nodes.
+#' @details The last column is used as the leaf nodes
 #' @importFrom utils head tail
 #' @importFrom dplyr arrange_all
 #' @return a phylo object
@@ -41,6 +39,7 @@ toTree <- function(data, cache = FALSE) {
     })
 
     data <- arrange_all(data.frame(data, stringsAsFactors = FALSE))
+
     # input NA with the value in the previous level
     if (any(is.na(data))) {
         cn <- colnames(data)
@@ -66,12 +65,13 @@ toTree <- function(data, cache = FALSE) {
 
 
     # decide the leaf
-    vleaf <- rownames(data)
-    if (is.null(vleaf)) {
-        warning("data has no rownames; Last column is used as leaf nodes. ")
-        vleaf <- data[, ncol(data)]
-    }
+    #vleaf <- rownames(data)
+    # if (is.null(vleaf)) {
+    #     warning("data has no rownames; Last column is used as leaf nodes. ")
+    #     vleaf <- data[, ncol(data)]
+    # }
 
+    vleaf <- data[, ncol(data)]
     if (anyDuplicated(vleaf)) {
         stop("Not allow to use the same label for different leaf nodes. \n")
     }
