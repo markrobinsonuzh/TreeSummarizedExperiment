@@ -22,9 +22,7 @@ a phylo object
 \code{toTree} translates a data frame to a phylo object
 }
 \details{
-The last column is used as the leaf nodes if the row names of the
-  input \code{data} are not availabel; otherwise, the row names is used as
-  the leaf nodes.
+The last column is used as the leaf nodes
 }
 \examples{
 

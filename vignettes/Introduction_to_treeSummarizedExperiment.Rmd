@@ -297,7 +297,9 @@ blue texts in Figure \@ref(fig:ctree)). We could further decide how to aggregate
 via the argument `FUN`.
 
 ```{r}
-aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"), FUN = sum)
+aggCol <- aggValue(x = tse, 
+                   colLevel = c("GroupA", "GroupB"),
+                   FUN = sum)
 
 # or
 aggCol <- aggValue(x = tse, colLevel = c(6, 7), FUN = sum)
