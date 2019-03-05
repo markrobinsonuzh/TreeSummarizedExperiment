@@ -103,6 +103,8 @@
     }
 
     ## ---------------------- get all data ready ------------------------------
+    if (message) {message("Preparing data... ")}
+
     ## The assay tables
     mat <- assays(x)
 
@@ -119,6 +121,9 @@
     } else {
         if (!is.null(rowLevel)) {
             onRow <- TRUE
+            if (message) {
+                message("Perform aggregation on the row dimension... ")
+                }
         } else {
             onRow <- FALSE
         }
@@ -133,6 +138,9 @@
     } else {
         if (!is.null(colLevel)) {
             onCol <- TRUE
+            if (message) {
+                message("Perform aggregation on the column dimension... ")
+            }
         } else {
             onCol <- FALSE
         }
@@ -151,7 +159,8 @@
                         mCol = rowM,
                         linkData = rowL,
                         level = rowLevel,
-                        FUN = FUN)
+                        FUN = FUN,
+                        message = message)
         newRD <- outR$LinkDF
         mat <- outR$dataTab
 
@@ -222,7 +231,7 @@
 
 
 .aggFun <- function(tree, assayTab, mCol, linkData,
-                    level, FUN) {
+                    level, FUN, message = FALSE) {
 
     # The link information via nodeNum
     numR <- linkData$nodeNum
@@ -255,6 +264,10 @@
 
     ## Perform the aggregation
     # on the assay tables
+
+    if (message) {
+        message("Working on the assays table... ")}
+
     outR <- vector("list", length(assayTab))
     names(outR) <- names(assayTab)
 
@@ -262,6 +275,12 @@
     for (i in seq_along(outR)) {
         mi <- assayTab[[i]]
         oi <- lapply(seq_along(idR), FUN = function(x) {
+
+            if (message) {
+                message(x, " out of ", length(idR),
+                        " finished", "\r", appendLF = FALSE)
+                flush.console()
+            }
 
             mx <- mi[idR[[x]], , drop = FALSE]
             ax <- apply(mx, 2, FUN = FUN)
@@ -283,15 +302,29 @@
     }
 
     # on the row data
+    if (message) {
+        message("Working on the row/column data... ")}
+
     if (!is.null(mCol)) {
         nc <- ncol(mCol)
         rnCol <- mCol[rep(1, sum(ll)), ]
         for (i in seq_len(nc)) {
             ri <- lapply(seq_along(idR), FUN = function(x) {
+                if (message) {
+                    message(x, " out of ", length(idR),
+                            " finished", "\r", appendLF = FALSE)
+                    flush.console()
+                }
+
                 xx <- idR[[x]]
                 rx <- mCol[xx, i]
                 ru <- unique(rx)
-                ui <- ifelse(length(ru) > 1, NA, ru)
+                if (length(ru) > 1) {
+                    ui <- NA
+                } else {
+                    ui <- ru
+                }
+                #ui <- ifelse(length(ru) > 1, NA, ru)
                 ul <- rep(ui, ll[x])
                 return(ul)
             })
@@ -354,6 +387,7 @@
 #'   out the running process.
 #'
 #' @importFrom SummarizedExperiment colData rowData 'colData<-' 'rowData<-'
+#' @importFrom utils flush.console
 #' @return A \code{TreeSummarizedExperiment} object or a
 #'   \code{matrix}. The output has the same class of the input \code{x}.
 #' @export
