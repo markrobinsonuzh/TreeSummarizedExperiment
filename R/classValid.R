@@ -43,20 +43,6 @@ checkTSE <- function(object){
         }
     }
 
-
-    # -------------------------------------------------------------------------
-    # if the linkData exists, a column nodeLab_alias should be generated if
-    # there are duplicated value in the nodeLab column
-    # lk <- object@linkData
-    # if (!is.null(lk)) {
-    #     if (anyDuplicated(lk$nodeLab)) {
-    #         if (is.null(lk$nodeLab_alias)) {
-    #             msg <- cat("\n Duplicated values in the column nodeLab. \n")
-    #             errors <- c(errors, msg)
-    #         }
-    #     }
-    # }
-
     # -------------------------------------------------------------------------
     # Note : duplicated value in nodeLab column is allowed because we might
     # have multiple rows corresponding to a same leaf.
