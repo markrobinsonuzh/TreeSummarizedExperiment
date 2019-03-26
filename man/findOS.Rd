@@ -4,20 +4,20 @@
 \alias{findOS}
 \title{Find descendants (or offsprings)}
 \usage{
-findOS(tree, ancestor, only.Tip = TRUE, self.include = TRUE,
+findOS(tree, node, only.leaf = TRUE, self.include = FALSE,
   use.alias = FALSE)
 }
 \arguments{
 \item{tree}{A phylo object.}
 
-\item{ancestor}{An internal node. It could be the node number or the node
+\item{node}{An internal node. It could be the node number or the node
 label.}
 
-\item{only.Tip}{A logical value, TRUE or FALSE. The default is TRUE. If
+\item{only.leaf}{A logical value, TRUE or FALSE. The default is TRUE. If
 default, only the leaf nodes in the descendant nodes would be returned.}
 
-\item{self.include}{A logical value, TRUE or FALSE. The default is TRUE. If
-default, the node specified in \strong{ancestor} is included. The leaf node
+\item{self.include}{A logical value, TRUE or FALSE. The default is FALSE. If
+TRUE, the node specified in \strong{node} is included and the leaf node
 itself is returned as its descendant.}
 
 \item{use.alias}{A logical value, TRUE or FALSE. The default is FALSE, and
@@ -47,7 +47,7 @@ geom_hilight(node = 17, fill = 'steelblue', alpha = 0.5) +
 geom_text2(aes(label = label), color = "darkorange",
            hjust = -0.1, vjust = -0.7)
 
-(tips <- findOS(tree = tinyTree, ancestor = c(17), only.Tip = TRUE))
+(tips <- findOS(tree = tinyTree, node = c(17), only.leaf = TRUE))
 }
 \author{
 Ruizhu Huang

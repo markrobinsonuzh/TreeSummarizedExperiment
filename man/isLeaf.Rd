@@ -4,15 +4,15 @@
 \alias{isLeaf}
 \title{To test whether the specified nodes are leaf nodes}
 \usage{
-isLeaf(tree, input)
+isLeaf(tree, node)
 }
 \arguments{
 \item{tree}{A phylo object.}
 
-\item{input}{A numeric or character vector. Node labels or node numbers.}
+\item{node}{A numeric or character vector. Node labels or node numbers.}
 }
 \value{
-a logical vector with the same length as input
+a logical vector with the same length as the input \code{node}.
 }
 \description{
 \code{isLeaf} is to test wheter some specified nodes are leaf nodes of a
@@ -30,8 +30,8 @@ ggtree(tinyTree,branch.length = 'none')+
     geom_text2(aes(label = node), color = "darkblue",
                hjust = -0.5, vjust = 0.7)
 
-isLeaf(tree = tinyTree, input = c(5, 4, 18))
-isLeaf(tree = tinyTree, input = c("t4", "t9", "Node_18" ))
+isLeaf(tree = tinyTree, node = c(5, 4, 18))
+isLeaf(tree = tinyTree, node = c("t4", "t9", "Node_18" ))
 
 }
 \author{
