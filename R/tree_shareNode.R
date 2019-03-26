@@ -53,7 +53,7 @@ shareNode <- function(tree, node,
 
     # transfer node label to node number
     if (is.character(node)) {
-        node <- transNode(tree, input = node,
+        node <- transNode(tree, node = node,
                           message = FALSE)
     } else {
         node <- node
@@ -75,13 +75,20 @@ shareNode <- function(tree, node,
     # the ancestor on the lowest level (the root has the highest level)
     vec <- as.vector(mat)
     count <- table(vec, useNA = "no")[loc]
-    df <- as.data.frame(count, stringsAsFactors = FALSE)
+    if (length(count) == 1) {
+        af <- as.data.frame(count, stringsAsFactors = FALSE)
+        df <- data.frame(vec = as.numeric(rownames(af)),
+                         Freq = af$count)
+    } else {
+        df <- as.data.frame(count, stringsAsFactors = FALSE)
+    }
+
 
     # select the node with the lowest frequency.  closest to the leaf level.
     out <- as.numeric(df[df$Freq == min(df$Freq), "vec"])
 
     # final output
-    names(out) <- transNode(tree = tree, input = out,
+    names(out) <- transNode(tree = tree, node = out,
                             use.alias = use.alias,
                             message = FALSE)
     return(out)

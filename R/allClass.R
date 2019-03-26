@@ -284,7 +284,7 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     # the labels and the alias of the labels
     treeLab <- c(tree$tip.label, tree$node.label)
     nodeA <- unique(as.vector(tree$edge))
-    treeLab_alias <- transNode(tree = tree, input = nodeA,
+    treeLab_alias <- transNode(tree = tree, node = nodeA,
                                use.alias = TRUE, message = FALSE)
 
 
@@ -335,11 +335,11 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
 
     # create the link data
     labN <- lab[isIn]
-    nd <- transNode(tree = tree, input = labN, use.alias = FALSE,
+    nd <- transNode(tree = tree, node = labN, use.alias = FALSE,
                     message = FALSE)
-    fLab <- transNode(tree = tree, input = nd, use.alias = FALSE,
+    fLab <- transNode(tree = tree, node = nd, use.alias = FALSE,
                       message = FALSE)
-    faLab <- transNode(tree = tree, input = nd, use.alias = TRUE,
+    faLab <- transNode(tree = tree, node = nd, use.alias = TRUE,
                        message = FALSE)
     leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
 

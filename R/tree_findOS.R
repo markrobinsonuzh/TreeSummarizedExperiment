@@ -2,13 +2,13 @@
 #'
 #' \code{findOS} finds descendants of a node.
 #'
-#' @param ancestor An internal node. It could be the node number or the node
+#' @param node An internal node. It could be the node number or the node
 #'   label.
 #' @param tree A phylo object.
-#' @param only.Tip A logical value, TRUE or FALSE. The default is TRUE. If
+#' @param only.leaf A logical value, TRUE or FALSE. The default is TRUE. If
 #'   default, only the leaf nodes in the descendant nodes would be returned.
-#' @param self.include A logical value, TRUE or FALSE. The default is TRUE. If
-#'   default, the node specified in \strong{ancestor} is included. The leaf node
+#' @param self.include A logical value, TRUE or FALSE. The default is FALSE. If
+#'   TRUE, the node specified in \strong{node} is included and the leaf node
 #'   itself is returned as its descendant.
 #' @param use.alias A logical value, TRUE or FALSE. The default is FALSE, and
 #'   the node label would be used to name the output; otherwise, the alias of
@@ -34,33 +34,33 @@
 #' geom_text2(aes(label = label), color = "darkorange",
 #'            hjust = -0.1, vjust = -0.7)
 #'
-#' (tips <- findOS(tree = tinyTree, ancestor = c(17), only.Tip = TRUE))
+#' (tips <- findOS(tree = tinyTree, node = c(17), only.leaf = TRUE))
 
 findOS <- function(tree,
-                   ancestor,
-                   only.Tip = TRUE,
-                   self.include = TRUE,
+                   node,
+                   only.leaf = TRUE,
+                   self.include = FALSE,
                    use.alias = FALSE) {
 
     if (!inherits(tree, "phylo")) {
         stop("tree: should be a phylo object")
     }
 
-    if (!(is.character(ancestor) |
-          is.numeric(ancestor) |
-          is.integer(ancestor))) {
-        stop("ancestor should be character or numeric")
+    if (!(is.character(node) |
+          is.numeric(node) |
+          is.integer(node))) {
+        stop("The argument (node) should be character or numeric")
     }
     # the edge matrix
     mat <- tree$edge
     matN <- matTree(tree = tree)
 
-    if (is.character(ancestor)) {
-        numA <- transNode(tree = tree, input = ancestor,
+    if (is.character(node)) {
+        numA <- transNode(tree = tree, node = node,
                           use.alias = TRUE,
                           message = FALSE)
     } else {
-        numA <- ancestor
+        numA <- node
         isOut <- !numA %in% mat
         if (any(isOut)) {
             stop("Node ", numA,
@@ -86,7 +86,7 @@ findOS <- function(tree,
 
     matNN <- apply(matN, 2, FUN = function(x) {
         xe <- x[!is.na(x)]
-        xx <- transNode(tree = tree, input = xe,
+        xx <- transNode(tree = tree, node = xe,
                         use.alias = use.alias,
                         message = FALSE)
         x[!is.na(x)] <- xx
@@ -107,19 +107,24 @@ findOS <- function(tree,
          }
 
         # only leaf nodes
-        if (only.Tip) {
+        if (only.leaf) {
             y <- intersect(y, tipA)
             }
+
 
         # index those kept
         ii <-  y0 %in% y
         xi <- xx[ii, , drop = FALSE]
-        names(y) <- matNN[xi]
-        return(y)
+
+        yy <- y0[ii]
+        names(yy) <- matNN[xi]
+
+        uy <- unique(yy)
+        return(uy)
     })
 
     # final output (node number or label)
-    names(desA) <- transNode(tree = tree, input = numA,
+    names(desA) <- transNode(tree = tree, node = numA,
                              use.alias = use.alias,
                              message = FALSE)
     return(desA)

@@ -44,7 +44,7 @@ findAncestor <- function(tree, node, level,
 
 
     if (is.character(node)) {
-        node <- transNode(tree = tree, input = node,
+        node <- transNode(tree = tree, node = node,
                             use.alias = TRUE,
                             message = FALSE)
     }
@@ -88,7 +88,7 @@ findAncestor <- function(tree, node, level,
 
     # return a vector of the found node (the node number of the node)
     # name the vector with the node label
-    names(out) <- transNode(tree = tree, input = out,
+    names(out) <- transNode(tree = tree, node = out,
                             use.alias = use.alias,
                             message = FALSE)
     return(out)
