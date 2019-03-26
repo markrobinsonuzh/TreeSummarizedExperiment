@@ -57,7 +57,7 @@ signalNode <- function(tree, node,
 
     # transfer node label to node number
     if (is.character(node)) {
-        node <- transNode(tree, input = node,
+        node <- transNode(tree, node = node,
                           message = FALSE)
     } else {
         node <- node
@@ -87,7 +87,7 @@ signalNode <- function(tree, node,
     out <- sNode[!is.na(sNode)]
 
     # final output
-    names(out) <- transNode(tree = tree, input = out,
+    names(out) <- transNode(tree = tree, node = out,
                             use.alias = use.alias,
                             message = FALSE)
     return(out)

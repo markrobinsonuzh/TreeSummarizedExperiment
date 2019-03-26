@@ -4,12 +4,12 @@
 \alias{transNode}
 \title{Transfer between node number and node label}
 \usage{
-transNode(tree, input, use.alias = FALSE, message = FALSE)
+transNode(tree, node, use.alias = FALSE, message = FALSE)
 }
 \arguments{
 \item{tree}{A phylo object}
 
-\item{input}{A character or numeric vector representing tree node label(s) or
+\item{node}{A character or numeric vector representing tree node label(s) or
 tree node number(s)}
 
 \item{use.alias}{A logical value, TRUE or FALSE. This is an optional argument
@@ -41,9 +41,9 @@ geom_text2(aes(label = node), vjust = -0.8,
 hjust = -0.3, color = 'blue')
 
 #check whether the node number and node label are matched
-transNode(tinyTree, input = c(11, 2, 4, 15))
+transNode(tinyTree, node = c(11, 2, 4, 15))
 
-transNode(tree = tinyTree, input = c("Node_16", "Node_11"))
+transNode(tree = tinyTree, node = c("Node_16", "Node_11"))
 
 }
 \author{

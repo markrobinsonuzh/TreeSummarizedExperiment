@@ -137,7 +137,7 @@ toTree <- function(data, cache = FALSE) {
     attr(treeList, "order") <- "cladewise"
 
     # keep cache
-    desA2 <- findOS(tree = treeList, ancestor = numI, only.Tip = TRUE)
+    desA2 <- findOS(tree = treeList, node = numI, only.leaf = TRUE)
     desA1 <- split(numL, names(numL))
     desA <- c(desA1, desA2)
 

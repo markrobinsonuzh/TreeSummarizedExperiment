@@ -4,12 +4,12 @@
 \alias{findSibling}
 \title{find the sibling node}
 \usage{
-findSibling(tree, input, use.alias = FALSE)
+findSibling(tree, node, use.alias = FALSE)
 }
 \arguments{
 \item{tree}{A phylo object.}
 
-\item{input}{A numeric or character vector. Node labels or node numbers.}
+\item{node}{A numeric or character vector. Node labels or node numbers.}
 
 \item{use.alias}{A logical value, TRUE or FALSE. The default is FALSE, and
 the original node label would be used to name the output; otherwise, the
@@ -25,7 +25,7 @@ A vector of nodes. The numeric value is the node number, and the
   node label as name when \code{use.alias = TRUE}.
 }
 \description{
-\code{findSibling} is to find the sibling node of an \code{input} node.
+\code{findSibling} is to find the sibling node of an \code{node} node.
 }
 \examples{
 library(ggtree)
@@ -37,6 +37,6 @@ ggtree(tinyTree, branch.length = 'none') +
                hjust = -0.5, vjust = 0.7)
 
 
- findSibling(tree = tinyTree, input = 17)
- findSibling(tree = tinyTree, input = c(13, 17))
+ findSibling(tree = tinyTree, node = 17)
+ findSibling(tree = tinyTree, node = c(13, 17))
 }

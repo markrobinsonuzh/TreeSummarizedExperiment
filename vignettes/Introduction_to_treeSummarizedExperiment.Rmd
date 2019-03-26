@@ -67,8 +67,7 @@ suppressPackageStartupMessages({
     library(ape)})
 
 # assays data
-set.seed(1)
-toyTable <- matrix(rnbinom(20, size = 1, mu = 10), nrow = 5)
+toyTable <- rbind(rep(0, 4), matrix(1:16, nrow = 4))
 colnames(toyTable) <- paste(rep(LETTERS[1:2], each = 2), 
                             rep(1:2, 2), sep = "_")
 rownames(toyTable) <- paste("entity", seq_len(5), sep = "")
@@ -91,8 +90,10 @@ colInf <- DataFrame(gg = c(1, 2, 3, 3),
 colInf
 ```
 
-The hierarchical structure of the `r nrow(toyTable)` entities is denoted as **treeR**. The hierarchical structure of the `r ncol(toyTable)` samples is denoted as **treeC**. We create
-them by using the function `rtree` from the package `r CRANpkg("ape")`. 
+The hierarchical structure of the `r nrow(toyTable)` entities is denoted as
+**treeR**. The hierarchical structure of the `r ncol(toyTable)` samples is
+denoted as **treeC**. We create them by using the function `rtree` from the
+package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
 set.seed(1)
@@ -492,3 +493,159 @@ df$new <- rep("nn", nrow(df))
 
 
 ## More about the small functions on the `phylo` object.
+
+Below shows the node label (black texts) and node number (blue texts) of each
+node on an example tree.
+```{r}
+ggtree(tinyTree, branch.length = 'none') +
+    geom_text2(aes(label = label), hjust = -0.3) +
+    geom_text2(aes(label = node), vjust = -0.8,
+               hjust = -0.3, color = 'blue')
+```
+
+### Translation between the node label and the node number
+The translation between the labels and the numbers of nodes could be achieved by
+the function `transNode`.
+```{r}
+transNode(tree = tinyTree, node = c(12, 1, 4))
+```
+
+```{r}
+transNode(tree = tinyTree, node = c("t4", "Node_18"))
+```
+
+### find the descendants 
+
+To get the descendants only on the leaf level, we could set the argument `only.leaf = TRUE`.
+```{r}
+# only the leaf nodes
+findOS(tree = tinyTree, node = 17, only.leaf = TRUE)
+```
+
+```{r}
+# all descendant nodes
+findOS(tree = tinyTree, node = 17, only.leaf = FALSE)
+```
+
+### find the sibling node
+
+The input `node` could be either the node label or the node number. 
+```{r}
+findSibling(tree = tinyTree, node = 5)
+findSibling(tree = tinyTree, node = "t4")
+```
+
+### find the share node
+
+This would find the first node that joined by the specified nodes in `node` in
+the path to the root.
+```{r}
+shareNode(tree = tinyTree, node = c(5, 6))
+```
+
+
+### check whether it is a leaf node
+```{r}
+isLeaf(tree = tinyTree, node = 5)
+isLeaf(tree = tinyTree, node = 17)
+```
+
+### calculate the distance between any two nodes
+
+The distance between any two nodes on the tree could be calculated by
+`distNode`.
+```{r}
+distNode(tree = tinyTree, node = c(1, 5))
+```
+
+### prune tree
+
+We could specify the leaf nodes `rmLeaf` to remove parts of a tree. 
+```{r}
+pruneTree(tree = tinyTree, rmLeaf = c(4, 5))
+```
+
+### convert a `phylo` object to a matrix
+
+Each row gives a path that connects a leaf and the root.
+```{r}
+matTree(tree = tinyTree)
+```
+
+## Self-customized functions on `TreeSummarizedExperiment`
+
+R package developers could customize their own functions based on the functions
+provided above on the `phylo` object or develop their own functions
+independently. Below shows an example how to create functions to work on
+`TreeSummarizedExperiment`.
+
+To remove rows that have zero in all columns, we could create a
+function `rmRows` as below.
+
+```{r}
+# dat: a TreeSummarizedExperiment
+rmRows <- function(dat) {
+    # calculate the total counts of each row
+    count <- assays(dat)[[1]]
+    tot <- apply(count, 1, sum)
+    
+    # find the row with zero in all columns
+    ind <- which(tot == 0)
+    
+    # remove those rows
+    out <- dat[-ind, ]
+    return(out)
+    
+}
+
+(rte <- rmRows(dat = tse))
+```
+
+The function `rmRows` doesn't update the tree data. To update the tree, we could
+do it as below.
+
+```{r}
+updateTSE <- function(dat) {
+    # extract the linkData
+    linkD <- linkData(dat, onRow = TRUE)
+    
+    # check the nodeNum available
+    nodN <- linkD$nodeNum
+    
+    # extract the tree data
+    treeD <- treeData(dat, onRow = TRUE)
+    
+    # list all the leaves of the tree
+    ed <- treeD$edge
+    leaf <- setdiff(ed[, 2], ed[, 1])
+    
+    # check which leaves are on the tree but not on the assay table
+    dleaf <- setdiff(leaf, nodN)
+    
+    # remove leaves that don't match with the assay table
+    # pruneTree is a small function work on the phylo class
+    newTree <- pruneTree(tree = treeD, rmLeaf = dleaf, mergeSingle = TRUE)
+    
+    # the node number changed after the tree is pruned
+    # The pair between the old and new node number is output from the pruneTree
+    nodePair <- newTree$nodeNumPair
+    
+    ## update the row data
+    mm <- match(linkD$nodeNum, nodePair[, "old"])
+    linkD$nodeNum <- nodePair[mm, "new"]
+    linkD$nodeLab <- transNode(tree = newTree, node = linkD$nodeNum, 
+                               use.alias = FALSE)
+    linkD$nodeLab_alias <- transNode(tree = newTree, node = linkD$nodeNum, 
+                               use.alias = TRUE)
+    linkD$isLeaf <- isLeaf(tree = newTree, node = linkD$nodeNum)
+    
+    rowData(dat) <- LinkDataFrame(LinkData = linkD, metaCol(dat))
+    
+    ## update the tree
+    dat@treeData$rowTree <- newTree
+    
+    return(dat)
+} 
+
+ntse <- updateTSE(dat = rte)
+```

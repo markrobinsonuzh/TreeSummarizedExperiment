@@ -1,12 +1,13 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-Depends: R(>= 3.5.0), SummarizedExperiment, S4Vectors
+Version: 0.99.0
+Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
+           role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945"))
+Maintainer: Ruizhu Huang <ruizhuRH@gmail.com>
+Description: TreeSummarizedExperiment has extended SummarizedExperiment to 
+    include hierarchical information on the rows or columns of the rectangular data.
+Depends: R(>= 3.6.0), SummarizedExperiment, S4Vectors
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
@@ -16,7 +17,12 @@ Imports:
     ape,
     dplyr
 VignetteBuilder: knitr
-Suggests: ggtree, BiocStyle, knitr, rmarkdown
+Suggests: 
+    ggtree,
+    BiocStyle,
+    knitr,
+    rmarkdown,
+    testthat
 RoxygenNote: 6.1.1
 Collate: 
     'classValid.R'
@@ -26,11 +32,13 @@ Collate:
     'classAccessor.R'
     'data.R'
     'toTree.R'
+    'tree_distNode.R'
     'tree_findAncestor.R'
     'tree_findOS.R'
     'tree_findSibling.R'
     'tree_isLeaf.R'
     'tree_matTree.R'
+    'tree_pruneLeaf.R'
     'tree_shareNode.R'
     'tree_signalNode.R'
     'tree_transNode.R'

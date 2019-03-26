@@ -88,6 +88,7 @@ NULL
 #' @param x A \code{LinkDataFrame} object
 #' @param i,j The row, column index to subset \code{x}.
 #' @param name The name of the column.
+#' @param value The value to replace.
 #' @name LinkDataFrame-accessor
 #' @return Depends on the functions
 #'

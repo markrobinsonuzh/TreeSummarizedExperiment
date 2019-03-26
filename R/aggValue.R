@@ -27,9 +27,11 @@
         datM <- NULL
         datL <- DataFrame(nodeLab = rownames(x),
                           nodeNum = transNode(tree = rowTree,
-                                              input = rownames(x),
+                                              node = rownames(x),
                                               use.alias = FALSE,
-                                              message = FALSE))
+                                              message = FALSE),
+                          isLeaf = isLeaf(tree = rowTree,
+                                          node = rownames(x)))
         outR <- .aggFun(tree = rowTree,
                         assayTab = mat,
                         mCol = datM,
@@ -52,9 +54,11 @@
         datM <- NULL
         datL <- DataFrame(nodeLab = colnames(x),
                           nodeNum = transNode(tree = colTree,
-                                              input = colnames(x),
+                                              node = colnames(x),
                                               use.alias = FALSE,
-                                              message = FALSE))
+                                              message = FALSE),
+                          isLeaf = isLeaf(tree = colTree,
+                                          node = rownames(x)))
         outR <- .aggFun(tree = colTree,
                         assayTab = mat,
                         mCol = datM,
@@ -89,6 +93,8 @@
                  "rowTree and colTree should both be NULL.\n ")
         }
     }
+
+
 
     ## The provided rowLevel or colLevel should be a numeric or character vector
     isR <- (is.character(rowLevel) | is.numeric(rowLevel) |
@@ -243,15 +249,15 @@
     # The aggregation level
     if (is.null(level)) {level <- numAR}
     if (is.character(level)) {
-        level <- transNode(tree = tree, input = level,
+        level <- transNode(tree = tree, node = level,
                            use.alias = FALSE, message = FALSE)
     }
 
     # The descendants of the aggregation level
     if (is.null(tree$cache)) {
-        desR <- findOS(tree = tree, ancestor = level,
-                       only.Tip = TRUE, self.include = TRUE)
-        names(desR) <- transNode(tree = tree, input = level,
+        desR <- findOS(tree = tree, node = level,
+                       only.leaf = TRUE, self.include = TRUE)
+        names(desR) <- transNode(tree = tree, node = level,
                                  use.alias = TRUE, message = FALSE)
     } else {
         desR <- tree$cache[level]
@@ -261,6 +267,15 @@
     idR <- lapply(desR, FUN = function(x) {
         numR %in% x
     })
+
+    miR <- lapply(desR, FUN = function(x){
+        x[!x %in% numR]
+    })
+    miR <- unique(unlist(miR))
+    if (length(miR)) {
+        warning(length(miR), "leaves couldn't be found from the data table.
+                The value 0 is used for the missing leaves. \n")
+    }
 
     ## Perform the aggregation
     # on the assay tables
@@ -339,11 +354,11 @@
     lvr <- rep(level, ll)
     tipN <- setdiff(ed[, 2], ed[, 1])
     lkr <- DataFrame(nodeLab = transNode(tree = tree,
-                                         input = lvr,
+                                         node = lvr,
                                          use.alias = FALSE,
                                          message = FALSE),
                      nodeLab_alias = transNode(tree = tree,
-                                               input = lvr,
+                                               node = lvr,
                                                use.alias = TRUE,
                                                message = FALSE),
                      nodeNum = lvr,

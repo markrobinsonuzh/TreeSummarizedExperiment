@@ -23,6 +23,8 @@
 \item{i, j}{The row, column index to subset \code{x}.}
 
 \item{name}{The name of the column.}
+
+\item{value}{The value to replace.}
 }
 \value{
 Depends on the functions
