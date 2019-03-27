@@ -10,6 +10,9 @@ https://github.com/Bioconductor/GenomicRanges/blob/master/R/GPos-class.R}
 \usage{
 \S4method{show}{LinkDataFrame}(object)
 }
+\value{
+print the linkDataFrame
+}
 \description{
 The show method of the class \strong{LinkDataFrame} is modified based on the
 codes of the show method of the class \strong{"GPos"}. The original code
