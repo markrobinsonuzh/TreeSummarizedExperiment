@@ -34,6 +34,7 @@ matTree <- function(tree) {
 
     # the leaves
     L1 <- setdiff(mat[, 2], mat[, 1])
+
     # each path connects a tip with the root.
     # each path is stored as a row of matN
     # the first column stores the tips (or leaves)
