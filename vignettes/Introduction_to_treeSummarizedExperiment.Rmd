@@ -494,6 +494,10 @@ df$new <- rep("nn", nrow(df))
 
 ## More about the small functions on the `phylo` object.
 
+Here, we show some functions as examples to manipulate or to extract information
+from the `phylo` object. More functions could be found in other packages, such
+as `r CRANpkg("ape")`, `r CRANpkg("tidytree")`.
+
 Below shows the node label (black texts) and node number (blue texts) of each
 node on an example tree.
 ```{r}
@@ -504,6 +508,7 @@ ggtree(tinyTree, branch.length = 'none') +
 ```
 
 ### Translation between the node label and the node number
+
 The translation between the labels and the numbers of nodes could be achieved by
 the function `transNode`.
 ```{r}
