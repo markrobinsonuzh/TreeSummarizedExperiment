@@ -118,6 +118,16 @@ toTree <- function(data, cache = FALSE) {
     mat2 <- do.call(rbind, lx)
     mat3 <- mat2[!duplicated(mat2), ]
 
+    tt <- table(mat3[, 2])
+    if (any(tt > 1)) {
+        bt <- tt[tt=1]
+        dt <- data.frame(node = as.numeric(names(bt)),
+                         Freq = as.vector(bt))
+        dn <- numN[match(dt$node, numN)]
+        dnn <- names(dn)
+        message("Loops are detected in: \n", paste(dnn, collapse = "\n "))
+        stop("The tree can't be built; loops detected in the tree.")
+    }
 
     # sort node number
     numL <- sort(numL)
