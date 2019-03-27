@@ -30,8 +30,8 @@ The class \strong{TreeSummarizedExperiment} is designed to store
 \section{Slots}{
 
 \describe{
-\item{\code{treeData}}{A list of phylo objects. It gives information about the hiearchical
-structure of rows or columns of \code{assay} tables.}
+\item{\code{treeData}}{A list of phylo objects. It gives information about the
+hiearchical structure of rows or columns of \code{assay} tables.}
 
 \item{\code{...}}{Other slots from
 \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}}

@@ -193,7 +193,7 @@
         newRD <- rowData(x)
     }
 
-    ## -------------------- aggregation on column dimension ----------------------
+    ## -------------------- aggregation on column dimension ----------------
     if (onCol) {
         colM <- metaCol(x, onRow = FALSE)
         colL <- linkData(x, onRow = FALSE)

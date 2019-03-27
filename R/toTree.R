@@ -48,7 +48,7 @@ toTree <- function(data, cache = FALSE) {
             xx <- data[, x]
             ii <- is.na(xx)
             if (sum(ii)) {
-                y <- data[ii, 1: x, drop = FALSE]
+                y <- data[ii, seq_len(x), drop = FALSE]
                 uy <- apply(y, 1, FUN = function(x) {
                     xx <- x[!is.na(x)]
                     nax <- sum(is.na(x))

@@ -44,7 +44,8 @@ transNode <- function(tree, node, use.alias = FALSE,
     }
 
     if (is.factor(node)) {
-        stop("factor detected; The node label is required to be character or numeric.")
+        stop("factor detected; The node label is required to be character or
+             numeric.")
     }
     # node number & tip number
     mat <- tree$edge

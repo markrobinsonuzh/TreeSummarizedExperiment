@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment
-Version: 0.99.0
+Version: 0.99.1
 Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945"))
 Maintainer: Ruizhu Huang <ruizhuRH@gmail.com>
@@ -11,6 +11,7 @@ Depends: R(>= 3.6.0), SummarizedExperiment, S4Vectors
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
+biocViews: DataRepresentation, Infrastructure
 Imports:
     methods,
     utils,

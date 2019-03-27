@@ -87,8 +87,8 @@ LinkDataFrame <- function(LinkData = NULL, ...) {
 #' slot is \code{treeData} that is to store the hiearchical information of rows
 #' (or columns or both) of \code{assays} tables.
 #'
-#' @slot treeData A list of phylo objects. It gives information about the hiearchical
-#'   structure of rows or columns of \code{assay} tables.
+#' @slot treeData A list of phylo objects. It gives information about the
+#'   hiearchical structure of rows or columns of \code{assay} tables.
 #' @slot ... Other slots from
 #'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
 #'

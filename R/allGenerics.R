@@ -189,6 +189,7 @@ setMethod("$<-", signature(x = "LinkDataFrame"),
 #' https://github.com/Bioconductor/GenomicRanges/blob/master/R/GPos-class.R
 #' @keywords internal
 #' @importMethodsFrom S4Vectors show
+#' @return print the linkDataFrame
 setMethod("show", "LinkDataFrame", function(object) {
     x_class <- class(object)
     left_len <- ncol(object@LinkData)
@@ -202,7 +203,8 @@ setMethod("show", "LinkDataFrame", function(object) {
 
     out <- S4Vectors:::makePrettyMatrixForCompactPrinting(object,
                                                           .nakedMatrix)
-    classX <- c(lapply(object@LinkData, class), list("|" = " "), lapply(object, class))
+    classX <- c(lapply(object@LinkData, class), list("|" = " "),
+                lapply(object, class))
     classX <- unlist(classX)
 
     classinfo <- S4Vectors:::makeClassinfoRowForCompactPrinting(object, classX)
