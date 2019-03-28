@@ -1,10 +1,9 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945"))
-Maintainer: Ruizhu Huang <ruizhuRH@gmail.com>
 Description: TreeSummarizedExperiment has extended SummarizedExperiment to 
     include hierarchical information on the rows or columns of the rectangular data.
 Depends: R(>= 3.6.0), SummarizedExperiment, S4Vectors
