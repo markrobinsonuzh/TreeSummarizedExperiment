@@ -53,7 +53,7 @@ setClass("LinkDataFrame",
 #' Construct a LinkDataFrame object
 #'
 #' @param LinkData A \code{\link[S4Vectors]{DataFrame-class}}.
-#' @param ... All arguments accepted by \code{\link[S4Vectors]{DataFrame}}.
+#' @param ... All arguments accepted by \code{\link[S4Vectors]{DataFrame-class}}.
 #'
 #' @importFrom S4Vectors DataFrame
 #' @name LinkDataFrame-constructor

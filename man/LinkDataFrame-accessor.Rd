@@ -61,7 +61,7 @@ ld4
 }
 \seealso{
 \code{\link{LinkDataFrame-constructor}}
-  \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame}}
+  \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame-class}}
 }
 \author{
 Ruizhu HUANG

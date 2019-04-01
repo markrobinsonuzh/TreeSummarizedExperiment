@@ -11,7 +11,7 @@ LinkDataFrame(LinkData = NULL, ...)
 \arguments{
 \item{LinkData}{A \code{\link[S4Vectors]{DataFrame-class}}.}
 
-\item{...}{All arguments accepted by \code{\link[S4Vectors]{DataFrame}}.}
+\item{...}{All arguments accepted by \code{\link[S4Vectors]{DataFrame-class}}.}
 }
 \value{
 A LinkDataFrame object
