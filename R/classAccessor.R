@@ -94,7 +94,7 @@ NULL
 #'
 #' @author Ruizhu HUANG
 #' @seealso \code{\link{LinkDataFrame-constructor}}
-#'   \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame}}
+#'   \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame-class}}
 #' @examples
 #'
 #' left <- DataFrame(left1 = 1:5, left2 = letters[1:5])
