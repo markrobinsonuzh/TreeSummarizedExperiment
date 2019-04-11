@@ -5,9 +5,9 @@
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("linkData", function(x, onRow = TRUE) {
+setGeneric("linkData", function(x, onRow = TRUE)
     standardGeneric("linkData")
-})
+)
 
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -35,9 +35,9 @@ setMethod("linkData", signature("TreeSummarizedExperiment"),
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("treeData", function(x, onRow = TRUE) {
+setGeneric("treeData", function(x, onRow = TRUE)
     standardGeneric("treeData")
-})
+)
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
@@ -55,9 +55,9 @@ setMethod("treeData", signature("TreeSummarizedExperiment"),
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("metaCol", function(x, onRow = TRUE) {
+setGeneric("metaCol", function(x, onRow = TRUE)
     standardGeneric("metaCol")
-})
+)
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @importFrom methods is
