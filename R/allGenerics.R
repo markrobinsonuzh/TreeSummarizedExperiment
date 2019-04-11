@@ -207,7 +207,7 @@ setMethod("show", "LinkDataFrame", function(object) {
     cat(x_class, " object with ",
         left_len, " link data ", ifelse(left_len == 1L, "column", "columns"),
         " and ",
-        right_len, " metadata ", ifelse(right_len == 1L, "column", "columns"),
+        right_len, " main data ", ifelse(right_len == 1L, "column", "columns"),
         ":\n", sep="")
 
     out <- S4Vectors:::makePrettyMatrixForCompactPrinting(object,
