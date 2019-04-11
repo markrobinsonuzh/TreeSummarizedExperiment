@@ -9,7 +9,7 @@
 \alias{LinkDataFrame-accessor}
 \title{LinkDataFrame-accessor}
 \usage{
-\S4method{[}{LinkDataFrame,ANY,ANY,ANY}(x, i, j)
+\S4method{[}{LinkDataFrame,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
 
 \S4method{as.data.frame}{LinkDataFrame}(x)
 

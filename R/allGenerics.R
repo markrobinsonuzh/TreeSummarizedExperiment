@@ -125,24 +125,33 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
 #' @rdname LinkDataFrame-accessor
 #' @export
 setMethod("[", signature(x = "LinkDataFrame"),
-          function(x, i, j){
+          function(x, i, j, ..., drop = TRUE){
+              # check the number of arguments
+              nn <- (nargs() - !missing(drop))
 
-              # Subset the slots from DataFrame
-              nx <- callNextMethod(x, i, j, drop = FALSE)
+              # 1-d subset
+              if (nn < 3){
+                  final <- callNextMethod()
+              }
 
-              # subset the new slot LinkData: only on rows
-              nc <- ncol(x@LinkData)
-              jj <- seq_len(nc)
 
-              y <- x@LinkData
-              ld <- callNextMethod(y, i, jj)
+              # 2-d subset
+              if (nn == 3) {
+                  nx <- callNextMethod(x, i, j, drop = FALSE)
+                  # subset the new slot LinkData: only on rows
+                  nc <- ncol(x@LinkData)
+                  jj <- seq_len(nc)
 
-              # update slots
-              final <- BiocGenerics:::replaceSlots(nx,
-                                                   LinkData = ld)
+                  y <- x@LinkData
+                  ld <- callNextMethod(y, i, jj)
+
+                  # update slots
+                  final <- BiocGenerics:::replaceSlots(nx,
+                                                       LinkData = ld)
+              }
 
               return(final)
-              })
+          })
 
 #' @importFrom methods callNextMethod
 #' @rdname LinkDataFrame-accessor
