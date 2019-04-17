@@ -16,19 +16,15 @@
 phylo <- structure(list(), class = "phylo")
 setOldClass("phylo")
 
-
+setClassUnion("phyloOrNULL", c("phylo", "NULL"))
 #-------------------------------------------------------------------------------
 #' LinkDataFrame: A S4 class extended from DataFrame
 #-------------------------------------------------------------------------------
 #' An S4 class LinkDataFrame
 #'
-#' The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} by
-#' adding one new slot \code{LinkData}
-#'
-#' @slot LinkData A \link[S4Vectors]{DataFrame-class}. It will be shown in the
-#'   left side of the vertical line when print out the generated
-#'   \code{LinkDataFrame}.
-#' @slot ... Other slots from \link[S4Vectors]{DataFrame-class}.
+#' The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} to
+#' include at least four columns \code{nodeLab}, \code{nodeLab_alias},
+#' \code{nodeNum}, and \code{isLeaf}.
 #'
 #' @importClassesFrom S4Vectors DataFrame
 #' @exportClass LinkDataFrame
@@ -37,41 +33,40 @@ setOldClass("phylo")
 #' See \code{\link{LinkDataFrame-constructor}} for constructor
 #' functions.
 #'
-#' @section Accessor:
-#' See \code{\link{LinkDataFrame-accessor}} for accessor functions.
-#'
-#' @seealso \code{\link{LinkDataFrame-accessor}}
-#'   \code{\link{LinkDataFrame-constructor}} \link[S4Vectors]{DataFrame-class}
-#' @name LinkDataFrame-class
 setClass("LinkDataFrame",
-         representation(LinkData = "DataFrame"),
-         contains = "DataFrame")
+         contains = "DataFrame",
+         validity = .checkLDF)
 
 #-------------------------------------------------------------------------------
 #' Construct a LinkDataFrame
 #-------------------------------------------------------------------------------
 #' Construct a LinkDataFrame object
-#'
-#' @param LinkData A \code{\link[S4Vectors]{DataFrame-class}}.
+#' @param nodeLab A character vector
+#' @param nodeLab_alias A character vector
+#' @param nodeNum A numeric vector
+#' @param isLeaf A logical vector
 #' @param ... All arguments accepted by \code{\link[S4Vectors]{DataFrame-class}}.
 #'
 #' @importFrom S4Vectors DataFrame
 #' @name LinkDataFrame-constructor
 #' @export
 #' @return A LinkDataFrame object
-#' @seealso \code{\link{LinkDataFrame-accessor}}
-#'   \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame-class}}
+#' @seealso \code{\link{LinkDataFrame-class}}
+#'   \code{\link[S4Vectors]{DataFrame-class}}
 #' @examples
 #'
-#' left <- DataFrame(left1 = 1:5, left2 = letters[1:5])
-#' right <- DataFrame(right1 = sample(letters[1:3], 5, replace = TRUE),
-#'                   right2 = sample(c(TRUE, FALSE), 5, replace = TRUE),
-#'                   right3 = 11:15)
 #'
-#' (ld <- LinkDataFrame(LinkData = left, right))
-LinkDataFrame <- function(LinkData = NULL, ...) {
-    df <- DataFrame(...)
-    new("LinkDataFrame", df, LinkData = LinkData)
+#' (ld <- LinkDataFrame(nodeLab = letters[1:5],
+#'                      nodeLab_alias = LETTERS[1:5],
+#'                      nodeNum = 1:5,
+#'                      isLeaf = TRUE,
+#'                      right = 1:5))
+LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
+                          isLeaf, ...) {
+    df <- DataFrame(nodeLab, nodeLab_alias, nodeNum,
+                    isLeaf, ...)
+
+    new("LinkDataFrame", df)
 }
 
 #-------------------------------------------------------------------------------
@@ -113,7 +108,7 @@ LinkDataFrame <- function(LinkData = NULL, ...) {
 #'   \code{\link{LinkDataFrame}} for more details.
 #'
 #' @importFrom methods setClass
-#' @importClassesFrom SummarizedExperiment SummarizedExperiment
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importClassesFrom S4Vectors DataFrame
 #' @name TreeSummarizedExperiment-class
 #' @exportClass TreeSummarizedExperiment
@@ -121,9 +116,12 @@ LinkDataFrame <- function(LinkData = NULL, ...) {
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
 #'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
 setClass("TreeSummarizedExperiment",
-         representation(treeData = "list"),
-         contains = "SummarizedExperiment",
-         validity = checkTSE)
+         representation(rowTree = "phyloOrNULL",
+                        colTree = "phyloOrNULL",
+                        rowLink = "LinkDataFrame",
+                        colLink = "LinkDataFrame"),
+         contains = "SingleCellExperiment",
+         validity = .checkTSE)
 
 
 
@@ -247,23 +245,20 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
 
     # -------------------------------------------------------------------------
     ## create the link data
+    tse <- as(se, "TreeSummarizedExperiment")
     # the rows:
     if (isRow) {
-        se <- .linkFun(tree = rowTree, se = se, onRow = TRUE)
+        tse@rowTree <- rowTree
+        tse@rowLink <- .linkFun(tree = rowTree, se = se, onRow = TRUE)
+
     }
 
 
     # the columns:
     if (isCol) {
-        se <- .linkFun(tree = colTree, se = se, onRow = FALSE)
+        tse@colTree <- colTree
+        tse@colLink <- .linkFun(tree = colTree, se = se, onRow = FALSE)
     }
-
-
-    # -------------------------------------------------------------------------
-    # create TreeSummarizedExperiment
-    tse <- new("TreeSummarizedExperiment", se,
-               treeData = list(rowTree = rowTree,
-                               colTree = colTree))
 
     return(tse)
 }
@@ -343,21 +338,12 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
                        message = FALSE)
     leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
 
-    linkD <- DataFrame(nodeLab = fLab,
+    linkD <- LinkDataFrame(nodeLab = fLab,
                        nodeLab_alias = faLab,
                        nodeNum = nd,
                        isLeaf = nd %in% leaf)
 
 
     # create the rowData
-    rd <- annDat[isIn, ]
-    rd <- rd[, colnames(rd) != "nodeLab", drop = FALSE]
-
-    if (onRow) {
-        rowData(se) <- LinkDataFrame(LinkData = linkD, rd)
-    } else {
-        colData(se) <- LinkDataFrame(LinkData = linkD, rd)
-    }
-
-    return(se)
+    return(linkD)
     }
