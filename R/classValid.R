@@ -13,13 +13,6 @@
 
     errors <- character()
     # -------------------------------------------------------------------------
-    # it must have table in assays
-    if (length(assays(object)) < 0) {
-      msg <- "No table is available in assays. \n"
-      errors <- c(errors, msg)
-    }
-
-    # -------------------------------------------------------------------------
     # If provided, the row tree should be a phylo object; otherwise, NULL
     rTree <- object@rowTree
     isRT <- class(rTree) %in% c("phylo", "NULL")
@@ -78,6 +71,24 @@
         if (!colEq) {
             msg <- sprintf("rowLink: %d rows are expected",
                            ncol(object))
+            errors <- c(errors, msg)
+        }
+    }
+
+    # -------------------------------------------------------------------------
+    # if rowTree doesn't exist, rowLink should have 0 rows
+    if (is.null(rTree)) {
+        if (nrow(object@rowLink)) {
+            msg <- sprintf("rowLink: %d row is expected when rowTree is NULL",
+                           0)
+            errors <- c(errors, msg)
+        }
+    }
+
+    if (is.null(cTree)) {
+        if (nrow(object@colLink)) {
+            msg <- sprintf("colLink: %d row is expected when colTree is NULL",
+                           0)
             errors <- c(errors, msg)
         }
     }
