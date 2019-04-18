@@ -10,20 +10,21 @@
 #' TreeSummarizedExperiment-accessors
 #'
 #' All accessor functions that work on
-#' \code{\link[SummarizedExperiment]{SummarizedExperiment-class}} should work on
-#' \strong{TreeSummarizedExperiment}. Additionally, two new \code{linkData} and
-#' \code{treeData} accessor function are available for
-#' \strong{TreeSummarizedExperiment}.
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} should work on
+#' \strong{TreeSummarizedExperiment}. Additionally, new accessors \code{rowLink}
+#' \code{colLink}, \code{rowTree} and \code{colTree} accessor function are
+#' available for \strong{TreeSummarizedExperiment}.
 #'
 #' @param x A TreeSummarizedExperiment object
-#' @param onRow A logical(1) value, TRUE or FALSE. The default is TRUE. It
-#'   indicates the returned \code{treeData} or \code{linkData} is on rows (TRUE)
-#'   or columns (FALSE) of \code{assays} tables.
-#'
+#' @param i,j The row, column index to subset \code{x}. The arguments of the
+#'   subset function \code{[]}
+#' @param drop A logical value, TRUE or FALSE. The argument from the subset
+#'   function \code{[]}
+#' @param ... The argument from the subset function \code{[]}
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}
-#'   \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
+#'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 #'
 #' @author Ruizhu HUANG
 #' @examples
@@ -65,59 +66,15 @@
 #'
 #' ## extract the linkData
 #' # on rows
-#' (rowL <- linkData(x = toy_tse, onRow = TRUE))
+#' (rowL <- rowLink(x = toy_tse))
 #' # on columns
-#' (colL <- linkData(x = toy_tse, onRow = FALSE))
+#' (colL <- colLink(x = toy_tse))
 #'
 #'  ## extract the treeData
 #' # on rows
-#' (rowT <- treeData(x = toy_tse, onRow = TRUE))
+#' (rowT <- rowTree(x = toy_tse))
 #' # on columns
-#' (colT <- treeData(x = toy_tse, onRow = FALSE))
+#' (colT <- colTree(x = toy_tse))
 #'
 NULL
 
-# -----------------------------------------------------------------------------
-### LinkDataFrame
-# -----------------------------------------------------------------------------
-#' LinkDataFrame-accessor
-#'
-#' This page lists the accesssor, coercion, subsetting and combining functions
-#' for the class \strong{LinkDataFrame}.
-#'
-#' @param x A \code{LinkDataFrame} object
-#' @param i,j The row, column index to subset \code{x}.
-#' @param name The name of the column.
-#' @param value The value to replace.
-#' @name LinkDataFrame-accessor
-#' @return Depends on the functions
-#'
-#' @author Ruizhu HUANG
-#' @seealso \code{\link{LinkDataFrame-constructor}}
-#'   \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame-class}}
-#' @examples
-#'
-#' left <- DataFrame(left1 = 1:5, left2 = letters[1:5])
-#' right <- DataFrame(right1 = sample(letters[1:3], 5, replace = TRUE),
-#'                   right2 = sample(c(TRUE, FALSE), 5, replace = TRUE),
-#'                   right3 = 11:15)
-#'
-#' ld <- LinkDataFrame(LinkData = left, right)
-#'
-#' ## subset
-#' # by rows
-#' (ld1 <- ld[1:3, ])
-#' # by columns (only on the right side of the vertical line)
-#' (ld2 <- ld[, c(1, 3)])
-#' (ld3 <- ld[, c("right1", "right2")])
-#'
-#' ## add a new column (only on the right side of the vertical line)
-#' ld4 <- ld
-#' ld4$right4 <- 11:15
-#' ld4
-#'
-#' ## coercion
-#' (ld5 <- as.data.frame(ld))
-#'
-#'
-NULL

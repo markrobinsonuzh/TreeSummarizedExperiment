@@ -6,10 +6,16 @@
 \title{Construct a LinkDataFrame
 Construct a LinkDataFrame object}
 \usage{
-LinkDataFrame(LinkData = NULL, ...)
+LinkDataFrame(nodeLab, nodeLab_alias, nodeNum, isLeaf, ...)
 }
 \arguments{
-\item{LinkData}{A \code{\link[S4Vectors]{DataFrame-class}}.}
+\item{nodeLab}{A character vector}
+
+\item{nodeLab_alias}{A character vector}
+
+\item{nodeNum}{A numeric vector}
+
+\item{isLeaf}{A logical vector}
 
 \item{...}{All arguments accepted by \code{\link[S4Vectors]{DataFrame-class}}.}
 }
@@ -22,14 +28,14 @@ Construct a LinkDataFrame object
 }
 \examples{
 
-left <- DataFrame(left1 = 1:5, left2 = letters[1:5])
-right <- DataFrame(right1 = sample(letters[1:3], 5, replace = TRUE),
-                  right2 = sample(c(TRUE, FALSE), 5, replace = TRUE),
-                  right3 = 11:15)
 
-(ld <- LinkDataFrame(LinkData = left, right))
+(ld <- LinkDataFrame(nodeLab = letters[1:5],
+                     nodeLab_alias = LETTERS[1:5],
+                     nodeNum = 1:5,
+                     isLeaf = TRUE,
+                     right = 1:5))
 }
 \seealso{
-\code{\link{LinkDataFrame-accessor}}
-  \code{\link{LinkDataFrame-class}} \code{\link[S4Vectors]{DataFrame-class}}
+\code{\link{LinkDataFrame-class}}
+  \code{\link[S4Vectors]{DataFrame-class}}
 }

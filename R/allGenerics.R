@@ -58,6 +58,46 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
               x@colTree
           })
 
+
+#' @importFrom methods callNextMethod
+#' @import SingleCellExperiment
+#' @importFrom S4Vectors metadata
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+#'
+setMethod("[", signature(x = "TreeSummarizedExperiment"),
+          function(x, i, j, ..., drop = TRUE){
+
+             # Subset the traditional slots from SummarizedExperiment
+              nx <- callNextMethod()
+
+              # Subset the rowLink
+              lr <- x@rowLink
+              rt <- x@rowTree
+              if (!missing(i) & !is.null(rt)) {
+                  nlr <- lr[i, , drop = FALSE]
+              } else {
+                  nlr <- lr
+              }
+
+              # Subset the colLink
+              lc <- x@colLink
+              ct <- x@colTree
+              if (!missing(j) & !is.null(ct)) {
+                  nlc <- lc[j, , drop = FALSE]
+              } else {
+                  nlc <- lc
+              }
+
+
+              # update slots
+              final <- BiocGenerics:::replaceSlots(nx,
+                                                   rowLink = nlr,
+                                                   colLink = nlc)
+
+              return(final)
+          })
+
 #' @keywords internal
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SingleCellExperiment show
@@ -84,8 +124,7 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
         # the number of leaf nodes & internal nodes
         nlr <- countLeaf(rt)
         nnr <- countNode(rt) - countLeaf(rt)
-        msg1b <- sprintf("rowTree: a %s (%d %s, %d %s)", class(rt),
-                         nlr, "leaves", nnr, "internal nodes")
+        msg1b <- sprintf("rowTree: a %s ", class(rt))
     }
 
     # on column
@@ -98,8 +137,7 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
         # the number of leaf nodes & internal nodes
         nlc <- countLeaf(ct)
         nnc <- countNode(ct) - countLeaf(ct)
-        msg2b <- sprintf("colTree: a %s (%d %s, %d %s)", class(ct),
-                         nlc, "leaves", nnc, "internal nodes")
+        msg2b <- sprintf("colTree: a %s", class(ct))
     }
 
     cat(msg1a, "\n", msg1b, "\n",
