@@ -6,35 +6,44 @@
 \title{An S4 class TreeSummarizedExperiment}
 \description{
 The class \strong{TreeSummarizedExperiment} is an extension class of standard
-\code{\link[SummarizedExperiment]{SummarizedExperiment-class}} class. It has
-five slots. Four of them are traditional slots from
-\code{\link[SummarizedExperiment]{SummarizedExperiment-class}} class:
-\code{assays}, \code{rowData} \code{colData} and \code{metadata}. The new
-slot is \code{treeData} that is to store the hiearchical information of rows
-(or columns or both) of \code{assays} tables.
+\code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class. It has
+four more slots that are not in
+\code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class:
+\code{rowTree}, \code{rowLink} \code{colTree} and \code{colLink}. The
+hierarchical information of rows (columns) is stored in \code{rowTree}
+(\code{colTree}) and the link between the rows (columns) of \code{assays}
+tables and nodes of the tree is given in \code{rowLink} (\code{colLink}).
 }
 \details{
 The class \strong{TreeSummarizedExperiment} is designed to store
   rectangular data for entities (e.g., microbes or cell types)
   (\code{assays}), information about the hiearchical structure
-  (\code{treeData}), and the mapping information between the rows (or
-  columns, or both) of the rectangular data and the tree nodes
-  (\code{linkData}). Users could provide hiearchical information on the rows
-  or columns (or both) of the \code{assay} tables, and the \code{linkData}
-  will be automatically integrated as one part of the \code{rowData} or
-  \code{colData} or both, respectively. When the \code{linkData} is added to
-  \code{rowData} or \code{colData}, a class \code{LinkDataFrame} is used to
-  store data instead of \code{DataFrame}. Please see the page
+  (\code{rowTree} on rows; \code{colTree} on columns), and the mapping
+  information between the tree nodes and the rows or the columns of the
+  rectangular data. Users could provide the hiearchical structure of the
+  rows, columns or both) of the \code{assay} tables, and the link data will
+  be automatically generated in \code{rowLink}, \code{colData} or both,
+  respectively. It's required that the object in \code{rowLink} or
+  \code{colLink} has the \code{LinkDataFrame} class. Please see the page
   \code{\link{LinkDataFrame}} for more details.
 }
 \section{Slots}{
 
 \describe{
-\item{\code{treeData}}{A list of phylo objects. It gives information about the
-hiearchical structure of rows or columns of \code{assay} tables.}
+\item{\code{rowTree}}{A phylo object or NULL. It gives information about the
+hiearchical structure of rows of \code{assay} tables.}
+
+\item{\code{colTree}}{A phylo object or NULL. It gives information about the
+hiearchical structure of columns of \code{assay} tables.}
+
+\item{\code{rowLink}}{A LinkDataFrame. It gives information about the link between
+the nodes of the \code{rowTree} and the rows of \code{assay} tables.}
+
+\item{\code{colLink}}{A LinkDataFrame. It gives information about the link between
+the nodes of the \code{colTree} and the columns of \code{assay} tables.}
 
 \item{\code{...}}{Other slots from
-\code{\link[SummarizedExperiment]{SummarizedExperiment-class}}}
+\code{\link[SingleCellExperiment]{SingleCellExperiment-class}}}
 }}
 
 \section{Constructor}{
@@ -51,5 +60,5 @@ See \code{\link{TreeSummarizedExperiment-accessor}} for accessor functions.
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
   \code{\link{TreeSummarizedExperiment-accessor}}
-  \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
+  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 }

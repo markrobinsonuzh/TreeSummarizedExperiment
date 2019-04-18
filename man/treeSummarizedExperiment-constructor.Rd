@@ -14,13 +14,7 @@ of assay tables.}
 \item{colTree}{A phylo object that provides hiearchical information of
 columns of assay tables.}
 
-\item{...}{For \code{SummarizedExperiment}, S4 methods \code{list}
-    and \code{matrix}, arguments identical to those of the
-    \code{SimpleList} method.
-
-    For \code{rowRanges}, ignored.
-
-  }
+\item{...}{Arguments to pass to the \code{SummarizedExperiment} constructor.}
 }
 \value{
 a TreeSummarizedExperiment object
@@ -31,11 +25,11 @@ a TreeSummarizedExperiment object
 \details{
 The output TreeSummarizedExperiment object has very similar
   structure as the
-  \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}. The
+  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}. The
   differences are summarized be as below.
   \itemize{
-  \item \strong{treeData} A slot exists in \code{TreeSummarizedExperiment}
-  but not in \code{SummarizedExperiment}. It stores the tree structure(s)
+  \item \strong{rowTree} A slot exists in \code{TreeSummarizedExperiment}
+  but not in \code{SingleCellExperiment}. It stores the tree structure(s)
   that provide(s) hierarchical information of \code{assays} rows or columns
   or both.
   \item \strong{rowData} If a \code{phylo} object is available in the slot
@@ -46,7 +40,7 @@ The output TreeSummarizedExperiment object has very similar
   vertical line provides the link information between the \code{assays} rows
   and the tree \code{phylo} object, and could be accessed via
   \code{linkData}; The data on the left side is the original \code{rowData}
-  like \code{SummarizedExperiment} object.
+  like \code{SingleCellExperiment} object.
   \item \strong{colData} Similar to the explanaition for \strong{rowData} as
   above.
  }
@@ -82,7 +76,7 @@ tse <- TreeSummarizedExperiment(rowTree = tinyTree,
 \seealso{
 \code{\link{TreeSummarizedExperiment-class}}
   \code{\link{TreeSummarizedExperiment-accessor}}
-  \code{\link[SummarizedExperiment]{SummarizedExperiment-class}}
+  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 }
 \author{
 Ruizhu HUANG

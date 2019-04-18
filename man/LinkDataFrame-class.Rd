@@ -6,31 +6,13 @@
 \title{LinkDataFrame: A S4 class extended from DataFrame
 An S4 class LinkDataFrame}
 \description{
-The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} by
-adding one new slot \code{LinkData}
+The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} to
+include at least four columns \code{nodeLab}, \code{nodeLab_alias},
+\code{nodeNum}, and \code{isLeaf}.
 }
-\section{Slots}{
-
-\describe{
-\item{\code{LinkData}}{A \link[S4Vectors]{DataFrame-class}. It will be shown in the
-left side of the vertical line when print out the generated
-\code{LinkDataFrame}.}
-
-\item{\code{...}}{Other slots from \link[S4Vectors]{DataFrame-class}.}
-}}
-
 \section{Constructor}{
 
 See \code{\link{LinkDataFrame-constructor}} for constructor
 functions.
 }
 
-\section{Accessor}{
-
-See \code{\link{LinkDataFrame-accessor}} for accessor functions.
-}
-
-\seealso{
-\code{\link{LinkDataFrame-accessor}}
-  \code{\link{LinkDataFrame-constructor}} \link[S4Vectors]{DataFrame-class}
-}
