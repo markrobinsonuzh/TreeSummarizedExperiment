@@ -16,8 +16,11 @@
 #' available for \strong{TreeSummarizedExperiment}.
 #'
 #' @param x A TreeSummarizedExperiment object
-#' @param i,j The row, column index to subset \code{x}
-#' @param drop A logical value, TRUE or FALSE
+#' @param i,j The row, column index to subset \code{x}. The arguments of the
+#'   subset function \code{[]}
+#' @param drop A logical value, TRUE or FALSE. The argument from the subset
+#'   function \code{[]}
+#' @param ... The argument from the subset function \code{[]}
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}

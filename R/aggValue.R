@@ -67,7 +67,7 @@
 #' aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 #' FUN = sum)
 #'
-#' assays(aggRow)[[1]]
+#' assays(aggCol)[[1]]
 aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                     FUN = sum, message = FALSE) {
     ## --------------------- check input before run ---------------------------

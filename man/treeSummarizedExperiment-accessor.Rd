@@ -36,9 +36,13 @@ colTree(x)
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
 
-\item{i, j}{The row, column index to subset \code{x}}
+\item{i, j}{The row, column index to subset \code{x}. The arguments of the
+subset function \code{[]}}
 
-\item{drop}{A logical value, TRUE or FALSE}
+\item{...}{The argument from the subset function \code{[]}}
+
+\item{drop}{A logical value, TRUE or FALSE. The argument from the subset
+function \code{[]}}
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.

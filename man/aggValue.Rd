@@ -75,7 +75,7 @@ tse <- TreeSummarizedExperiment(assays = list(toyTable),
 aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 FUN = sum)
 
-assays(aggRow)[[1]]
+assays(aggCol)[[1]]
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
