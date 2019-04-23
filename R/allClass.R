@@ -78,19 +78,19 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class. It has
 #' four more slots that are not in
 #' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class:
-#' \code{rowTree}, \code{rowLink} \code{colTree} and \code{colLink}. The
+#' \code{rowTree}, \code{rowLinks} \code{colTree} and \code{colLinks}. The
 #' hierarchical information of rows (columns) is stored in \code{rowTree}
 #' (\code{colTree}) and the link between the rows (columns) of \code{assays}
-#' tables and nodes of the tree is given in \code{rowLink} (\code{colLink}).
+#' tables and nodes of the tree is given in \code{rowLinks} (\code{colLinks}).
 #'
 #' @slot rowTree A phylo object or NULL. It gives information about the
-#'   hiearchical structure of rows of \code{assay} tables.
+#'   hiearchical structure of rows of \code{assays} tables.
 #' @slot colTree A phylo object or NULL. It gives information about the
-#'   hiearchical structure of columns of \code{assay} tables.
-#' @slot rowLink A LinkDataFrame. It gives information about the link between
-#'   the nodes of the \code{rowTree} and the rows of \code{assay} tables.
-#' @slot colLink A LinkDataFrame. It gives information about the link between
-#'   the nodes of the \code{colTree} and the columns of \code{assay} tables.
+#'   hiearchical structure of columns of \code{assays} tables.
+#' @slot rowLinks A LinkDataFrame. It gives information about the link between
+#'   the nodes of the \code{rowTree} and the rows of \code{assays} tables.
+#' @slot colLinks A LinkDataFrame. It gives information about the link between
+#'   the nodes of the \code{colTree} and the columns of \code{assays} tables.
 #' @slot ... Other slots from
 #'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
 #'
@@ -107,10 +107,10 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #'   (\code{rowTree} on rows; \code{colTree} on columns), and the mapping
 #'   information between the tree nodes and the rows or the columns of the
 #'   rectangular data. Users could provide the hiearchical structure of the
-#'   rows, columns or both) of the \code{assay} tables, and the link data will
-#'   be automatically generated in \code{rowLink}, \code{colData} or both,
-#'   respectively. It's required that the object in \code{rowLink} or
-#'   \code{colLink} has the \code{LinkDataFrame} class. Please see the page
+#'   rows, columns or both) of the \code{assays} tables, and the link data will
+#'   be automatically generated in \code{rowLinks}, \code{colData} or both,
+#'   respectively. It's required that the object in \code{rowLinks} or
+#'   \code{colLinks} has the \code{LinkDataFrame} class. Please see the page
 #'   \code{\link{LinkDataFrame}} for more details.
 #'
 #' @importFrom methods setClass
@@ -124,8 +124,8 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 setClass("TreeSummarizedExperiment",
          representation(rowTree = "phyloOrNULL",
                         colTree = "phyloOrNULL",
-                        rowLink = "LinkDataFrame",
-                        colLink = "LinkDataFrame"),
+                        rowLinks = "LinkDataFrame",
+                        colLinks = "LinkDataFrame"),
          contains = "SingleCellExperiment",
          validity = .checkTSE)
 
@@ -176,7 +176,7 @@ setClass("TreeSummarizedExperiment",
 #'  \item isLeaf It indicates whether the node is a leaf node or internal node.
 #'  }
 #'
-#' @import SingleCellExperiment
+#' @importFrom SummarizedExperiment assays colData<- rowData<-
 #' @importFrom S4Vectors DataFrame
 #' @importFrom methods new is as
 #' @export
@@ -251,19 +251,23 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
 
     # -------------------------------------------------------------------------
     ## create the link data
-    tse <- as(sce, "TreeSummarizedExperiment")
+    tse <- new("TreeSummarizedExperiment", sce)
     # the rows:
     if (isRow) {
+        rowD <- rowData(sce)
+        rowData(tse) <- rowD[, setdiff(colnames(rowD), "nodeLab")]
         tse@rowTree <- rowTree
-        tse@rowLink <- .linkFun(tree = rowTree, sce = sce, onRow = TRUE)
+        tse@rowLinks <- .linkFun(tree = rowTree, sce = sce, onRow = TRUE)
 
     }
 
 
     # the columns:
     if (isCol) {
+        colD <- colData(sce)
+        colData(tse) <- colD[, setdiff(colnames(colD), "nodeLab")]
         tse@colTree <- colTree
-        tse@colLink <- .linkFun(tree = colTree, sce = sce, onRow = FALSE)
+        tse@colLinks <- .linkFun(tree = colTree, sce = sce, onRow = FALSE)
     }
 
     return(tse)

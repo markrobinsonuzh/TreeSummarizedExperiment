@@ -16,8 +16,7 @@ tree node number(s)}
 that only requried when \code{return = "label"}. The default is FALSE, and
 the node label would be returned; otherwise, the alias of node label would
 be output. The alias of node label is created by adding a prefix
-\code{"Node_"} to the node number if the node is an internal node or adding
-a prefix \code{"Leaf_"} if the node is a leaf node.}
+\code{"alias_"} to the node number.}
 
 \item{message}{A logical value, TRUE or FALSE. The default is FALSE. If TRUE,
 message will show when a tree have duplicated labels for some internal
@@ -44,7 +43,7 @@ hjust = -0.3, color = 'blue')
 transNode(tinyTree, node = c(11, 2, 4, 15))
 
 transNode(tree = tinyTree, node = c("Node_16", "Node_11"))
-
+transNode(tree = tinyTree, node = c("alias_16", "alias_11"))
 }
 \author{
 Ruizhu Huang

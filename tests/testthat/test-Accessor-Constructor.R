@@ -50,10 +50,10 @@ test_that("assays could be written successfully", {
 
 test_that("row data could be extracted successfully", {
     expect_equal(colnames(rowData(tse)), setdiff(colnames(rowInf), "nodeLab"))
-    expect_setequal(colnames(linkData(tse)), c("nodeLab", "nodeLab_alias",
+    expect_setequal(colnames(rowLinks(tse)), c("nodeLab", "nodeLab_alias",
                                          "nodeNum", "isLeaf"))
-    expect_equal(treeData(tse, onRow = TRUE), tinyTree)
-    expect_equal(metaCol(tse, onRow = TRUE), rowInf[, !colnames(rowInf) %in% "nodeLab"])
+    expect_equal(rowTree(tse), tinyTree)
+
 })
 
 test_that("row data could be written successfully", {

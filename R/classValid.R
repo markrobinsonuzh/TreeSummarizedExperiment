@@ -54,40 +54,40 @@
     }
 
     # -------------------------------------------------------------------------
-    # check the dimension is correct for rowLink and colLink
+    # check the dimension is correct for rowLinks and colLinks
     if (!is.null(rTree)) {
-        rowEq <- nrow(object@rowLink) == nrow(object)
+        rowEq <- nrow(object@rowLinks) == nrow(object)
 
         if (!rowEq) {
-            msg <- sprintf("rowLink: %d rows are expected",
+            msg <- sprintf("rowLinks: %d rows are expected",
                            nrow(object))
             errors <- c(errors, msg)
         }
     }
 
     if (!is.null(cTree)) {
-        colEq <- nrow(object@colLink) == ncol(object)
+        colEq <- nrow(object@colLinks) == ncol(object)
 
         if (!colEq) {
-            msg <- sprintf("rowLink: %d rows are expected",
+            msg <- sprintf("rowLinks: %d rows are expected",
                            ncol(object))
             errors <- c(errors, msg)
         }
     }
 
     # -------------------------------------------------------------------------
-    # if rowTree doesn't exist, rowLink should have 0 rows
+    # if rowTree doesn't exist, rowLinks should have 0 rows
     if (is.null(rTree)) {
-        if (nrow(object@rowLink)) {
-            msg <- sprintf("rowLink: %d row is expected when rowTree is NULL",
+        if (nrow(object@rowLinks)) {
+            msg <- sprintf("rowLinks: %d row is expected when rowTree is NULL",
                            0)
             errors <- c(errors, msg)
         }
     }
 
     if (is.null(cTree)) {
-        if (nrow(object@colLink)) {
-            msg <- sprintf("colLink: %d row is expected when colTree is NULL",
+        if (nrow(object@colLinks)) {
+            msg <- sprintf("colLinks: %d row is expected when colTree is NULL",
                            0)
             errors <- c(errors, msg)
         }

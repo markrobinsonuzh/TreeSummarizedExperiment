@@ -130,7 +130,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     ## -------------------- aggregation on row dimension ----------------------
     if (onRow) {
         rD <- rowData(x)
-        rL <- rowLink(x)
+        rL <- rowLinks(x)
         outR <- .aggFun(tree = rTree,
                         assayTab = mat,
                         dimData = rD,
@@ -142,13 +142,13 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         mat <- outR$dataTab
     }else{
         nrD <- rowData(x)
-        nrD$nodeLab <- rowLink(x)$nodeLab
+        nrD$nodeLab <- rowLinks(x)$nodeLab
     }
 
     ## -------------------- aggregation on column dimension ----------------
     if (onCol) {
         cD <- colData(x)
-        cL <- colLink(x)
+        cL <- colLinks(x)
         outC <- .aggFun(tree = cTree,
                         assayTab = lapply(mat, t),
                         dimData = cD,
@@ -159,7 +159,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         mat <- lapply(outC$dataTab, t)
     } else {
         ncD <- colData(x)
-        ncD$nodeLab <- colLink(x)$nodeLab
+        ncD$nodeLab <- colLinks(x)$nodeLab
     }
 
     # create the new TreeSummarizedExperiment object

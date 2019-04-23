@@ -27,7 +27,9 @@ ggtree(tinyTree) +
     geom_text2(aes(label = branch.length), color = "darkblue",
                vjust = 0.7)
 
-# remove the blue branch
-distNode(tree = tinyTree, node = c(10, 11))
 
+distNode(tree = tinyTree, node = c(10, 11))
+distNode(tree = tinyTree, node = c(12, 13))
+distNode(tree = tinyTree, node = c(13, 15))
+distNode(tree = tinyTree, node = c(12, 14))
 }

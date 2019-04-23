@@ -9,10 +9,10 @@ The class \strong{TreeSummarizedExperiment} is an extension class of standard
 \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class. It has
 four more slots that are not in
 \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class:
-\code{rowTree}, \code{rowLink} \code{colTree} and \code{colLink}. The
+\code{rowTree}, \code{rowLinks} \code{colTree} and \code{colLinks}. The
 hierarchical information of rows (columns) is stored in \code{rowTree}
 (\code{colTree}) and the link between the rows (columns) of \code{assays}
-tables and nodes of the tree is given in \code{rowLink} (\code{colLink}).
+tables and nodes of the tree is given in \code{rowLinks} (\code{colLinks}).
 }
 \details{
 The class \strong{TreeSummarizedExperiment} is designed to store
@@ -21,26 +21,26 @@ The class \strong{TreeSummarizedExperiment} is designed to store
   (\code{rowTree} on rows; \code{colTree} on columns), and the mapping
   information between the tree nodes and the rows or the columns of the
   rectangular data. Users could provide the hiearchical structure of the
-  rows, columns or both) of the \code{assay} tables, and the link data will
-  be automatically generated in \code{rowLink}, \code{colData} or both,
-  respectively. It's required that the object in \code{rowLink} or
-  \code{colLink} has the \code{LinkDataFrame} class. Please see the page
+  rows, columns or both) of the \code{assays} tables, and the link data will
+  be automatically generated in \code{rowLinks}, \code{colData} or both,
+  respectively. It's required that the object in \code{rowLinks} or
+  \code{colLinks} has the \code{LinkDataFrame} class. Please see the page
   \code{\link{LinkDataFrame}} for more details.
 }
 \section{Slots}{
 
 \describe{
 \item{\code{rowTree}}{A phylo object or NULL. It gives information about the
-hiearchical structure of rows of \code{assay} tables.}
+hiearchical structure of rows of \code{assays} tables.}
 
 \item{\code{colTree}}{A phylo object or NULL. It gives information about the
-hiearchical structure of columns of \code{assay} tables.}
+hiearchical structure of columns of \code{assays} tables.}
 
-\item{\code{rowLink}}{A LinkDataFrame. It gives information about the link between
-the nodes of the \code{rowTree} and the rows of \code{assay} tables.}
+\item{\code{rowLinks}}{A LinkDataFrame. It gives information about the link between
+the nodes of the \code{rowTree} and the rows of \code{assays} tables.}
 
-\item{\code{colLink}}{A LinkDataFrame. It gives information about the link between
-the nodes of the \code{colTree} and the columns of \code{assay} tables.}
+\item{\code{colLinks}}{A LinkDataFrame. It gives information about the link between
+the nodes of the \code{colTree} and the columns of \code{assays} tables.}
 
 \item{\code{...}}{Other slots from
 \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}}
