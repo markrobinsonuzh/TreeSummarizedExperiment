@@ -17,11 +17,11 @@
 #'     geom_text2(aes(label = branch.length), color = "darkblue",
 #'                vjust = 0.7)
 #'
-#' # remove the blue branch
-#' distNode(tree = tinyTree, node = c(10, 11))
 #'
-
-
+#' distNode(tree = tinyTree, node = c(10, 11))
+#' distNode(tree = tinyTree, node = c(12, 13))
+#' distNode(tree = tinyTree, node = c(13, 15))
+#' distNode(tree = tinyTree, node = c(12, 14))
 
 distNode <- function(tree, node) {
 
@@ -29,44 +29,63 @@ distNode <- function(tree, node) {
         node <- transNode(tree = tree, node = node)
     }
 
-    sNode <- shareNode(tree = tree, node = node)
-
+    mat <- matTree(tree)
     ed <- tree$edge
-    mt <- matTree(tree = tree)
-    wi <- apply(mt, 1, FUN = function(x) {
-        nn <- c(node, sNode)
-        nn <- unique(nn)
-        sum(nn %in% x) == 2
+
+    oo <- lapply(node, FUN = function(x) {
+        xx <- which(mat == x, arr.ind = TRUE)
+        return(xx)
     })
 
-
-    # edges connect two nodes
-    if (sum(wi) > 2) {
-        wi <- which(wi)[1]
-        smt1 <- mt[wi, ]
-        ss <- smt1[!is.na(smt1)]
-        rs <- rev(ss)
-        smt2 <- rs[rs %in% node]
-        smt2 <- rbind(smt2)
-
+    samePath <- intersect(oo[[1]][, "row"], oo[[2]][, "row"])
+    if (length(samePath)) {
+        dd <- .samePath(tree = tree, node = node)
     } else {
-        smt1 <- mt[wi, , drop = FALSE]
-        smt2 <- lapply(seq_len(nrow(smt1)), FUN = function(x){
-            xx <- smt1[x, ]
-            wx <- which(xx == sNode)
-            x1 <- xx[seq_len(wx)]
-            x2 <- rev(x1)
-            rr <- seq_len(length(x2)-1)
-            cbind(x2[rr], x2[rr+1])
-        })
-        smt2 <- do.call(rbind, smt2)
+        dd <- .diffPath(tree = tree, node = node)
     }
 
-    fi <- match(data.frame(t(smt2)), data.frame(t(ed)))
+    return(dd)
 
+    }
+
+.samePath <- function(tree, node) {
+    # edges
+    ed <- tree$edge
+
+    # edge.length
     len <- tree$edge.length
 
+    # the input nodes are not directly connected but in the same path
+    mt <- matTree(tree = tree)
+    loc <- lapply(node, FUN = function(x) {
+        xx <- which(mt == x, arr.ind = TRUE)
+    })
+
+    shareRow <- intersect(loc[[1]][, "row"], loc[[2]][, "row"])
+    ush <- unique(shareRow)[1]
+
+    loc <- do.call(rbind, loc)
+    tcol <- loc[loc[, "row"] == ush, "col"]
+    sel <- seq(from = max(tcol), to = min(tcol), by = -1)
+    pn <- mt[ush, sel[-length(sel)]]
+    cn <- mt[ush, sel[-1]]
+    pir <- cbind(pn, cn)
+    fi <- match(data.frame(t(pir)), data.frame(t(ed)))
     dd <- sum(len[fi])
 
     return(dd)
 }
+
+.diffPath <- function(tree, node) {
+    # the share node
+    sNode <- shareNode(tree = tree, node = node)
+
+
+    d1 <- .samePath(tree = tree, node = c(node[1], sNode))
+    d2 <- .samePath(tree = tree, node = c(node[2], sNode))
+    dd <- d1 + d2
+
+    return(dd)
+}
+
+
