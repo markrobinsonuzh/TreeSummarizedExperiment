@@ -30,23 +30,33 @@
 #'  findSibling(tree = tinyTree, node = c(13, 17))
 findSibling <- function(tree, node, use.alias = FALSE){
 
-    # find descendant leaves of the input node
-    inT <- findOS(tree = tree, node = node,
-               only.leaf = TRUE)
+    if (is.character(node)) {
+        node <- transNode(tree = tree, node = node, message = FALSE)
+    }
+    matT <- matTree(tree = tree)
+
     # find the parent node of the input node
     pN <- findAncestor(tree = tree, node = node, level = 1)
 
-    # Leaves not included in input node
-    exT <- lapply(seq_along(pN), FUN = function(x) {
-        aT <- findOS(tree = tree, node = pN[x], only.leaf = TRUE)[[1]]
-        setdiff(aT, inT[[x]])
+    # find the siblings
+    loc1 <- lapply(pN, FUN = function(x) {
+        which(matT == x, arr.ind = TRUE)
     })
 
-    # replace leaves with their ancestor branch node
-    fT <- lapply(exT, FUN = function(x) {
-        signalNode(tree = tree, node = x,
-                   use.alias = use.alias)} )
-    out <- unlist(fT)
+    loc2 <- lapply(loc1, FUN = function(x) {
+        x1 <- x[, "col"]
+        x2 <- x1 - 1
+
+        mc <- cbind(row = x[, "row"],
+                    col = x2)
+    })
+
+    sib <- lapply(seq_along(loc2), FUN = function(x){
+        xx <- matT[loc2[[x]]]
+        setdiff(xx, node[x])
+
+        })
+    out <- unlist(sib)
 
     names(out) <- transNode(tree = tree, node = out,
                             use.alias = use.alias,
