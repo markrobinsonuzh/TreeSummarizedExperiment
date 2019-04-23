@@ -11,8 +11,8 @@
 #'
 #' All accessor functions that work on
 #' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} should work on
-#' \strong{TreeSummarizedExperiment}. Additionally, new accessors \code{rowLink}
-#' \code{colLink}, \code{rowTree} and \code{colTree} accessor function are
+#' \strong{TreeSummarizedExperiment}. Additionally, new accessors \code{rowLinks}
+#' \code{colLinks}, \code{rowTree} and \code{colTree} accessor function are
 #' available for \strong{TreeSummarizedExperiment}.
 #'
 #' @param x A TreeSummarizedExperiment object
@@ -66,9 +66,9 @@
 #'
 #' ## extract the linkData
 #' # on rows
-#' (rowL <- rowLink(x = toy_tse))
+#' (rowL <- rowLinks(x = toy_tse))
 #' # on columns
-#' (colL <- colLink(x = toy_tse))
+#' (colL <- colLinks(x = toy_tse))
 #'
 #'  ## extract the treeData
 #' # on rows

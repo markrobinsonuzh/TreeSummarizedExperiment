@@ -4,30 +4,30 @@
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("rowLink", function(x)
-    standardGeneric("rowLink")
+setGeneric("rowLinks", function(x)
+    standardGeneric("rowLinks")
 )
 
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setMethod("rowLink", signature("TreeSummarizedExperiment"),
+setMethod("rowLinks", signature("TreeSummarizedExperiment"),
           function(x) {
-              x@rowLink
+              x@rowLinks
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("colLink", function(x)
-    standardGeneric("colLink")
+setGeneric("colLinks", function(x)
+    standardGeneric("colLinks")
 )
 
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setMethod("colLink", signature("TreeSummarizedExperiment"),
+setMethod("colLinks", signature("TreeSummarizedExperiment"),
           function(x) {
-              x@colLink
+              x@colLinks
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -71,8 +71,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
              # Subset the traditional slots from SummarizedExperiment
               nx <- callNextMethod()
 
-              # Subset the rowLink
-              lr <- x@rowLink
+              # Subset the rowLinks
+              lr <- x@rowLinks
               rt <- x@rowTree
               if (!missing(i) & !is.null(rt)) {
                   nlr <- lr[i, , drop = FALSE]
@@ -80,8 +80,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
                   nlr <- lr
               }
 
-              # Subset the colLink
-              lc <- x@colLink
+              # Subset the colLinks
+              lc <- x@colLinks
               ct <- x@colTree
               if (!missing(j) & !is.null(ct)) {
                   nlc <- lc[j, , drop = FALSE]
@@ -92,8 +92,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
 
               # update slots
               final <- BiocGenerics:::replaceSlots(nx,
-                                                   rowLink = nlr,
-                                                   colLink = nlc)
+                                                   rowLinks = nlr,
+                                                   colLinks = nlc)
 
               return(final)
           })
@@ -109,35 +109,35 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
 
 
 
-    rlk <- rowLink(object)
-    clk <- colLink(object)
+    rlk <- rowLinks(object)
+    clk <- colLinks(object)
 
     # on row
     if (is.null(rt)) {
-        msg1a <- "rowLink:"
+        msg1a <- "rowLinks:"
         msg1b <- "rowTree:"
     } else {
-        msg1a <- sprintf("rowLink: a LinkDataFrame (%d %s)",
+        msg1a <- sprintf("rowLinks: a LinkDataFrame (%d %s)",
                          nrow(rlk), "rows")
 
 
         # the number of leaf nodes & internal nodes
         nlr <- countLeaf(rt)
         nnr <- countNode(rt) - countLeaf(rt)
-        msg1b <- sprintf("rowTree: a %s ", class(rt))
+        msg1b <- sprintf("rowTree: a %s (%d leaves)", class(rt), nlr)
     }
 
     # on column
     if (is.null(ct)) {
-        msg2a <- "colLink:"
+        msg2a <- "colLinks:"
         msg2b <- "colTree:"
     } else {
-        msg2a <- sprintf("colLink: a LinkDataFrame (%d %s)", nrow(clk), "rows")
+        msg2a <- sprintf("colLinks: a LinkDataFrame (%d %s)", nrow(clk), "rows")
 
         # the number of leaf nodes & internal nodes
         nlc <- countLeaf(ct)
         nnc <- countNode(ct) - countLeaf(ct)
-        msg2b <- sprintf("colTree: a %s", class(ct))
+        msg2b <- sprintf("colTree: a %s (%d leaves)", class(ct), nlc)
     }
 
     cat(msg1a, "\n", msg1b, "\n",
