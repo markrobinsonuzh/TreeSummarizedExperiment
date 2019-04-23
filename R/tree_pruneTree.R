@@ -25,16 +25,26 @@
 #'            hjust = -0.1, vjust = -0.7) +
 #'     geom_text2(aes(label = node), color = "darkblue",
 #'                hjust = -0.5, vjust = 0.7) +
-#'     geom_hilight(node = 18)
+#'     geom_hilight(node = 18) +
+#'     geom_point2()
 #'
 #' # remove the blue branch
-#' NT <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5),
+#' NT1 <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5),
+#'                 mergeSingle = FALSE)
+#'
+#' ggtree(NT1, branch.length = "none") +
+#'     geom_text2(aes(label = label), color = "darkorange",
+#'                hjust = -0.1, vjust = -0.7) +
+#'     geom_point2()
+#'
+#' # if mergeSingle = TRUE, the node (Node_17) is removed.
+#' NT2 <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5),
 #'                 mergeSingle = TRUE)
 #'
-#' ggtree(NT) +
+#' ggtree(NT2, branch.length = "none") +
 #'     geom_text2(aes(label = label), color = "darkorange",
-#'                hjust = -0.1, vjust = -0.7)
-#'
+#'                hjust = -0.1, vjust = -0.7) +
+#'     geom_point2()
 
 pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
 
@@ -109,18 +119,6 @@ pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
     tipLab.new <- nodeA[mat[tip.new, "old"]]
     nodeLab.new <- nodeA[mat[intNode.new, "old"]]
     rootNode <- setdiff(ed[, 1], ed[, 2])
-
-    # if (length(tree$edge.length) < length(nodeA)) {
-    #     len <- tree$edge.length
-    #     ll <- cbind(len = len,
-    #                 nodeNum = setdiff(nodeA, rootNode))
-    #     len.new <- ll[ll[, "nodeNum"] %in% mat[, "old"], "len"]
-    # } else{
-    #     len <- tree$edge.length
-    #     ll <- cbind(len = len, nodeNum = nodeA)
-    #     len.new <- ll[ll[, "nodeNum"] %in% mat[, "old"], "len"]
-    #
-    # }
 
     len <- tree$edge.length
     len.new <- apply(edo, 1, FUN = function(x){

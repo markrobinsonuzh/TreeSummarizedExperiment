@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment
-Version: 0.99.20
+Version: 0.99.21
 Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945"))
 Description: TreeSummarizedExperiment has extended SingleCellExperiment to 
