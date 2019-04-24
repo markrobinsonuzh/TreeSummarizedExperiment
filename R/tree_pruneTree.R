@@ -48,6 +48,7 @@
 
 pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
 
+
     # Use the node number
     if (is.character(rmLeaf)) {
         rmLeaf <- transNode(tree = tree, node = rmLeaf)
@@ -56,6 +57,22 @@ pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
     # edges & paths
     ed <- tree$edge
     mt <- matTree(tree = tree)
+
+    # tree labels
+    tipLab <- tree$tip.label
+    nodeLab <- tree$node.label
+    nodeA <- sort(unique(as.vector(ed)))
+    names(nodeA) <- c(tipLab, nodeLab)
+
+
+    # check the existance of the node label alias
+    if (is.null(tree$alias.label)) {
+        tree$alias.label <- transNode(tree = tree, node = nodeA,
+                                      use.alias = TRUE, message = FALSE)
+    }
+    nodeA_alias <- nodeA
+    nodeLab_alias <- tree$alias.label
+    names(nodeA_alias) <-  nodeLab_alias
 
     # The path to be deleted
     mi <- match(rmLeaf, mt[, "L1"])
@@ -99,7 +116,7 @@ pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
     rownames(edm) <- NULL
     edo <- edm[!duplicated(edm), ]
 
-
+    # new edge matrix
     xx <- unique(sort(edo))
     mat <- cbind(old = xx, new = seq_along(xx)) # the pair (old - new )
     edn <- apply(edo, 2, FUN = function(x) {
@@ -107,27 +124,30 @@ pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
         mat[ind, "new"]
     })
 
-    # tree labels
-    tipLab <- tree$tip.label
-    nodeLab <- tree$node.label
-    nodeA <- sort(unique(as.vector(ed)))
-    names(nodeA) <- c(tipLab, nodeLab)
 
+    # new nodes
     tip.new <- sort(setdiff(edn[, 2], edn[, 1]))
     intNode.new <- sort(unique(edn[, 1]))
 
+    # new labels
     tipLab.new <- nodeA[mat[tip.new, "old"]]
+    tipLab.new <- names(tipLab.new)
     nodeLab.new <- nodeA[mat[intNode.new, "old"]]
-    rootNode <- setdiff(ed[, 1], ed[, 2])
+    nodeLab.new <- names(nodeLab.new)
+    if (all(is.na(nodeLab.new))) {
+        nodeLab.new <- NULL
+    }
+    nodeLab_alias.new <- nodeA_alias[mat[c(tip.new, intNode.new), "old"]]
+    alias.new <- names(nodeLab_alias.new)
 
     len <- tree$edge.length
     len.new <- apply(edo, 1, FUN = function(x){
         distNode(tree = tree, node = x)
     })
 
-    br <- list(edge = edn, tip.label = names(tipLab.new),
+    br <- list(edge = edn, tip.label = tipLab.new,
                edge.length = len.new, Nnode = length(intNode.new),
-               node.label = names(nodeLab.new), nodeNumPair = mat)
+               node.label = nodeLab.new, alias.label = alias.new)
     attr(br, "class") <- attr(tree, "class")
     attr(br, "order") <- attr(tree, "order")
 
