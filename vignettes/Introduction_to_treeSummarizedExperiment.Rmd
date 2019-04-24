@@ -102,12 +102,9 @@ denoted as **treeC**. We create them by using the function `rtree` from the
 package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
-data(treeR)
-class(treeR)
+data("treeR")
 # Toy tree 2
-data(treeC)
-treeC$tip.label <- colnames(toyTable)
-treeC$node.label <- c("All", "GroupA", "GroupB")
+data("treeC")
 ```
 
 The created trees are `phylo` objects. The `phylo` object is actually a list
@@ -607,6 +604,7 @@ rmRows <- function(dat) {
     
 }
 (rte <- rmRows(dat = tse))
+rowLinks(rte)
 ```
 
 The function `rmRows` doesn't update the tree data. To update the tree, we could
@@ -634,25 +632,29 @@ updateTSE <- function(dat) {
     # pruneTree is a function work on the phylo class
     newTree <- pruneTree(tree = rowT, rmLeaf = out, mergeSingle = TRUE)
 
-    # the node number changed after the tree is pruned
-    # The pair between the old and new node number is output from the pruneTree
-    nodePair <- newTree$nodeNumPair
-
-    ## update the row link data
-    mm <- match(rowL$nodeNum, nodePair[, "old"])
-    rowL$nodeNum <- nodePair[mm, "new"]
-    rowL$nodeLab <- transNode(tree = newTree, node = rowL$nodeNum,
-                              use.alias = FALSE)
-    rowL$nodeLab_alias <- transNode(tree = newTree, node = rowL$nodeNum,
+    # Not all trees have internal node labels, so nodeLab_alias is used to
+    # update the link data
+    rowNL <- DataFrame(rowL)
+    rowNL$nodeNum <- transNode(tree = newTree, node = rowL$nodeLab_alias,
                                use.alias = TRUE)
-    rowL$isLeaf <- isLeaf(tree = newTree, node = rowL$nodeNum)
+    rowNL$nodeLab <- transNode(tree = newTree, node = rowNL$nodeNum,
+                               use.alias = FALSE)
+    rowNL$isLeaf <- isLeaf(tree = newTree, node = rowNL$nodeNum)
 
+    rowNL <- as(rowNL, "LinkDataFrame")
     ## update the tree
     newDat <- BiocGenerics:::replaceSlots(dat,
-                                          rowLinks = rowL)
+                                          rowLinks = rowNL,
+                                          rowTree = newTree)
     return(newDat)
 }
+```
+
+Now the row tree has four leaves.
+```{r}
 ntse <- updateTSE(dat = rte)
+ntse
+rowLinks(ntse)
 ```
 
 # Session Info

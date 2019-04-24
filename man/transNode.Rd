@@ -12,11 +12,12 @@ transNode(tree, node, use.alias = FALSE, message = FALSE)
 \item{node}{A character or numeric vector representing tree node label(s) or
 tree node number(s)}
 
-\item{use.alias}{A logical value, TRUE or FALSE. This is an optional argument
-that only requried when \code{return = "label"}. The default is FALSE, and
-the node label would be returned; otherwise, the alias of node label would
-be output. The alias of node label is created by adding a prefix
-\code{"alias_"} to the node number.}
+\item{use.alias}{A logical value, TRUE or FALSE. If the input \code{node} is
+character and \code{use.alias = TRUE}, it tells that the input label is the
+alias of node labels; otherwise, it tells that the input label is the
+original node labels; If the input \code{node} is numeric and
+\code{use.alias = TRUE}, the alias of node labels are returned; otherwise,
+the original node labels are returned.}
 
 \item{message}{A logical value, TRUE or FALSE. The default is FALSE. If TRUE,
 message will show when a tree have duplicated labels for some internal
@@ -40,10 +41,12 @@ geom_text2(aes(label = node), vjust = -0.8,
 hjust = -0.3, color = 'blue')
 
 #check whether the node number and node label are matched
-transNode(tinyTree, node = c(11, 2, 4, 15))
+transNode(tinyTree, node = c(11, 2, 4, 15), use.alias = FALSE)
+transNode(tinyTree, node = c(11, 2, 4, 15), use.alias = TRUE)
 
 transNode(tree = tinyTree, node = c("Node_16", "Node_11"))
-transNode(tree = tinyTree, node = c("alias_16", "alias_11"))
+transNode(tree = tinyTree, node = c("alias_16", "alias_11"),
+use.alias = TRUE)
 }
 \author{
 Ruizhu Huang

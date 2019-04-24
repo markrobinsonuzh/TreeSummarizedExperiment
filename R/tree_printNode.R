@@ -33,16 +33,25 @@ printNode <- function(tree, type = "leaf"){
     # edges
     edge <- tree$edge
 
+    # the alias label
+    labAlias <- tree$alias.label
+
+    if (is.null(labAlias)) {
+        message("The alias label can't be found;
+                 Prefix 'alias_' to the node number as the alias label.")
+
+    }
     # leaves
     leaf <- setdiff(edge[, 2], edge[, 1])
     leaf <- sort(leaf)
     labL <- tree$tip.label
 
     outL <- data.frame(nodeLab = labL,
-                       nodeLab_alias = paste0("alias_", leaf),
+                       nodeLab_alias = paste0("alias", leaf),
                        nodeNum = leaf,
                        isLeaf = TRUE,
                        stringsAsFactors = FALSE)
+
 
     # all nodes
     nodeA <- unique(as.vector(edge))
