@@ -102,12 +102,10 @@ denoted as **treeC**. We create them by using the function `rtree` from the
 package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
-set.seed(1)
-treeR <- rtree(5)
+data(treeR)
 class(treeR)
 # Toy tree 2
-set.seed(4)
-treeC <- rtree(4)
+data(treeC)
 treeC$tip.label <- colnames(toyTable)
 treeC$node.label <- c("All", "GroupA", "GroupB")
 ```
