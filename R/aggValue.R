@@ -9,13 +9,14 @@
 #' @param x A \code{TreeSummarizedExperiment} object or a matrix. If the latter
 #'   is given, the tree structure is required (more details in \code{rowTree}
 #'   and \code{colTree}).
-#' @param rowLevel A numeric or character vector. The default is NULL. It
-#'   provides the level on the tree that the aggregation is performed to. The
-#'   aggregation is on the row dimension of matrix (or the \code{assay} tables).
-#' @param colLevel A numeric or character vector. The default is NULL. It
-#'   provides the level on the tree that the aggregation is performed to. The
-#'   aggregation is on the column dimension of matrix (or the \code{assay}
-#'   tables).
+#' @param rowLevel A numeric (node numbers) or character (node labels) vector.
+#'   It provides the level on the tree that data is aggregated to. The
+#'   aggregation is on the row dimension. The default is \code{rowLevel = NULL},
+#'   and no aggregation is performed.
+#' @param colLevel A numeric (node numbers) or character (node labels) vector.
+#'   It provides the level on the tree that data is aggregated to. The
+#'   aggregation is on the column dimension. The default is \code{colLevel = NULL},
+#'   and no aggregation is performed.
 #' @param FUN A function to be applied on the aggregation. It's similar to the
 #'   \code{FUN} in \code{\link[base]{apply}}
 #' @param message A logical value. The default is TRUE. If TRUE, it will print
@@ -129,6 +130,10 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
     ## -------------------- aggregation on row dimension ----------------------
     if (onRow) {
+        if (message) {
+            message("The row aggregation is using ", deparse(substitute(FUN)))
+        }
+
         rD <- rowData(x)
         rL <- rowLinks(x)
         outR <- .aggFun(tree = rTree,
@@ -147,6 +152,10 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
     ## -------------------- aggregation on column dimension ----------------
     if (onCol) {
+        if (message) {
+            message("The column aggregation is using ",
+                    deparse(substitute(FUN)))
+        }
         cD <- colData(x)
         cL <- colLinks(x)
         outC <- .aggFun(tree = cTree,
@@ -184,7 +193,6 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     numAR <- unique(as.vector(ed))
 
     # The aggregation level
-    if (is.null(level)) {level <- numR}
     if (is.character(level)) {
         level <- transNode(tree = tree, node = level,
                            use.alias = FALSE, message = FALSE)
@@ -290,13 +298,4 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
     out <- list(dataTab = outR, newDD = newDD)
     return(out)
-}
-
-
-
-
-
-
-
-
-
+    }
