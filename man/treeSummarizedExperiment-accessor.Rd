@@ -50,9 +50,9 @@ Elements from \code{TreeSummarizedExperiment}.
 \description{
 All accessor functions that work on
 \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} should work on
-\strong{TreeSummarizedExperiment}. Additionally, new accessors \code{rowLinks}
-\code{colLinks}, \code{rowTree} and \code{colTree} accessor function are
-available for \strong{TreeSummarizedExperiment}.
+\strong{TreeSummarizedExperiment}. Additionally, new accessors
+\code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
+function are available for \strong{TreeSummarizedExperiment}.
 }
 \examples{
 

@@ -15,8 +15,8 @@
 #'   and no aggregation is performed.
 #' @param colLevel A numeric (node numbers) or character (node labels) vector.
 #'   It provides the level on the tree that data is aggregated to. The
-#'   aggregation is on the column dimension. The default is \code{colLevel = NULL},
-#'   and no aggregation is performed.
+#'   aggregation is on the column dimension. The default is \code{colLevel =
+#'   NULL}, and no aggregation is performed.
 #' @param FUN A function to be applied on the aggregation. It's similar to the
 #'   \code{FUN} in \code{\link[base]{apply}}
 #' @param message A logical value. The default is TRUE. If TRUE, it will print
@@ -69,6 +69,7 @@
 #' FUN = sum)
 #'
 #' assays(aggCol)[[1]]
+#'
 aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                     FUN = sum, message = FALSE) {
     ## --------------------- check input before run ---------------------------
@@ -113,7 +114,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         if (message) {
             message("Perform aggregation on the row dimension... ")
         }
-       }
+    }
 
     if (is.null(colLevel)) {
         onCol <- FALSE
@@ -298,4 +299,4 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
     out <- list(dataTab = outR, newDD = newDD)
     return(out)
-    }
+}
