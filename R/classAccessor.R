@@ -11,9 +11,9 @@
 #'
 #' All accessor functions that work on
 #' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} should work on
-#' \strong{TreeSummarizedExperiment}. Additionally, new accessors \code{rowLinks}
-#' \code{colLinks}, \code{rowTree} and \code{colTree} accessor function are
-#' available for \strong{TreeSummarizedExperiment}.
+#' \strong{TreeSummarizedExperiment}. Additionally, new accessors
+#' \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
+#' function are available for \strong{TreeSummarizedExperiment}.
 #'
 #' @param x A TreeSummarizedExperiment object
 #' @param i,j The row, column index to subset \code{x}. The arguments of the

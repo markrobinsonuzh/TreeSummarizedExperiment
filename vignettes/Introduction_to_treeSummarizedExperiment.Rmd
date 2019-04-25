@@ -158,7 +158,12 @@ rse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 rowTree = treeR)
 ```
 
-When printing out **rse**, we see a similar message as `SingleCellExperiment` with four additional lines about `rowLinks`, `rowTree`, `colLinks` and `colTree`. Here, **rse** stores a row tree (`phylo` object), and the `rowLinks` has `r nrow(rse)` rows that is exactly the same as the number of rows in the `assays` tables. More details about the link data could be found in Section \@ref(linkData).
+When printing out **rse**, we see a similar message as `SingleCellExperiment`
+with four additional lines about `rowLinks`, `rowTree`, `colLinks` and
+`colTree`. Here, **rse** stores a row tree (`phylo` object), and the `rowLinks`
+has `r nrow(rse)` rows that is exactly the same as the number of rows in the
+`assays` tables. More details about the link data could be found in Section
+\@ref(linkData).
 
 ```{r}
 rse
@@ -193,7 +198,8 @@ tse
 ## The accessor functions
 ### Assays, rowData, colData, and metadata
 
-It's exactly the same work as shown in `r Biocpkg("SingleCellExperiment")` to exctract slots inherited from the `SingleCellExperiment` class.
+It's exactly the same work as shown in `r Biocpkg("SingleCellExperiment")` to
+exctract slots inherited from the `SingleCellExperiment` class.
 
 ```{r}
 # to get the first table in the assays
@@ -247,7 +253,8 @@ showClass("LinkDataFrame")
 nrow(rLink) == nrow(tse)
 ```
 
-Similarly, the number of rows of `colLinks` data matches with the number of columns of `assays` table.
+Similarly, the number of rows of `colLinks` data matches with the number of
+columns of `assays` table.
 ```{r}
 (cLink <- colLinks(tse))
 nrow(cLink) == ncol(tse)

@@ -19,8 +19,8 @@ and no aggregation is performed.}
 
 \item{colLevel}{A numeric (node numbers) or character (node labels) vector.
 It provides the level on the tree that data is aggregated to. The
-aggregation is on the column dimension. The default is \code{colLevel = NULL},
-and no aggregation is performed.}
+aggregation is on the column dimension. The default is \code{colLevel =
+NULL}, and no aggregation is performed.}
 
 \item{FUN}{A function to be applied on the aggregation. It's similar to the
 \code{FUN} in \code{\link[base]{apply}}}
@@ -77,6 +77,7 @@ aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 FUN = sum)
 
 assays(aggCol)[[1]]
+
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}

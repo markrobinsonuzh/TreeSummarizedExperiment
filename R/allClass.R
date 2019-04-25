@@ -45,7 +45,8 @@ setClass("LinkDataFrame",
 #' @param nodeLab_alias A character vector
 #' @param nodeNum A numeric vector
 #' @param isLeaf A logical vector
-#' @param ... All arguments accepted by \code{\link[S4Vectors]{DataFrame-class}}.
+#' @param ... All arguments accepted by
+#'   \code{\link[S4Vectors]{DataFrame-class}}.
 #'
 #' @importFrom S4Vectors DataFrame
 #' @name LinkDataFrame-constructor
