@@ -7,7 +7,7 @@ Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
 Description: TreeSummarizedExperiment has extended SingleCellExperiment to 
     include hierarchical information on the rows or columns of the rectangular 
     data.
-Depends: R(>= 3.6.0), SingleCellExperiment, S4Vectors
+Depends: R(>= 3.5.0), SingleCellExperiment, S4Vectors
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
