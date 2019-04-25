@@ -25,7 +25,7 @@ a TreeSummarizedExperiment object
 \details{
 The output TreeSummarizedExperiment object has very similar
   structure as the
-  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}. The
+  \code{\link[SingleCellExperiment]{SingleCellExperiment}}. The
   differences are summarized be as below.
   \itemize{
   \item \strong{rowTree} A slot exists in \code{TreeSummarizedExperiment}
@@ -76,7 +76,7 @@ tse <- TreeSummarizedExperiment(rowTree = tinyTree,
 \seealso{
 \code{\link{TreeSummarizedExperiment-class}}
   \code{\link{TreeSummarizedExperiment-accessor}}
-  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
+  \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 }
 \author{
 Ruizhu HUANG

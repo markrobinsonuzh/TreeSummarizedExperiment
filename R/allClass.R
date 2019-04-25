@@ -76,9 +76,9 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' An S4 class TreeSummarizedExperiment
 #'
 #' The class \strong{TreeSummarizedExperiment} is an extension class of standard
-#' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class. It has
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} class. It has
 #' four more slots that are not in
-#' \code{\link[SingleCellExperiment]{SingleCellExperiment-class}} class:
+#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} class:
 #' \code{rowTree}, \code{rowLinks} \code{colTree} and \code{colLinks}. The
 #' hierarchical information of rows (columns) is stored in \code{rowTree}
 #' (\code{colTree}) and the link between the rows (columns) of \code{assays}
@@ -93,7 +93,7 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' @slot colLinks A LinkDataFrame. It gives information about the link between
 #'   the nodes of the \code{colTree} and the columns of \code{assays} tables.
 #' @slot ... Other slots from
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
+#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #'
 #' @section Constructor:
 #' See \code{\link{TreeSummarizedExperiment-constructor}} for constructor
@@ -121,7 +121,7 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' @exportClass TreeSummarizedExperiment
 #' @seealso \code{\link{TreeSummarizedExperiment}}
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
+#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 setClass("TreeSummarizedExperiment",
          representation(rowTree = "phyloOrNULL",
                         colTree = "phyloOrNULL",
@@ -149,7 +149,7 @@ setClass("TreeSummarizedExperiment",
 #'
 #' @details The output TreeSummarizedExperiment object has very similar
 #'   structure as the
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}. The
+#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}. The
 #'   differences are summarized be as below.
 #'   \itemize{
 #'   \item \strong{rowTree} A slot exists in \code{TreeSummarizedExperiment}
@@ -187,7 +187,7 @@ setClass("TreeSummarizedExperiment",
 #' @author Ruizhu HUANG
 #' @seealso \code{\link{TreeSummarizedExperiment-class}}
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
+#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 #' @examples
 #'
 #' data("tinyTree")

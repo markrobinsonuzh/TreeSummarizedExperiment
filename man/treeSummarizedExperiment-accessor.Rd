@@ -49,7 +49,7 @@ Elements from \code{TreeSummarizedExperiment}.
 }
 \description{
 All accessor functions that work on
-\code{\link[SingleCellExperiment]{SingleCellExperiment-class}} should work on
+\code{\link[SingleCellExperiment]{SingleCellExperiment}} should work on
 \strong{TreeSummarizedExperiment}. Additionally, new accessors
 \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 function are available for \strong{TreeSummarizedExperiment}.
@@ -106,7 +106,7 @@ toy_tse <- TreeSummarizedExperiment(assays = list(y),
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
-  \code{\link[SingleCellExperiment]{SingleCellExperiment-class}}
+  \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 }
 \author{
 Ruizhu HUANG
