@@ -12,14 +12,15 @@ aggValue(x, rowLevel = NULL, colLevel = NULL, FUN = sum,
 is given, the tree structure is required (more details in \code{rowTree}
 and \code{colTree}).}
 
-\item{rowLevel}{A numeric or character vector. The default is NULL. It
-provides the level on the tree that the aggregation is performed to. The
-aggregation is on the row dimension of matrix (or the \code{assay} tables).}
+\item{rowLevel}{A numeric (node numbers) or character (node labels) vector.
+It provides the level on the tree that data is aggregated to. The
+aggregation is on the row dimension. The default is \code{rowLevel = NULL},
+and no aggregation is performed.}
 
-\item{colLevel}{A numeric or character vector. The default is NULL. It
-provides the level on the tree that the aggregation is performed to. The
-aggregation is on the column dimension of matrix (or the \code{assay}
-tables).}
+\item{colLevel}{A numeric (node numbers) or character (node labels) vector.
+It provides the level on the tree that data is aggregated to. The
+aggregation is on the column dimension. The default is \code{colLevel = NULL},
+and no aggregation is performed.}
 
 \item{FUN}{A function to be applied on the aggregation. It's similar to the
 \code{FUN} in \code{\link[base]{apply}}}
