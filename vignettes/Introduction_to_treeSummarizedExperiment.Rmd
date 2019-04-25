@@ -33,7 +33,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 # Introduction 
 
 The `TreeSummarizedExperiment` class is an extensions of the
-`SingleCellExperiment` class. It's used to store rectangular data of
+`SingleCellExperiment` class[@Aaron2019]. It's used to store rectangular data of
 experimental results as in a `SingleCellExperiment`, and also support the
 storage of a hierarchical structure and its link information to the rectangular
 data. 
@@ -59,6 +59,11 @@ Correspondingly, the `rowLinks` and `colLinks` would have $0$ rows. Other slots
 in `TreeSummarizedExperiment` are exactly the same as those in
 `SingleCellExperiment`.
 
+The slots `rowTree` and `colTree` only accept the tree data as the `phylo`
+class. If the tree is availabel in other formats, one would need to convert it
+to `phylo` with other R packages. For example, the package `r Biocpkg("treeio")`
+provides 12 functions to import different tree formats and output `phylo` object
+in the slot `phylo`.
 
 ## Toy data
 
@@ -102,9 +107,15 @@ denoted as **treeC**. We create them by using the function `rtree` from the
 package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
-data("treeR")
+set.seed(1)
+treeR <- rtree(5)
+class(treeR)
+
 # Toy tree 2
-data("treeC")
+set.seed(4)
+treeC <- rtree(4)
+treeC$tip.label <- colnames(toyTable)
+treeC$node.label <- c("All", "GroupA", "GroupB")
 ```
 
 The created trees are `phylo` objects. The `phylo` object is actually a list
@@ -114,8 +125,8 @@ class(treeR)
 str(treeR)
 ```
 
-The package `r Biocpkg("ggtree")` has been used to visualize the tree. The node
-labels and node numbers are in blue and orange texts, respectively. The
+The package `r Biocpkg("ggtree")` [@Yu2017] has been used to visualize the tree.
+The node labels and node numbers are in blue and orange texts, respectively. The
 **treeR** has no labels for internal nodes.
 
 ```{r rtree, fig.cap="\\label{rtree} The structure of the row tree"}
@@ -466,7 +477,7 @@ rowData(aggF)
 
 Here, we show some functions as examples to manipulate or to extract information
 from the `phylo` object. More functions could be found in other packages, such
-as `r CRANpkg("ape")`, `r CRANpkg("tidytree")`. These functions might be useful
+as `r CRANpkg("ape")`[@ape2018], `r CRANpkg("tidytree")`. These functions might be useful
 when R package developers want to create their own functions to work on the
 `TreeSummarizedExperiment` class.
 
@@ -681,3 +692,5 @@ rowLinks(ntse)
 ```{r}
 sessionInfo()
 ```
+
+# Reference
