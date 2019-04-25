@@ -1,12 +1,12 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment
-Version: 0.99.30
+Version: 0.99.31
 Authors@R: person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945"))
 Description: TreeSummarizedExperiment has extended SingleCellExperiment to 
     include hierarchical information on the rows or columns of the rectangular data.
-Depends: R(>= 3.6.0), SingleCellExperiment
+Depends: R(>= 3.6.0), SingleCellExperiment, S4Vectors
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
@@ -16,7 +16,6 @@ Imports:
     utils,
     ape,
     dplyr,
-    S4Vectors, 
     SummarizedExperiment
 VignetteBuilder: knitr
 Suggests: 
@@ -33,7 +32,6 @@ Collate:
     'allGenerics.R'
     'classAccessor.R'
     'data.R'
-    'toTree.R'
     'tree_countLeaf.R'
     'tree_countNode.R'
     'tree_distNode.R'
@@ -46,4 +44,6 @@ Collate:
     'tree_pruneTree.R'
     'tree_shareNode.R'
     'tree_signalNode.R'
+    'tree_toTree.R'
+    'tree_trackNode.R'
     'tree_transNode.R'

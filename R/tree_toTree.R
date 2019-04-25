@@ -7,10 +7,12 @@
 #'   the output `phylo` has 6 elements (edge, tip.label, edge.length, Nnode,
 #'   node.label, and cache). The \strong{cache} is a list that has the length
 #'   equals to the number of internal node, and each of its element stores the
-#'   descendant leaves.
+#'   descendant leaves. The list is named with the alias labels of internal
+#'   nodes. The alias labels are created by prefixing the node numbers with
+#'   \code{alias_}
 #'
 #' @details The last column is used as the leaf nodes
-#' @importFrom utils head tail
+#' @importFrom S4Vectors head tail
 #' @importFrom dplyr arrange_all
 #' @return a phylo object
 #' @author Ruizhu HUANG
