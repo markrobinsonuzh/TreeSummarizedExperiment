@@ -41,7 +41,7 @@ setGeneric("rowTree", function(x)
 #' @export
 setMethod("rowTree", signature("TreeSummarizedExperiment"),
           function(x) {
-              x@rowTree
+              x@rowTree$phylo
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -55,7 +55,7 @@ setGeneric("colTree", function(x)
 #' @export
 setMethod("colTree", signature("TreeSummarizedExperiment"),
           function(x) {
-              x@colTree
+              x@colTree$phylo
           })
 
 
@@ -72,8 +72,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               nx <- callNextMethod()
 
               # Subset the rowLinks
-              lr <- x@rowLinks
-              rt <- x@rowTree
+              lr <- rowLinks(x)
+              rt <- rowTree(x)
               if (!missing(i) & !is.null(rt)) {
                   nlr <- lr[i, , drop = FALSE]
               } else {
@@ -81,8 +81,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               }
 
               # Subset the colLinks
-              lc <- x@colLinks
-              ct <- x@colTree
+              lc <- colLinks(x)
+              ct <- colTree(x)
               if (!missing(j) & !is.null(ct)) {
                   nlc <- lc[j, , drop = FALSE]
               } else {

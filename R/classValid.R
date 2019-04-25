@@ -14,19 +14,22 @@
     errors <- character()
     # -------------------------------------------------------------------------
     # If provided, the row tree should be a phylo object; otherwise, NULL
-    rTree <- object@rowTree
-    isRT <- class(rTree) %in% c("phylo", "NULL")
-    if (!isRT) {
+    rTree <- rowTree(object)
+
+    if (!is.null(rTree)) {
+        if (!is(rTree, "phylo")) {
         msg <- "The row tree is not a phylo object. \n"
         errors <- c(errors, msg)
-    }
+        }
+     }
 
     # If provided, the column tree should be a phylo object; otherwise, NULL
-    cTree <- object@colTree
-    isCT <- class(cTree) %in% c("phylo", "NULL")
-    if (!isCT) {
-        msg <- "The column tree is not a phylo object. \n"
-        errors <- c(errors, msg)
+    cTree <- colTree(object)
+    if (!is.null(cTree)) {
+        if (!is(cTree, "phylo")) {
+            msg <- "The column tree is not a phylo object. \n"
+            errors <- c(errors, msg)
+        }
     }
 
     # -------------------------------------------------------------------------

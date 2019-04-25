@@ -662,7 +662,7 @@ updateRowTree <- function(tse, dropLeaf) {
     ## update the row tree and links
     newDat <- BiocGenerics:::replaceSlots(tse,
                                           rowLinks = rowNL,
-                                          rowTree = newTree)
+                                          rowTree = list(phylo = newTree))
     return(newDat)
     
 }

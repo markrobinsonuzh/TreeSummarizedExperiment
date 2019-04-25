@@ -148,7 +148,9 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         mat <- outR$dataTab
     }else{
         nrD <- rowData(x)
-        nrD$nodeLab <- rowLinks(x)$nodeLab
+        if (!is.null(rTree)) {
+            nrD$nodeLab <- rowLinks(x)$nodeLab
+        }
     }
 
     ## -------------------- aggregation on column dimension ----------------
@@ -169,7 +171,9 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         mat <- lapply(outC$dataTab, t)
     } else {
         ncD <- colData(x)
-        ncD$nodeLab <- colLinks(x)$nodeLab
+        if (!is.null(cTree)) {
+            ncD$nodeLab <- colLinks(x)$nodeLab
+        }
     }
 
     # create the new TreeSummarizedExperiment object
