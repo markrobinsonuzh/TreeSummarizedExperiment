@@ -16,7 +16,7 @@
 phylo <- structure(list(), class = "phylo")
 setOldClass("phylo")
 
-setClassUnion("phyloOrNULL", c("phylo", "NULL"))
+setClassUnion("listOrNULL", c("list", "NULL"))
 #-------------------------------------------------------------------------------
 #' LinkDataFrame: A S4 class extended from DataFrame
 #-------------------------------------------------------------------------------
@@ -123,8 +123,8 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
 #'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 setClass("TreeSummarizedExperiment",
-         representation(rowTree = "phyloOrNULL",
-                        colTree = "phyloOrNULL",
+         representation(rowTree = "listOrNULL",
+                        colTree = "listOrNULL",
                         rowLinks = "LinkDataFrame",
                         colLinks = "LinkDataFrame"),
          contains = "SingleCellExperiment",
@@ -253,22 +253,32 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     # -------------------------------------------------------------------------
     ## create the link data
     tse <- new("TreeSummarizedExperiment", sce)
+    tse@rowTree <- list(phylo = rowTree)
+
     # the rows:
     if (isRow) {
         rowD <- rowData(sce)
-        rowData(tse) <- rowD[, setdiff(colnames(rowD), "nodeLab")]
-        tse@rowTree <- rowTree
         tse@rowLinks <- .linkFun(tree = rowTree, sce = sce, onRow = TRUE)
-
+        rowData(tse) <- rowD[, setdiff(colnames(rowD), "nodeLab")]
+    } else {
+        tse@rowLinks <- LinkDataFrame(nodeLab = character(0),
+                                      nodeLab_alias = character(0),
+                                      nodeNum = numeric(0),
+                                      isLeaf = logical(0))
     }
 
-
+    tse@colTree <- list(phylo = colTree)
     # the columns:
     if (isCol) {
         colD <- colData(sce)
-        colData(tse) <- colD[, setdiff(colnames(colD), "nodeLab")]
-        tse@colTree <- colTree
         tse@colLinks <- .linkFun(tree = colTree, sce = sce, onRow = FALSE)
+        colData(tse) <- colD[, setdiff(colnames(colD), "nodeLab")]
+
+    } else {
+        tse@colLinks <- LinkDataFrame(nodeLab = character(0),
+                                      nodeLab_alias = character(0),
+                                      nodeNum = numeric(0),
+                                      isLeaf = logical(0))
     }
 
     return(tse)
@@ -314,9 +324,8 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
         }
 
     # decide whether treeLab or treeLab_alias should be used
-    sw1 <- startsWith(lab, "Node_")
-    sw2 <- startsWith(lab, "Leaf_")
-    sw <- all(sw1 | sw2)
+    sw <- startsWith(lab, "alias_")
+    sw <- all(sw)
 
     # Match lab with the alias of the node labels on the tree
     if (sw) {
