@@ -8,9 +8,7 @@ aggValue(x, rowLevel = NULL, colLevel = NULL, FUN = sum,
   message = FALSE)
 }
 \arguments{
-\item{x}{A \code{TreeSummarizedExperiment} object or a matrix. If the latter
-is given, the tree structure is required (more details in \code{rowTree}
-and \code{colTree}).}
+\item{x}{A \code{TreeSummarizedExperiment} object.}
 
 \item{rowLevel}{A numeric (node numbers) or character (node labels) vector.
 It provides the level on the tree that data is aggregated to. The

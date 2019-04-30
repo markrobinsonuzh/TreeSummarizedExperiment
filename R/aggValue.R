@@ -6,9 +6,7 @@
 #' tree. Users could decide on which dimension (row or column) and how should
 #' the aggregation be performed.
 #'
-#' @param x A \code{TreeSummarizedExperiment} object or a matrix. If the latter
-#'   is given, the tree structure is required (more details in \code{rowTree}
-#'   and \code{colTree}).
+#' @param x A \code{TreeSummarizedExperiment} object.
 #' @param rowLevel A numeric (node numbers) or character (node labels) vector.
 #'   It provides the level on the tree that data is aggregated to. The
 #'   aggregation is on the row dimension. The default is \code{rowLevel = NULL},
