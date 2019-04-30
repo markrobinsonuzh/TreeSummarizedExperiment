@@ -20,7 +20,7 @@
 #' @examples
 #' library(ggtree)
 #' data(tinyTree)
-#' ggtree(tinyTree) +
+#' ggtree(tinyTree, branch.length = "none") +
 #'     geom_text2(aes(label = label), color = "darkorange",
 #'            hjust = -0.1, vjust = -0.7) +
 #'     geom_text2(aes(label = node), color = "darkblue",
@@ -40,6 +40,9 @@
 #' # if mergeSingle = TRUE, the node (Node_17) is removed.
 #' NT2 <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5),
 #'                 mergeSingle = TRUE)
+#' # or use the ape::drop.tip
+#' # NT3 <-  ape::drop.tip(phy = tinyTree, tip = 4:5)
+#' # all.equal(NT2, NT3)
 #'
 #' ggtree(NT2, branch.length = "none") +
 #'     geom_text2(aes(label = label), color = "darkorange",
