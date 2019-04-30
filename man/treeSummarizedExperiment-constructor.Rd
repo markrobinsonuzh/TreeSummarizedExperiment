@@ -5,16 +5,25 @@
 \alias{TreeSummarizedExperiment}
 \title{Construct a TreeSummarizedExperiment object}
 \usage{
-TreeSummarizedExperiment(rowTree = NULL, colTree = NULL, ...)
+TreeSummarizedExperiment(..., rowTree = NULL, colTree = NULL,
+  rowNodeLab = NULL, colNodeLab = NULL)
 }
 \arguments{
+\item{...}{Arguments to pass to the \code{SummarizedExperiment} constructor.}
+
 \item{rowTree}{A phylo object that provides hiearchical information of rows
 of assay tables.}
 
 \item{colTree}{A phylo object that provides hiearchical information of
 columns of assay tables.}
 
-\item{...}{Arguments to pass to the \code{SummarizedExperiment} constructor.}
+\item{rowNodeLab}{A character string. It provides the labels of nodes that
+the rows of \code{assays} tables corresponding to. If NULL (default), the
+row names of the \code{assays} tables are used.}
+
+\item{colNodeLab}{A character string. It provides the labels of nodes that
+the columns of \code{assays} tables corresponding to. If NULL (default),
+the column names of the \code{assays} tables are used.}
 }
 \value{
 a TreeSummarizedExperiment object
@@ -68,9 +77,9 @@ sampC <- data.frame(condition = rep(c("control", "trt"), each = 5),
 rownames(sampC) <- colnames(count)
 
 # build a TreeSummarizedExperiment object
-tse <- TreeSummarizedExperiment(rowTree = tinyTree,
-                                assays = list(count),
-                                colData = sampC)
+tse <- TreeSummarizedExperiment(assays = list(count),
+                                colData = sampC,
+                                rowTree = tinyTree)
 
 }
 \seealso{

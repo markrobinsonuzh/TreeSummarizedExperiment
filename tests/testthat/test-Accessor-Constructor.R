@@ -10,7 +10,6 @@ data("tinyTree")
 # row data
 rowInf <- DataFrame(var1 = sample(letters[1:2], 10, replace = TRUE),
                     var2 = sample(c(TRUE, FALSE), 10, replace = TRUE),
-                    nodeLab = tinyTree$tip.label,
                     row.names = rownames(toyTable))
 # column data
 colInf <- DataFrame(gg = c(1, 2, 3, 3),
@@ -18,6 +17,7 @@ colInf <- DataFrame(gg = c(1, 2, 3, 3),
                     row.names = colnames(toyTable))
 tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 rowData = rowInf,
+                                rowNodeLab = tinyTree$tip.label,
                                 colData = colInf,
                                 rowTree = tinyTree)
 test_that("TreeSummarizedExperiment constuctor works", {
@@ -31,7 +31,7 @@ test_that("TreeSummarizedExperiment constuctor works", {
                                        colData = colInf),
               "TreeSummarizedExperiment")
 
-    expect_message(TreeSummarizedExperiment(assays = list(toyTable),
+    expect_warning(TreeSummarizedExperiment(assays = list(toyTable),
                                           rowData = rowInf,
                                           colData = colInf,
                                           colTree = tinyTree))
@@ -49,7 +49,7 @@ test_that("assays could be written successfully", {
 })
 
 test_that("row data could be extracted successfully", {
-    expect_equal(colnames(rowData(tse)), setdiff(colnames(rowInf), "nodeLab"))
+    expect_equal(colnames(rowData(tse)), colnames(rowInf))
     expect_setequal(colnames(rowLinks(tse)), c("nodeLab", "nodeLab_alias",
                                          "nodeNum", "isLeaf"))
     expect_equal(rowTree(tse), tinyTree)

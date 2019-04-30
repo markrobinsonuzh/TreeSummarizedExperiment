@@ -68,10 +68,11 @@ ggtree(treeC, size = 2) +
     geom_text2(aes(label = label), color = "darkorange",
                hjust = -0.1, vjust = -0.7, size = 6)
 
-colInf$nodeLab <- treeC$tip.label
+
 tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 colData = colInf,
-                                colTree = treeC)
+                                colTree = treeC,
+                                colNodeLab = treeC$tip.label)
 
 aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 FUN = sum)
