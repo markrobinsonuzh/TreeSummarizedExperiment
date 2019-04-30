@@ -1,9 +1,11 @@
 language: r
+warnings_are_errors: false
 r: bioc-devel
 sudo: required
 cache: packages
 r_packages:
   - covr
+
 after_success:
   - Rscript -e 'library(covr); codecov()'
 r_binary_packages:
