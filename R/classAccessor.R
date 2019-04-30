@@ -50,8 +50,6 @@
 #' sampTree$tip.label <- colnames(y)
 #'
 #' # create the TreeSummarizedExperiment object
-#' rowInf$nodeLab <- rownames(y)
-#' colInf$nodeLab <- colnames(y)
 #' toy_tse <- TreeSummarizedExperiment(assays = list(y),
 #'                                     rowData = rowInf,
 #'                                     colData = colInf,

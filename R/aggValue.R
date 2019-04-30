@@ -60,10 +60,11 @@
 #'     geom_text2(aes(label = label), color = "darkorange",
 #'                hjust = -0.1, vjust = -0.7, size = 6)
 #'
-#' colInf$nodeLab <- treeC$tip.label
+#'
 #' tse <- TreeSummarizedExperiment(assays = list(toyTable),
 #'                                 colData = colInf,
-#'                                 colTree = treeC)
+#'                                 colTree = treeC,
+#'                                 colNodeLab = treeC$tip.label)
 #'
 #' aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 #' FUN = sum)
@@ -145,11 +146,15 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                         FUN = FUN,
                         message = message)
         nrD <- outR$newDD
+        nrD <- nrD[, setdiff(colnames(nrD), "nodeLab")]
+        nrL <- outR$newDD$nodeLab
         mat <- outR$dataTab
     }else{
         nrD <- rowData(x)
         if (!is.null(rTree)) {
-            nrD$nodeLab <- rowLinks(x)$nodeLab
+            nrL <- rowLinks(x)$nodeLab
+        } else {
+            nrL <- NULL
         }
     }
 
@@ -168,20 +173,25 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                         level = colLevel,
                         FUN = FUN)
         ncD <- outC$newDD
+        ncD <- ncD[, setdiff(colnames(ncD), "nodeLab")]
+        ncL <- outC$newDD$nodeLab
         mat <- lapply(outC$dataTab, t)
     } else {
         ncD <- colData(x)
+
         if (!is.null(cTree)) {
-            ncD$nodeLab <- colLinks(x)$nodeLab
-        }
+            ncL <- colLinks(x)$nodeLab
+        } else {ncL <- NULL}
     }
 
     # create the new TreeSummarizedExperiment object
     out <- TreeSummarizedExperiment(assays = mat,
-                                    rowTree = rTree,
-                                    colTree = cTree,
                                     rowData = nrD,
-                                    colData = ncD)
+                                    colData = ncD,
+                                    rowTree = rTree,
+                                    rowNodeLab = nrL,
+                                    colTree = cTree,
+                                    colNodeLab = ncL)
 
     return(out)
 }
@@ -225,8 +235,10 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     })
     miR <- unique(unlist(miR))
     if (length(miR)) {
-        warning(length(miR), "leaves couldn't be found from the assay table.
-                You might want to clean the tree before aggregation \n")
+        warning(length(miR), "leaves couldn't be found from the assay table.\n")
+        miR <- transNode(tree = tree, node = miR,
+                         use.alias = FALSE, message = FALSE)
+        warning("Missing leaves: ", head(miR), " ...")
     }
 
     ## Perform the aggregation
