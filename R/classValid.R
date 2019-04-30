@@ -81,17 +81,15 @@
     # -------------------------------------------------------------------------
     # if rowTree doesn't exist, rowLinks should have 0 rows
     if (is.null(rTree)) {
-        if (nrow(object@rowLinks)) {
-            msg <- sprintf("rowLinks: %d row is expected when rowTree is NULL",
-                           0)
+        if (!is.null(object@rowLinks)) {
+            msg <- "rowLinks should be NULL when rowTree doesn't exist \n"
             errors <- c(errors, msg)
         }
     }
 
     if (is.null(cTree)) {
-        if (nrow(object@colLinks)) {
-            msg <- sprintf("colLinks: %d row is expected when colTree is NULL",
-                           0)
+        if (!is.null(object@colLinks)) {
+            msg <- "colLinks should be NULL when colTree doesn't exist \n"
             errors <- c(errors, msg)
         }
     }

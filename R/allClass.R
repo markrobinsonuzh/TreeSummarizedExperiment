@@ -16,7 +16,7 @@
 phylo <- structure(list(), class = "phylo")
 setOldClass("phylo")
 
-setClassUnion("listOrNULL", c("list", "NULL"))
+setClassUnion("list_Or_NULL", c("list", "NULL"))
 #-------------------------------------------------------------------------------
 #' LinkDataFrame: A S4 class extended from DataFrame
 #-------------------------------------------------------------------------------
@@ -37,6 +37,7 @@ setClass("LinkDataFrame",
          contains = "DataFrame",
          validity = .checkLDF)
 
+setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #-------------------------------------------------------------------------------
 #' Construct a LinkDataFrame
 #-------------------------------------------------------------------------------
@@ -123,10 +124,10 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
 #'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
 setClass("TreeSummarizedExperiment",
-         representation(rowTree = "listOrNULL",
-                        colTree = "listOrNULL",
-                        rowLinks = "LinkDataFrame",
-                        colLinks = "LinkDataFrame"),
+         representation(rowTree = "list_Or_NULL",
+                        colTree = "list_Or_NULL",
+                        rowLinks = "LinkDataFrame_Or_NULL",
+                        colLinks = "LinkDataFrame_Or_NULL"),
          contains = "SingleCellExperiment",
          validity = .checkTSE)
 
@@ -141,11 +142,17 @@ setClass("TreeSummarizedExperiment",
 #'
 #' \code{TreeSummarizedExperiment} constructs a TreeSummarizedExperiment object.
 #'
+#' @inheritParams SingleCellExperiment::SingleCellExperiment
 #' @param rowTree A phylo object that provides hiearchical information of rows
 #'   of assay tables.
 #' @param colTree A phylo object that provides hiearchical information of
 #'   columns of assay tables.
-#' @inheritParams SingleCellExperiment::SingleCellExperiment
+#' @param rowNodeLab A character string. It provides the labels of nodes that
+#'   the rows of \code{assays} tables corresponding to. If NULL (default), the
+#'   row names of the \code{assays} tables are used.
+#' @param colNodeLab A character string. It provides the labels of nodes that
+#'   the columns of \code{assays} tables corresponding to. If NULL (default),
+#'   the column names of the \code{assays} tables are used.
 #'
 #' @details The output TreeSummarizedExperiment object has very similar
 #'   structure as the
@@ -203,12 +210,24 @@ setClass("TreeSummarizedExperiment",
 #' rownames(sampC) <- colnames(count)
 #'
 #' # build a TreeSummarizedExperiment object
-#' tse <- TreeSummarizedExperiment(rowTree = tinyTree,
-#'                                 assays = list(count),
-#'                                 colData = sampC)
+#' tse <- TreeSummarizedExperiment(assays = list(count),
+#'                                 colData = sampC,
+#'                                 rowTree = tinyTree)
 #'
-TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
-                                     ...){
+TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
+                                     rowNodeLab = NULL, colNodeLab = NULL) {
+
+    if (!is.null(rowNodeLab)) {
+        if (!is.character(rowNodeLab)) {
+            stop("rowNodeLab should be a character vector")
+        }
+    }
+
+    if (!is.null(colNodeLab)) {
+        if (!is.character(colNodeLab)) {
+            stop("colNodeLab should be a character vector")
+        }
+    }
 
     # -------------------------------------------------------------------------
     ## create a SummarizedExperiment object
@@ -253,41 +272,41 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     # -------------------------------------------------------------------------
     ## create the link data
     tse <- new("TreeSummarizedExperiment", sce)
-    tse@rowTree <- list(phylo = rowTree)
 
     # the rows:
     if (isRow) {
-        rowD <- rowData(sce)
-        tse@rowLinks <- .linkFun(tree = rowTree, sce = sce, onRow = TRUE)
-        rowData(tse) <- rowD[, setdiff(colnames(rowD), "nodeLab")]
+        rowData(tse) <- rowData(sce)
+        out <- .linkFun(tree = rowTree, sce = sce,
+                                 nodeLab = rowNodeLab, onRow = TRUE)
+        tse <- tse[out$isKeep, ]
+        tse@rowTree <- list(phylo = rowTree)
+        tse@rowLinks <- out$link
+
     } else {
-        tse@rowLinks <- LinkDataFrame(nodeLab = character(0),
-                                      nodeLab_alias = character(0),
-                                      nodeNum = numeric(0),
-                                      isLeaf = logical(0))
+        tse@rowLinks <- NULL
     }
 
-    tse@colTree <- list(phylo = colTree)
+
     # the columns:
     if (isCol) {
-        colD <- colData(sce)
-        tse@colLinks <- .linkFun(tree = colTree, sce = sce, onRow = FALSE)
-        colData(tse) <- colD[, setdiff(colnames(colD), "nodeLab")]
+        colData(tse) <- colData(sce)
+        out <- .linkFun(tree = colTree, sce = sce,
+                        nodeLab = colNodeLab, onRow = FALSE)
+        tse <- tse[, out$isKeep]
+        tse@colTree <- list(phylo = colTree)
+        tse@colLinks <- out$link
 
     } else {
-        tse@colLinks <- LinkDataFrame(nodeLab = character(0),
-                                      nodeLab_alias = character(0),
-                                      nodeNum = numeric(0),
-                                      isLeaf = logical(0))
+        tse@colLinks <- NULL
     }
+
 
     return(tse)
 }
 
 # An internal function to create the link data and added to the rowData or
 # colData
-.linkFun <- function(tree, sce, onRow = TRUE){
-
+.linkFun <- function(tree, sce, nodeLab, onRow = TRUE) {
     if (onRow) {
         annDat <- rowData(sce)
     } else {
@@ -303,24 +322,15 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     treeLab_alias <- transNode(tree = tree, node = nodeA,
                                use.alias = TRUE, message = FALSE)
 
-
-
     # ------------------ labels from the assays table -------------------------
-    # The order to be used: nodeLab_alias > nodeLab > the row names
-    # nodeLab_alias
-    lab <- as.data.frame(annDat)$nodeLab_alias
+    # The order to be used:nodeLab > the row names
+    lab <- nodeLab
 
-    # if nodeLab_alias is not available, use nodeLab
-    if (is.null(lab)) {
-        lab <- as.data.frame(annDat)$nodeLab
-    }
-
-    # if nodeLab_alias and nodeLab are not available, use the row names
+    # if nodeLab is not available, use the row names
     if (is.null(lab)) {
         lab <- rownames(annDat)
         if (is.null(lab)) {
-            stop("Either a nodeLab column or the row names should be
-                 provided for ", kw ," data. \n")}
+            stop(kw, "NodeLab should be provided. \n")}
         }
 
     # decide whether treeLab or treeLab_alias should be used
@@ -338,7 +348,7 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
     # excluded
     isOut <- !isIn
     if (sum(isOut) > 0) {
-        message(sum(isOut), " ", kw,
+        warning(sum(isOut), " ", kw,
                 "(s) couldn't be matched to the tree and are/is removed. \n")}
 
     if (onRow) {
@@ -364,6 +374,6 @@ TreeSummarizedExperiment <- function(rowTree = NULL, colTree = NULL,
                        isLeaf = nd %in% leaf)
 
 
-    # create the rowData
-    return(linkD)
+    out <- list(link = linkD, isKeep = isIn)
+    return(out)
     }

@@ -114,8 +114,8 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
 
     # on row
     if (is.null(rt)) {
-        msg1a <- "rowLinks:"
-        msg1b <- "rowTree:"
+        msg1a <- "rowLinks: NULL"
+        msg1b <- "rowTree: NULL"
     } else {
         msg1a <- sprintf("rowLinks: a LinkDataFrame (%d %s)",
                          nrow(rlk), "rows")
@@ -129,8 +129,8 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
 
     # on column
     if (is.null(ct)) {
-        msg2a <- "colLinks:"
-        msg2b <- "colTree:"
+        msg2a <- "colLinks: NULL"
+        msg2b <- "colTree: NULL"
     } else {
         msg2a <- sprintf("colLinks: a LinkDataFrame (%d %s)", nrow(clk), "rows")
 
