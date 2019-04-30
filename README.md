@@ -6,7 +6,7 @@
 # Installation
 `BiocManager::install("fionarhuang/TreeSummarizedExperiment")`
 
-## The structure is as below
+# The structure
 
 ![](https://github.com/fionarhuang/TreeSummarizedExperiment/blob/master/vignettes/tse.png)
 
