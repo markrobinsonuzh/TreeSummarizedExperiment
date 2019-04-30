@@ -32,11 +32,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 # Introduction 
 
-The `TreeSummarizedExperiment` class is an extensions of the
-`SingleCellExperiment` class[@Aaron2019]. It's used to store rectangular data of
-experimental results as in a `SingleCellExperiment`, and also support the
+The `TreeSummarizedExperiment` class is an extension of the
+`SingleCellExperiment` class [@Aaron2019]. It's used to store rectangular data
+of experimental results as in a `SingleCellExperiment`, and also supports the
 storage of a hierarchical structure and its link information to the rectangular
-data. 
+data.
 
 # TreeSummarizedExperiment {#tse-class}
 
@@ -55,12 +55,11 @@ four more slots.
 `colTree`.
 
 The `rowTree` and `colTree` could be empty (`NULL`) if no trees are available.
-Correspondingly, the `rowLinks` and `colLinks` would have $0$ rows. Other slots
-in `TreeSummarizedExperiment` are exactly the same as those in
-`SingleCellExperiment`.
+Correspondingly, the `rowLinks` and `colLinks` would be `NULL. All the other
+slots in `TreeSummarizedExperiment` are inherited from `SingleCellExperiment`.
 
 The slots `rowTree` and `colTree` only accept the tree data as the `phylo`
-class. If the tree is availabel in other formats, one would need to convert it
+class. If the tree is available in other formats, one would need to convert it
 to `phylo` with other R packages. For example, the package `r Biocpkg("treeio")`
 provides 12 functions to import different tree formats and output `phylo` object
 in the slot `phylo`.
@@ -75,72 +74,73 @@ suppressPackageStartupMessages({
     library(ape)})
 ```
 
-We generate a **toyTable** with observations of 5 entities collected from 4
+We generate a **assay_data** with observations of 5 entities collected from 4
 samples.
 ```{r}
 # assays data
-toyTable <- rbind(rep(0, 4), matrix(1:16, nrow = 4))
-colnames(toyTable) <- paste(rep(LETTERS[1:2], each = 2), 
+assay_data <- rbind(rep(0, 4), matrix(1:16, nrow = 4))
+colnames(assay_data) <- paste(rep(LETTERS[1:2], each = 2), 
                             rep(1:2, 2), sep = "_")
-rownames(toyTable) <- paste("entity", seq_len(5), sep = "")
-toyTable
+rownames(assay_data) <- paste("entity", seq_len(5), sep = "")
+assay_data
 ```
 
-The descriptions of the `r nrow(toyTable)` entities and `r ncol(toyTable)`
-samples are given in the **rowInf** and **colInf**, respectively.
+The descriptions of the `r nrow(assay_data)` entities and `r ncol(assay_data)`
+samples are given in the **row_data** and **col_data**, respectively.
 ```{r}
 # row data
-rowInf <- DataFrame(var1 = sample(letters[1:2], 5, replace = TRUE),
+row_data <- DataFrame(var1 = sample(letters[1:2], 5, replace = TRUE),
                     var2 = sample(c(TRUE, FALSE), 5, replace = TRUE),
-                    row.names = rownames(toyTable))
-rowInf
+                    row.names = rownames(assay_data))
+row_data
 # column data
-colInf <- DataFrame(gg = c(1, 2, 3, 3),
+col_data <- DataFrame(gg = c(1, 2, 3, 3),
                     group = rep(LETTERS[1:2], each = 2), 
-                    row.names = colnames(toyTable))
-colInf
+                    row.names = colnames(assay_data))
+col_data
 ```
 
-The hierarchical structure of the `r nrow(toyTable)` entities is denoted as
-**treeR**. The hierarchical structure of the `r ncol(toyTable)` samples is
-denoted as **treeC**. We create them by using the function `rtree` from the
+The hierarchical structure of the `r nrow(assay_data)` entities is denoted as
+**row_tree**. The hierarchical structure of the `r ncol(assay_data)` samples is
+denoted as **col_tree**. We create them by using the function `rtree` from the
 package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
 set.seed(1)
-treeR <- rtree(5)
-class(treeR)
+row_tree <- rtree(5)
+class(row_tree)
 
 # Toy tree 2
 set.seed(4)
-treeC <- rtree(4)
-treeC$tip.label <- colnames(toyTable)
-treeC$node.label <- c("All", "GroupA", "GroupB")
+col_tree <- rtree(4)
+col_tree$tip.label <- colnames(assay_data)
+col_tree$node.label <- c("All", "GroupA", "GroupB")
 ```
 
 The created trees are `phylo` objects. The `phylo` object is actually a list
 with at least four elements: `edge`, `tip.label`, `edge.length`, and `Nnode`.
 ```{r}
-class(treeR)
-str(treeR)
+class(row_tree)
+str(row_tree)
 ```
 
 The package `r Biocpkg("ggtree")` [@Yu2017] has been used to visualize the tree.
 The node labels and node numbers are in blue and orange texts, respectively. The
-**treeR** has no labels for internal nodes.
+**row_tree** has no labels for internal nodes.
 
 ```{r rtree, fig.cap="\\label{rtree} The structure of the row tree"}
 # Visualize the row tree
-ggtree(treeR, size = 2) +
+ggtree(row_tree, size = 2) +
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
 geom_text2(aes(label = label), color = "darkorange",
             hjust = -0.1, vjust = -0.7, size = 6)
 ```
 
+The **col_tree** has labels for internal nodes.
 ```{r ctree, fig.cap="\\label{ctree} The structure of the column tree"}
 # Visualize the column tree
-ggtree(treeC, size = 2) +
+ggtree(col_tree, size = 2) +
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
 geom_text2(aes(label = label), color = "darkorange",
@@ -150,86 +150,85 @@ geom_text2(aes(label = label), color = "darkorange",
 ## The construction of `TreeSummarizedExperiment`
 
 The `TreeSummarizedExperiment` class is used to store the toy data:
-**toyTable**, **rowInf**, **colInf**, **treeC** and **treeR**, To correctly
-store data, the link information between the rows (or columns) of **toyTable**
-and the nodes of the **treeR** (or **treeC**) is requried to provide via a
-column `nodeLab` in the `rowData` (or `colData`). Those columns or rows that
-don't match with the tree structure are removed. The link data between the
-`assays` tables and the tree data is automatically generated in the
-construction.
+**assay_data**, **row_data**, **col_data**, **col_tree** and **row_tree**, To
+correctly store data, the link information between the rows (or columns) of
+**assay_data** and the nodes of the **row_tree** (or **col_tree**) is requried
+to provide via a charactor vector `rowNodeLab` (or `colNodeLab`). Those columns
+or rows that don't match with any node of the tree structure are removed with
+warnings. The link data between the `assays` tables and the tree data is
+automatically generated in the construction.
 
 Below shows an example to construct `TreeSummarizedExperiment` without the
 column tree.
 ```{r}
-# add a column (nodeLab) to the row data 
-rowInf$nodeLab <- c(treeR$tip.label)
-rse <- TreeSummarizedExperiment(assays = list(toyTable),
-                                rowData = rowInf,
-                                colData = colInf,
-                                rowTree = treeR)
+# provide the node labels in rowNodeLab
+node_lab <- row_tree$tip.label
+row_tse <- TreeSummarizedExperiment(assays = list(assay_data),
+                                rowData = row_data,
+                                colData = col_data,
+                                rowTree = row_tree,
+                                rowNodeLab = node_lab)
 ```
 
-When printing out **rse**, we see a similar message as `SingleCellExperiment`
-with four additional lines about `rowLinks`, `rowTree`, `colLinks` and
-`colTree`. Here, **rse** stores a row tree (`phylo` object), and the `rowLinks`
-has `r nrow(rse)` rows that is exactly the same as the number of rows in the
-`assays` tables. More details about the link data could be found in Section
-\@ref(linkData).
+When printing out **row_tse**, we see a similar message as
+`SingleCellExperiment` with four additional lines about `rowLinks`, `rowTree`,
+`colLinks` and `colTree`. Here, **row_tse** stores a row tree (`phylo` object),
+and the `rowLinks` has `r nrow(row_tse)` rows that is exactly the same as the
+number of rows in the `assays` tables. More details about the link data could be
+found in Section \@ref(linkData).
 
 ```{r}
-rse
+row_tse
 ```
 
 If the row tree and the column tree are both available, the
 `TreeSummarizedExperiment` could be constructed similarly as below. Here, the
 column names of the `assays` table match with the node labels used in the column
-tree. So, we could omit the step of adding the column `nodeLab` to the column
-data.
+tree. So, we could omit the step of providing `colNodeLab`.
 ```{r}
-## omit this step
-# add a column (nodeLab) to the column data;
-# colInf$nodeLab <- treeC$tip.label
-all(colnames(toyTable) %in% c(treeC$tip.label, treeC$node.label))
+all(colnames(assay_data) %in% c(col_tree$tip.label, col_tree$node.label))
 
-tse <- TreeSummarizedExperiment(assays = list(toyTable),
-                                rowData = rowInf,
-                                colData = colInf,
-                                rowTree = treeR,
-                                colTree = treeC)
+both_tse <- TreeSummarizedExperiment(assays = list(assay_data),
+                                rowData = row_data,
+                                colData = col_data,
+                                rowTree = row_tree,
+                                rowNodeLab = node_lab,
+                                colTree = col_tree)
 ```
 
-Compared to **rse**, **tse** includes also a column tree. The column link data
-(`colLinks`) with `r ncol(tse)` rows is automatically generated. The number of
-rows in the link data is decided by the column dimension of the `assays` tables.
+Compared to **row_tse**, **both_tse** includes also a column tree. The column
+link data (`colLinks`) with `r ncol(both_tse)` rows is automatically generated.
+The number of rows in the link data is decided by the column dimension of the
+`assays` tables.
 ```{r}
-tse
+both_tse
 ```
 
 
 ## The accessor functions
 ### Assays, rowData, colData, and metadata
 
-It's exactly the same work as shown in `r Biocpkg("SingleCellExperiment")` to
-exctract slots inherited from the `SingleCellExperiment` class.
+For slots inherited from the `SingleCellExperiment` class, the accessors are
+exactly the same as shown in `r Biocpkg("SingleCellExperiment")`.
 
 ```{r}
 # to get the first table in the assays
-(count <- assays(tse)[[1]])
+(count <- assays(both_tse)[[1]])
 ```
 
 ```{r}
 # to get row data
-(rowD <- rowData(tse))
+rowData(both_tse)
 ```
 
 ```{r}
 # to get column data
-(colD <- colData(tse))
+colData(both_tse)
 ```
 
 ```{r}
 # to get metadata: it's empty here
-(mdata <- metadata(tse))
+metadata(both_tse)
 ```
 
 ### rowLinks, colLinks {#linkData}
@@ -238,8 +237,8 @@ The row link and column link could be accessed via `rowLinks` and `colLinks`,
 respectively. The output would be a `LinkDataFrame` object. The `LinkDataFrame`
 class is extended from the `DataFrame` class with the restriction that it has at
 least four columns: **nodeLab**, **nodeLab\_alias**, **nodeNum**, and
-**isLeaf**. More details about the `DataFrame` class could be found in the `r
-Biocpkg("S4Vectors")` package.
+**isLeaf**. More details about the `DataFrame` class could be found in the 
+`r Biocpkg("S4Vectors")` package.
 
 * nodeLab: the labels of nodes on the tree
 * nodeLab\_alias: the alias labels of nodes on the tree
@@ -252,7 +251,7 @@ matches with the number of rows of `assays` tables.
 
 
 ```{r}
-(rLink <- rowLinks(tse))
+(rLink <- rowLinks(both_tse))
 ```
 
 ```{r}
@@ -261,20 +260,20 @@ showClass("LinkDataFrame")
 ```
 
 ```{r}
-nrow(rLink) == nrow(tse)
+nrow(rLink) == nrow(both_tse)
 ```
 
 Similarly, the number of rows of `colLinks` data matches with the number of
 columns of `assays` table.
 ```{r}
-(cLink <- colLinks(tse))
-nrow(cLink) == ncol(tse)
+(cLink <- colLinks(both_tse))
+nrow(cLink) == ncol(both_tse)
 ```
 
-If the tree is not available, the corresponding link data would have zero rows.
+If the tree is not available, the corresponding link data is `NULL`.
 ```{r}
-colTree(rse)
-colLinks(rse)
+colTree(row_tse)
+colLinks(row_tse)
 ```
 
 The link data is automatically generated when constructing the
@@ -285,22 +284,22 @@ in the Section \@ref(modifyLink) about how to update the link.
 
 ## The subseting function
 
-We could use `[` to subset the `TreeSummarizedExperiment`. To keep tracking from
-the original data, the `rowTree` and `colTree` stay the same in the subsetting.
+We could use `[` to subset the `TreeSummarizedExperiment`. To keep track of the
+original data, the `rowTree` and `colTree` stay the same in the subsetting.
 ```{r}
-tse1 <- tse[1:2, 1]
-tse1
+sub_tse <- both_tse[1:2, 1]
+sub_tse
 ```
 
 The annotation data on the row and column dimension is changed accordingly.
 ```{r}
 # The first four columns are from rowLinks data and the others from rowData
-cbind(rowLinks(tse1), rowData(tse1))
+cbind(rowLinks(sub_tse), rowData(sub_tse))
 ```
 
 ```{r}
-# The first four columns are from rowLinks data and the others from rowData
-cbind(colLinks(tse1), colData(tse1))
+# The first four columns are from colLinks data and the others from colData
+cbind(colLinks(sub_tse), colData(sub_tse))
 ```
 
 
@@ -319,11 +318,11 @@ via the argument `FUN`.
 
 ```{r}
 # use node labels to specify colLevel
-aggCol <- aggValue(x = tse, 
+aggCol <- aggValue(x = both_tse, 
                    colLevel = c("GroupA", "GroupB"),
                    FUN = sum)
 # or use node numbers to specify colLevel
-aggCol <- aggValue(x = tse, colLevel = c(6, 7), FUN = sum)
+aggCol <- aggValue(x = both_tse, colLevel = c(6, 7), FUN = sum)
 ```
 
 
@@ -338,7 +337,7 @@ column **gg** has the `NA` value for `GroupA` because the descendant nodes of
 `GroupA` have different values, (1 and 2).
 ```{r}
 # before aggregation
-colData(tse)
+colData(both_tse)
 # after aggregation
 colData(aggCol)
 ```
@@ -351,7 +350,7 @@ colLinks(aggCol)
 ```
 From the Figure \@ref(fig:rtree), we could see that the nodes 6 and 7 are
 labelled with `GroupA` and `GroupB`, respectively. This agrees with the
-`LinkData` of the column data.
+column link data.
 
 ## The row dimension {#aggRow}
 
@@ -359,18 +358,18 @@ It's similar to the aggregation on the row dimension, except that the level
 should be specified via `rowLevel`.
 
 ```{r}
-aggRow <- aggValue(x = tse, rowLevel = 7:9, FUN = sum)
+agg_row <- aggValue(x = both_tse, rowLevel = 7:9, FUN = sum)
 ```
 
 Now, the output `assays` table has 3 rows.
 
 ```{r}
-assays(aggRow)[[1]]
+assays(agg_row)[[1]]
 ```
 
 We could see which row corresponds to which nodes via the `rowLinks` data.
 ```{r}
-rowLinks(aggRow)
+rowLinks(agg_row)
 ```
 The Figure \@ref(fig:rtree) shows that the nodes 7, 8 and 9  have no labels.
 Therefore, the `nodeLab` column in `LinkData` of the row data has missing value.
@@ -386,14 +385,14 @@ Section \@ref(aggRow) and Section \@ref(aggCol) because the order of aggregation
 might matter.
 
 ```{r}
-aggBoth <- aggValue(x = tse, colLevel = c(6, 7), 
+agg_both <- aggValue(x = both_tse, colLevel = c(6, 7), 
                     rowLevel = 7:9, FUN = sum)
 ```
 
 As expected, we obtain a table with 3 rows (`rowLevel = 7:9`) and 2 columns
 (`colLevel = c(6, 7)`). 
 ```{r}
-assays(aggBoth)[[1]]
+assays(agg_both)[[1]]
 ```
 
 
@@ -409,13 +408,13 @@ the aggregation step.
 
 ```{r}
 # The toy taxonomic table
-taxTab <- data.frame(Kindom = rep("A", 5),
+taxa <- data.frame(Kindom = rep("A", 5),
                      Phylum = c("B1", rep("B2", 4)),
                      Class = c("C1", "C2", "C3", "C3", NA),
                      OTU = c("D1", "D2", "D3", "D4", NA))
 # convert to a phylo tree
-taxTree <- toTree(data = taxTab, cache = FALSE)
-ggtree(taxTree)+
+taxa_tree <- toTree(data = taxa, cache = FALSE)
+ggtree(taxa_tree)+
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
 geom_text2(aes(label = label), color = "darkorange",
@@ -426,29 +425,29 @@ geom_text2(aes(label = label), color = "darkorange",
 
 ```{r}
 # construct a TreeSummarizedExperiment object
-rowInf$nodeLab <- taxTree$tip.label
-taxTSE <- TreeSummarizedExperiment(assays = list(toyTable),
-                                   rowData = rowInf,
-                                   rowTree = taxTree)
+taxa_tse <- TreeSummarizedExperiment(assays = list(assay_data),
+                                   rowData = row_data,
+                                   rowTree = taxa_tree,
+                                   rowNodeLab = taxa_tree$tip.label)
 ```
 
 Here is about how to aggregate to the phylum level.
 ```{r}
 # specify the level
-taxLab <- c(taxTree$tip.label, taxTree$node.label)
-ii <- startsWith(taxLab, "Phylum:") 
-(l1 <- taxLab[ii])
+taxa_lab <- c(taxa_tree$tip.label, taxa_tree$node.label)
+ii <- startsWith(taxa_lab, "Phylum:") 
+(l1 <- taxa_lab[ii])
 # aggregate
-aggTAX <- aggValue(x = taxTSE, rowLevel = l1, FUN = sum)
+agg_taxa <- aggValue(x = taxa_tse, rowLevel = l1, FUN = sum)
 ```
 
 
 ```{r}
-assays(aggTAX)[[1]]
+assays(agg_taxa)[[1]]
 ```
 
 ```{r}
-rowData(aggTAX)
+rowData(agg_taxa)
 ```
 
 
@@ -457,16 +456,16 @@ The aggregation could be on any freely combined level.
 # specify the level
 l2 <- c("Class:C3", "Phylum:B1")
 # aggregate
-aggF <- aggValue(x = taxTSE, rowLevel = l2, FUN = sum)
+agg_any <- aggValue(x = taxa_tse, rowLevel = l2, FUN = sum)
 ```
 
 
 ```{r}
-assays(aggF)[[1]]
+assays(agg_any)[[1]]
 ```
 
 ```{r}
-rowData(aggF)
+rowData(agg_any)
 ```
 
 
@@ -477,9 +476,9 @@ rowData(aggF)
 
 Here, we show some functions as examples to manipulate or to extract information
 from the `phylo` object. More functions could be found in other packages, such
-as `r CRANpkg("ape")`[@ape2018], `r CRANpkg("tidytree")`. These functions might be useful
-when R package developers want to create their own functions to work on the
-`TreeSummarizedExperiment` class.
+as `r CRANpkg("ape")` [@ape2018], `r CRANpkg("tidytree")`. These functions might
+be useful when R package developers want to create their own functions to work
+on the `TreeSummarizedExperiment` class.
 
 Below shows the node label (black texts) and node number (blue texts) of each
 node on an example tree.
@@ -530,7 +529,7 @@ To get descendants that are on the leaf level, we could set the argument
 findOS(tree = tinyTree, node = 17, only.leaf = TRUE)
 ```
 
-The argument `only.leaf = TRUE` is set to get all descendants 
+The argument `only.leaf = FALSE` is set to get all descendants 
 ```{r}
 # all descendant nodes
 findOS(tree = tinyTree, node = 17, only.leaf = FALSE)
@@ -540,13 +539,14 @@ findOS(tree = tinyTree, node = 17, only.leaf = FALSE)
 
 The input `node` could be either the node label or the node number. 
 ```{r}
+# node = 5, node = "t4" are the same node
 findSibling(tree = tinyTree, node = 5)
 findSibling(tree = tinyTree, node = "t4")
 ```
 
 ### find the share node
 
-This would find the first node that joined by the specified nodes in `node` in
+This would find the first node that joined by the specified nodes (`node`) in
 the path to the root.
 ```{r}
 shareNode(tree = tinyTree, node = c(5, 6))
@@ -596,7 +596,7 @@ Each row gives a path that connects a leaf and the root.
 matTree(tree = tinyTree)
 ```
 
-## Customize functions for the `TreeSummarizedExperiment` class
+## Customize functions for the `TreeSummarizedExperiment` class {#modifyLink}
 
 We show examples about how to create functions for the
 `TreeSummarizedExperiment`. R package developers could customize their functions
@@ -621,7 +621,7 @@ rmRows <- function(dat) {
     return(out)
     
 }
-(rte <- rmRows(dat = tse))
+(rte <- rmRows(dat = both_tse))
 rowLinks(rte)
 ```
 
@@ -674,12 +674,12 @@ Now the row tree has four leaves.
 ```{r}
 # find the mismatch between the rows of the 'assays' table and the leaves of the
 # tree
-rTree <- rowTree(rte)
-rLink <- rowLinks(rte)
-treeLeaf <- printNode(tree = rTree,type = "leaf")$nodeNum
-dataLeaf <- rLink$nodeNum[rLink$isLeaf]
-rmLeaf <- setdiff(treeLeaf, dataLeaf)
-ntse <- updateRowTree(tse = rte, dropLeaf = rmLeaf)
+row_tree <- rowTree(rte)
+row_link <- rowLinks(rte)
+leaf_tree <- printNode(tree = row_tree,type = "leaf")$nodeNum
+leaf_data <- row_link$nodeNum[row_link$isLeaf]
+leaf_rm <- setdiff(leaf_tree, leaf_data)
+ntse <- updateRowTree(tse = rte, dropLeaf = leaf_rm)
 ```
 
 ```{r}
