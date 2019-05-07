@@ -221,14 +221,21 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
         if (!is.character(rowNodeLab)) {
             stop("rowNodeLab should be a character vector")
         }
+        if (is.null(rowTree)) {
+            stop("rowTree is not available")
+        }
     }
 
     if (!is.null(colNodeLab)) {
         if (!is.character(colNodeLab)) {
             stop("colNodeLab should be a character vector")
         }
+        if (is.null(colTree)) {
+            stop("colTree is not available")
+        }
     }
 
+    
     # -------------------------------------------------------------------------
     ## create a SummarizedExperiment object
     sce <- SingleCellExperiment(...)
