@@ -282,7 +282,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
 
     nc <- ncol(dimData)
-    newDD <- dimData[rep(1, sum(ll)), ]
+    newDD <- dimData[rep(1, sum(ll)), ,drop = FALSE]
     for (i in seq_len(nc)) {
         ri <- lapply(seq_along(idR), FUN = function(x) {
             if (message) {
