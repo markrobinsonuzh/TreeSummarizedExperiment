@@ -33,6 +33,7 @@
 
 toTree <- function(data, cache = FALSE) {
 
+    # ========== check ========================
     # arrange data
     data <- as.matrix(data)
     data <- apply(data, 2, FUN = function(x) {
@@ -40,8 +41,20 @@ toTree <- function(data, cache = FALSE) {
         return(x)
     })
 
+    # The column should start from high level to low level (the root has the
+    # highest level)
+    ncat <- apply(data, 2, FUN = function(x) {
+        length(unique(x))
+    })
+    if (is.unsorted(ncat)) {
+        stop("Columns should be ordered from the high to low (leaf level)")
+    }
+    
     data <- arrange_all(data.frame(data, stringsAsFactors = FALSE))
-
+    if (ncat[[1]] !=1) {
+        warning("The root is added with label 'ALL'")
+        data <- cbind(root = rep("ALL", nrow(data)), data)
+    }
     # input NA with the value in the previous level
     if (any(is.na(data))) {
         cn <- colnames(data)
@@ -122,11 +135,17 @@ toTree <- function(data, cache = FALSE) {
 
     tt <- table(mat3[, 2])
     if (any(tt > 1)) {
-        bt <- tt[tt=1]
-        dt <- data.frame(node = as.numeric(names(bt)),
-                         Freq = as.vector(bt))
-        dn <- numN[match(dt$node, numN)]
-        dnn <- names(dn)
+        bt <- tt[tt>1]
+        st <- as.numeric(names(bt))
+        lt <- gsub(pattern = ".*:",  replacement = "",
+                   names(numN[st]))
+        ct <- gsub(pattern = ":.*",  replacement = "",
+                    names(numN[st]))
+        dt <- data.frame(node = st,
+                         Freq = as.vector(bt),
+                         column = ct,
+                         value = lt)
+        cat(dt)
         message("Loops are detected in: \n", paste(dnn, collapse = "\n "))
         stop("The tree can't be built; loops detected in the tree.")
     }
