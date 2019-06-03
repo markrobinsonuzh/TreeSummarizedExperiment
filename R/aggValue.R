@@ -62,7 +62,8 @@
 #' tse <- TreeSummarizedExperiment(assays = list(toyTable),
 #'                                 colData = colInf,
 #'                                 colTree = treeC,
-#'                                 colNodeLab = treeC$tip.label)
+#'                                 colNodeLab = treeC$tip.label,
+#'                                 metadata = list(test = 1:4))
 #'
 #' aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 #' FUN = sum)
@@ -261,6 +262,10 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 
             mx <- mi[idR[[x]], , drop = FALSE]
             ax <- apply(mx, 2, FUN = FUN)
+            if (is.list(ax)) {
+                stop("The output of FUN:", deparse(substitute(FUN)),
+                     "has different lengths")
+            }
             rx <- rbind(ax)
             rownames(rx) <- rep(names(idR)[x], nrow(rx))
             return(rx)
