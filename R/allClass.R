@@ -18,11 +18,12 @@ setOldClass("phylo")
 
 setClassUnion("list_Or_NULL", c("list", "NULL"))
 #-------------------------------------------------------------------------------
-#' LinkDataFrame: A S4 class extended from DataFrame
+#' LinkDataFrame: An S4 class extended (indirectly) from DataFrame
 #-------------------------------------------------------------------------------
 #' An S4 class LinkDataFrame
 #'
-#' The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} to
+#' The \strong{LinkDataFrame} class is extended (indirectly)
+#' from the \strong{DataFrame} class to
 #' include at least four columns \code{nodeLab}, \code{nodeLab_alias},
 #' \code{nodeNum}, and \code{isLeaf}.
 #'
@@ -34,7 +35,7 @@ setClassUnion("list_Or_NULL", c("list", "NULL"))
 #' functions.
 #'
 setClass("LinkDataFrame",
-         contains = "DataFrame",
+         contains = "DFrame",
          validity = .checkLDF)
 
 setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
