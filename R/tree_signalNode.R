@@ -76,6 +76,7 @@ signalNode <- function(tree, node,
     })
     # select nodes which only exist in the selected paths
     selN <- setdiff(as.vector(mat[ind, ]), as.vector(mat[!ind, ]))
+    selN <- selN[!is.na(selN)]
     # remove nodes which are descendants of any others
     matI <- mat[ind,, drop = FALSE]
     selF <- apply(matI, MARGIN = 1,
