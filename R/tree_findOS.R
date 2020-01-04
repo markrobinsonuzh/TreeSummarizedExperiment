@@ -39,11 +39,15 @@ findOS <- function(tree,
                    only.leaf = TRUE,
                    self.include = FALSE,
                    use.alias = FALSE) {
-
+    
     if (!inherits(tree, "phylo")) {
         stop("tree: should be a phylo object")
     }
-
+    
+    if (anyDuplicated(node)) {
+        warning("duplicated values are found in input 'node'")
+    }
+    
     if (!(is.character(node) |
           is.numeric(node) |
           is.integer(node))) {
@@ -52,7 +56,7 @@ findOS <- function(tree,
     # the edge matrix
     mat <- tree$edge
     matN <- matTree(tree = tree)
-
+    
     if (is.character(node)) {
         numA <- transNode(tree = tree, node = node,
                           use.alias = TRUE,
@@ -65,65 +69,80 @@ findOS <- function(tree,
                  " can't be found in the ",
                  deparse(substitute(tree)), "\n")
         }
-
+        
     }
-
-    # find all descendants
-    loc1 <- lapply(numA, FUN = function(x) {
-        xi <- which(matN == x, arr.ind = TRUE)
-        return(xi)
+    
+    loc <- lapply(seq_len(ncol(matN)), FUN = function(x){
+        xx <- matN[, x]
+        xm <- match(xx, numA)
+        # which elements in xx could be matched to numA
+        xi <- which(!is.na(xm))
+        # which elements in numA
+        mi <- xm[!is.na(xm)]
+        
+        mm <- cbind("row" = xi,
+                    "col" = rep(x, length(xi)),
+                    "node" = numA[mi])
+        
     })
-
-    loc2 <- lapply(loc1, FUN = function(x) {
-        x1 <- lapply(x[, "col"], seq)
-        x1 <- unlist(x1)
-        x2 <- rep(x[, "row"], x[, "col"])
-        cbind(row = x2, col = x1)
-
-    })
-
-    matNN <- apply(matN, 2, FUN = function(x) {
-        xe <- x[!is.na(x)]
-        xx <- transNode(tree = tree, node = xe,
-                        use.alias = use.alias,
-                        message = FALSE)
-        x[!is.na(x)] <- xx
-        return(x)
-    })
-
-
-    # descendants: tips or leaves
-    tipA <- unique(setdiff(mat[, 2], mat[, 1]))
-
-    desA <- lapply(seq_along(loc2), FUN = function(x) {
-        xx <- loc2[[x]]
-        y0 <- y <- matN[xx]
-
-        # if self.include, the leaf has itself as the descendant
+    
+    moc <- do.call(rbind, loc)
+    
+    
+    # separate leaf and internal nodes
+    mocL <- moc[moc[, "col"] == 1, , drop = FALSE]
+    mocI <- moc[moc[, "col"] != 1, , drop = FALSE]
+    
+    if (only.leaf) {
         if (!self.include) {
-         y <- setdiff(y, numA[x])
-         }
-
-        # only leaf nodes
-        if (only.leaf) {
-            y <- intersect(y, tipA)
+            mocL<- NULL
+        }
+        if (nrow(mocI)) {
+            mocI[, "col"] <- 1
+        }
+        
+    } else {
+        if (!self.include) {
+            mocL <- NULL
+            if (nrow(mocI)) {
+                mocI[, "col"] <- mocI[, "col"] - 1
             }
-
-
-        # index those kept
-        ii <-  y0 %in% y
-        xi <- xx[ii, , drop = FALSE]
-
-        yy <- y0[ii]
-        names(yy) <- matNN[xi]
-
-        uy <- unique(yy)
-        return(uy)
-    })
-
-    # final output (node number or label)
-    names(desA) <- transNode(tree = tree, node = numA,
-                             use.alias = use.alias,
-                             message = FALSE)
-    return(desA)
+        }
+        ll <- lapply(mocI[, "col"],
+                     FUN = function(x) {
+                         seq(from = 1, to = x , by = 1)
+                     })
+        mocII <- cbind("row" = rep(mocI[, "row"], mocI[, "col"]),
+                       "col" = unlist(ll),
+                       "node" = rep(mocI[, "node"], mocI[, "col"]))
+        mocI <- mocII
+    }
+    
+    out <- vector("list", length(numA))
+    if (is.null(mocL)) {
+        mocC <- mocI
+    } else {
+        mocC <- rbind(mocL, mocI)
+    }
+    
+    # descendants: get, remove duplicates and sort
+    desd <- cbind("found" = matN[mocC[, c("row", "col"), drop = FALSE]],
+                  "node" = mocC[, "node"])
+    desd <- desd[!duplicated(desd), , drop = FALSE]
+    od <- order(desd[, "node"], desd[, "found"], decreasing = FALSE)
+    desd <- desd[od, , drop = FALSE]
+    
+    # split according to the parent node
+    parent <- factor(desd[, "node"],
+                     levels = unique(desd[, "node"]))
+    dList <- split(desd[, "found"], f = parent)
+    
+    # output result in the order as the input node
+    #o <- match(unique(desd[, "node"]), numA)
+    # out[o] <- dList
+    o <- match(numA, unique(desd[, "node"]))
+    out <- dList[o]
+    names(out) <- transNode(tree = tree, node = numA,
+                            use.alias = use.alias)
+    return(out)
 }
