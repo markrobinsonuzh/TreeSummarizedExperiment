@@ -71,37 +71,37 @@
 #' assays(aggCol)[[1]]
 #'
 aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
-                    FUN = sum, message = FALSE) {
+                     FUN = sum, message = FALSE) {
     ## --------------------- check input before run ---------------------------
     ## If x is a TreeSummarizedExperiment, rowTree and colTree should be set to
     ## NULL
     if (!is(x, "TreeSummarizedExperiment")) {
         stop("x should be a TreeSummarizedExperiment")
-
+        
     }
-
+    
     ## The provided rowLevel or colLevel should be a numeric or character vector
     isR <- (is.character(rowLevel) | is.numeric(rowLevel) |
-             is.null(rowLevel))
+                is.null(rowLevel))
     isC <- (is.character(colLevel) | is.numeric(colLevel) |
-            is.null(colLevel))
+                is.null(colLevel))
     if (!isR) {
         stop("rowLevel should be a numeric or character vector. \n")
     }
     if (!isC) {
         stop("colLevel should be a numeric or character vector. \n")
     }
-
+    
     ## ---------------------- get all data ready ------------------------------
     if (message) {message("Preparing data... ")}
-
+    
     ## The assay tables
     mat <- assays(x)
-
+    
     ## The trees
     rTree <- rowTree(x)
     cTree <- colTree(x)
-
+    
     ## Indicate whether aggregation should be on rows or columns
     if (is.null(rowLevel)) {
         onRow <- FALSE
@@ -109,39 +109,39 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         if (is.null(rTree)) {
             stop("The tree on rows doesn't exist.")
         }
-
+        
         onRow <- TRUE
         if (message) {
             message("Perform aggregation on the row dimension... ")
         }
     }
-
+    
     if (is.null(colLevel)) {
         onCol <- FALSE
     } else {
         if (is.null(cTree)) {
             stop("The tree on columns doesn't exist.")
         }
-
+        
         onCol <- TRUE
         if (message) {
             message("Perform aggregation on the column dimension... ")
         }
     }
-
+    
     ## -------------------- aggregation on row dimension ----------------------
     if (onRow) {
         if (message) {
             message("The row aggregation is using ", deparse(substitute(FUN)))
         }
-
+        
         rD <- rowData(x)
         rL <- rowLinks(x)
         outR <- .aggFun(tree = rTree,
                         assayTab = mat,
                         dimData = rD,
                         linkData = rL,
-                        level = rowLevel,
+                        level = unique(rowLevel),
                         FUN = FUN,
                         message = message)
         nrD <- outR$newDD
@@ -156,7 +156,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
             nrL <- NULL
         }
     }
-
+    
     ## -------------------- aggregation on column dimension ----------------
     if (onCol) {
         if (message) {
@@ -169,20 +169,22 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                         assayTab = lapply(mat, t),
                         dimData = cD,
                         linkData = cL,
-                        level = colLevel,
-                        FUN = FUN)
+                        level = unique(colLevel),
+                        FUN = FUN, message = message)
         ncD <- outC$newDD
         ncD <- ncD[, setdiff(colnames(ncD), "nodeLab")]
         ncL <- outC$newDD$nodeLab
         mat <- lapply(outC$dataTab, t)
     } else {
         ncD <- colData(x)
-
+        
         if (!is.null(cTree)) {
             ncL <- colLinks(x)$nodeLab
         } else {ncL <- NULL}
     }
-
+    
+    # metadata
+    metaD <- metadata(x)
     # create the new TreeSummarizedExperiment object
     out <- TreeSummarizedExperiment(assays = mat,
                                     rowData = nrD,
@@ -190,28 +192,30 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                                     rowTree = rTree,
                                     rowNodeLab = nrL,
                                     colTree = cTree,
-                                    colNodeLab = ncL)
-
+                                    colNodeLab = ncL,
+                                    metadata = metaD)
+    
     return(out)
 }
 
+########################### version 2 ##############################
 
 .aggFun <- function(tree, assayTab, dimData, linkData,
                     level = NULL, FUN, message = FALSE) {
-
+    
     # nodeNum
     numR <- linkData$nodeNum
-
+    
     # All node numbers on the tree
     ed <- tree$edge
     numAR <- unique(as.vector(ed))
-
+    
     # The aggregation level
     if (is.character(level)) {
         level <- transNode(tree = tree, node = level,
                            use.alias = FALSE, message = FALSE)
     }
-
+    
     # The descendants of the aggregation level
     if (is.null(tree$cache)) {
         desR <- findOS(tree = tree, node = level,
@@ -223,101 +227,105 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         names(desR) <- transNode(tree = tree, node = level,
                                  use.alias = TRUE, message = FALSE)
     }
-
+    
     # Find the rows of the descendants
-    idR <- lapply(desR, FUN = function(x) {
-        numR %in% x
-    })
-
-    miR <- lapply(desR, FUN = function(x){
-        x[!x %in% numR]
-    })
-    miR <- unique(unlist(miR))
+    miR <- setdiff(unique(unlist(desR)), numR)
     if (length(miR)) {
-        warning(length(miR), "leaves couldn't be found from the assay table.\n")
+        warning(length(miR), 
+                " leaves couldn't be found from the assay table.\n")
         miR <- transNode(tree = tree, node = miR,
                          use.alias = FALSE, message = FALSE)
-        warning("Missing leaves: ", head(miR), " ...")
+        warning("Missing leaves: ", paste(head(miR), collapse = " "), " ...")
     }
-
+    
     ## Perform the aggregation
     # on the assay tables
-
+    
     if (message) {
         message("Working on the assays table... ")}
-
+    
+    # aggregate all assay tables together
+    nc <- ncol(assayTab[[1]])
+    ncn <- colnames(assayTab[[1]])
+    mtab <- do.call(cbind, assayTab)
+    
+    assayL <- annL <- vector("list", length(desR))
+    ll <- rep(NA, length(desR))
+    for (i in seq_along(desR)) {
+        if (message) {
+            message(i, " out of ", length(desR),
+                    " finished", "\r", appendLF = FALSE)
+            flush.console()
+        }
+        
+        # assay table
+        # ri <- match(desR[[i]], numR)
+        ri <- lapply(desR[[i]], FUN = function(x) {
+            which(numR == x)
+        })
+        ri <- unlist(ri)
+        mi <- mtab[ri, , drop = FALSE]
+        ax <- apply(mi, 2, FUN = FUN)
+        if (is.list(ax)) {
+            stop("The output of FUN:", deparse(substitute(FUN)),
+                 "has different lengths")
+        }
+        ax <- rbind(ax)
+        rownames(ax) <- NULL
+        #rownames(ax) <- rep(names(desR)[i], nrow(ax))
+        assayL[[i]] <- ax
+        
+        #dimension data
+        li <- nrow(ax)
+        ll[i] <- li
+        
+        if (ncol(dimData)) {
+            dl <- as.list(dimData[ri, , drop = FALSE])
+            # this is to fix the issue when the nominated node in the specified level has no data
+            if (!length(ri)) {
+                dl <- as.list(dimData[1, , drop = FALSE])
+                dl <- lapply(dl, FUN = function(x) {NA})
+            }
+            ru <- lapply(dl, FUN = function(x) {
+                ux <- unique(x)
+                if (length(ux) > 1) {
+                    ui <- NA
+                } else {
+                    ui <- ux
+                }
+                rep(ui, li)
+            })
+            annL[[i]] <- do.call(cbind.data.frame, ru)
+        }
+        
+    }
+    
+    # separate the results into the original number of assays tables as input
+    if (message) {
+        message("unwrap data ... ")}
+    
+    assayL <- do.call(rbind, assayL)
     outR <- vector("list", length(assayTab))
     names(outR) <- names(assayTab)
-
-    ll <- numeric()
-    for (i in seq_along(assayTab)) {
-        mi <- assayTab[[i]]
-        oi <- lapply(seq_along(idR), FUN = function(x) {
-
-            if (message) {
-                message(x, " out of ", length(idR),
-                        " finished", "\r", appendLF = FALSE)
-                flush.console()
-            }
-
-            mx <- mi[idR[[x]], , drop = FALSE]
-            ax <- apply(mx, 2, FUN = FUN)
-            if (is.list(ax)) {
-                stop("The output of FUN:", deparse(substitute(FUN)),
-                     "has different lengths")
-            }
-            rx <- rbind(ax)
-            rownames(rx) <- rep(names(idR)[x], nrow(rx))
-            return(rx)
-        })
-
-        roi <- do.call(rbind, oi)
-        outR[[i]] <- roi
-
-        # record the output length
-        if (i == 1) {
-            lo <-  lapply(oi, nrow)
-            ll <- unlist(lo)
-        }
+    for (i in seq_along(outR)) {
+        ii <- seq(from = (i-1)*nc + 1, to = i*nc, by = 1)
+        rii <- assayL[, ii, drop = FALSE]
+        colnames(rii) <- ncn
+        outR[[i]] <- rii
     }
-
-    # on the dimData (rowData/colData)
-    if (message) {
-        message("Working on the row/column data... ")}
-
-
-    nc <- ncol(dimData)
-
-    newDD <- dimData[rep(1, sum(ll)), , drop = FALSE]
-
-    for (i in seq_len(nc)) {
-        ri <- lapply(seq_along(idR), FUN = function(x) {
-            if (message) {
-                message(x, " out of ", length(idR),
-                        " finished", "\r", appendLF = FALSE)
-                flush.console()
-            }
-
-            xx <- idR[[x]]
-            rx <- dimData[xx, i]
-            ru <- unique(rx)
-            if (length(ru) > 1) {
-                ui <- NA
-            } else {
-                ui <- ru
-            }
-
-            ul <- rep(ui, ll[x])
-            return(ul)
-        })
-        newDD[, i] <- unlist(ri)
-
-    }
-    newDD$nodeLab <- rep(names(idR), ll)
-
+    
     # use the same row names as outR
-    rownames(newDD) <- rep(names(idR), ll)
-
+    
+    if (ncol(dimData)) {
+        newDD <- do.call(rbind, annL)
+    } else {
+        newDD <- dimData[rep(1, sum(ll)), , drop = FALSE]
+    }
+    
+    newDD$nodeLab <- rep(names(desR), ll)
+    newDD <- DataFrame(newDD)
+    rownames(newDD) <- rep(names(desR), ll)
+    
     out <- list(dataTab = outR, newDD = newDD)
     return(out)
 }
