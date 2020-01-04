@@ -4,8 +4,7 @@
 \alias{aggValue}
 \title{Perform data aggregations based on the available tree structures}
 \usage{
-aggValue(x, rowLevel = NULL, colLevel = NULL, FUN = sum,
-  message = FALSE)
+aggValue(x, rowLevel = NULL, colLevel = NULL, FUN = sum, message = FALSE)
 }
 \arguments{
 \item{x}{A \code{TreeSummarizedExperiment} object.}
@@ -70,7 +69,8 @@ ggtree(treeC, size = 2) +
 tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 colData = colInf,
                                 colTree = treeC,
-                                colNodeLab = treeC$tip.label)
+                                colNodeLab = treeC$tip.label,
+                                metadata = list(test = 1:4))
 
 aggCol <- aggValue(x = tse, colLevel = c("GroupA", "GroupB"),
 FUN = sum)

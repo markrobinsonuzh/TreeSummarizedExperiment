@@ -5,11 +5,16 @@
 \alias{TreeSummarizedExperiment}
 \title{Construct a TreeSummarizedExperiment object}
 \usage{
-TreeSummarizedExperiment(..., rowTree = NULL, colTree = NULL,
-  rowNodeLab = NULL, colNodeLab = NULL)
+TreeSummarizedExperiment(
+  ...,
+  rowTree = NULL,
+  colTree = NULL,
+  rowNodeLab = NULL,
+  colNodeLab = NULL
+)
 }
 \arguments{
-\item{...}{Arguments to pass to the \code{SummarizedExperiment} constructor.}
+\item{...}{Arguments passed to the \code{\link[SingleCellExperiment]{SummarizedExperiment}} constructor to fill the slots of the base class.}
 
 \item{rowTree}{A phylo object that provides hiearchical information of rows
 of assay tables.}

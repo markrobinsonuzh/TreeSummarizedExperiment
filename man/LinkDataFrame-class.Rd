@@ -3,11 +3,10 @@
 \docType{class}
 \name{LinkDataFrame-class}
 \alias{LinkDataFrame-class}
-\title{LinkDataFrame: An S4 class extended (indirectly) from DataFrame
+\title{LinkDataFrame: A S4 class extended from DataFrame
 An S4 class LinkDataFrame}
 \description{
-The \strong{LinkDataFrame} class is extended (indirectly)
-from the \strong{DataFrame} class to
+The \strong{LinkDataFrame} is extended from the class \strong{DataFrame} to
 include at least four columns \code{nodeLab}, \code{nodeLab_alias},
 \code{nodeNum}, and \code{isLeaf}.
 }

@@ -71,7 +71,9 @@ suppressPackageStartupMessages({
     library(TreeSummarizedExperiment)
     library(S4Vectors)
     library(ggtree)
-    library(ape)})
+    library(ape)
+    library(ggplot2)
+  })
 ```
 
 We generate a **assay_data** with observations of 5 entities collected from 4
@@ -106,12 +108,12 @@ denoted as **col_tree**. We create them by using the function `rtree` from the
 package `r CRANpkg("ape")`.
 ```{r}
 # Toy tree 1
-set.seed(1)
+set.seed(12)
 row_tree <- rtree(5)
 class(row_tree)
 
 # Toy tree 2
-set.seed(4)
+set.seed(12)
 col_tree <- rtree(4)
 col_tree$tip.label <- colnames(assay_data)
 col_tree$node.label <- c("All", "GroupA", "GroupB")
@@ -130,21 +132,23 @@ The node labels and node numbers are in blue and orange texts, respectively. The
 
 ```{r rtree, fig.cap="\\label{rtree} The structure of the row tree"}
 # Visualize the row tree
-ggtree(row_tree, size = 2) +
+ggtree(row_tree, size = 2, branch.length = "none") +
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
 geom_text2(aes(label = label), color = "darkorange",
-            hjust = -0.1, vjust = -0.7, size = 6)
+            hjust = -0.1, vjust = -0.7, size = 6) +
+  ylim(c(0.8, 5.5))
 ```
 
 The **col_tree** has labels for internal nodes.
 ```{r ctree, fig.cap="\\label{ctree} The structure of the column tree"}
 # Visualize the column tree
-ggtree(col_tree, size = 2) +
+ggtree(col_tree, size = 2, branch.length = "none") +
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
 geom_text2(aes(label = label), color = "darkorange",
-            hjust = -0.1, vjust = -0.7, size = 6)
+            hjust = -0.1, vjust = -0.7, size = 6)+
+  ylim(c(0.8, 4.5))
 ```
 
 ## The construction of `TreeSummarizedExperiment`
@@ -413,7 +417,7 @@ taxa <- data.frame(Kindom = rep("A", 5),
                      Class = c("C1", "C2", "C3", "C3", NA),
                      OTU = c("D1", "D2", "D3", "D4", NA))
 # convert to a phylo tree
-taxa_tree <- toTree(data = taxa, cache = FALSE)
+taxa_tree <- toTree(data = taxa, edges = FALSE)
 ggtree(taxa_tree)+
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
@@ -657,7 +661,7 @@ updateRowTree <- function(tse, dropLeaf) {
                                     use.alias = TRUE, message = FALSE)
     rowL$isLeaf <- isLeaf(tree = newTree, node = rowL$nodeNum)
 
-    rowNL <- as(rowL, "LinkDataFrame")
+    rowNL <- new("LinkDataFrame", rowL)
     
     ## update the row tree and links
     newDat <- BiocGenerics:::replaceSlots(tse,
@@ -676,7 +680,7 @@ Now the row tree has four leaves.
 # tree
 row_tree <- rowTree(rte)
 row_link <- rowLinks(rte)
-leaf_tree <- printNode(tree = row_tree,type = "leaf")$nodeNum
+leaf_tree <- showNode(tree = row_tree, only.leaf = TRUE)
 leaf_data <- row_link$nodeNum[row_link$isLeaf]
 leaf_rm <- setdiff(leaf_tree, leaf_data)
 ntse <- updateRowTree(tse = rte, dropLeaf = leaf_rm)

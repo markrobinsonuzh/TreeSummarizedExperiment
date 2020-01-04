@@ -21,11 +21,12 @@ Imports:
 VignetteBuilder: knitr
 Suggests: 
     ggtree,
+    ggplot2,
     BiocStyle,
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.0
 Collate: 
     'classValid.R'
     'allClass.R'
@@ -33,17 +34,22 @@ Collate:
     'allGenerics.R'
     'classAccessor.R'
     'data.R'
+    'tree_addLabel.R'
+    'tree_asLeaf.R'
     'tree_countLeaf.R'
     'tree_countNode.R'
     'tree_distNode.R'
     'tree_findAncestor.R'
+    'tree_findChild.R'
     'tree_findOS.R'
     'tree_findSibling.R'
     'tree_isLeaf.R'
+    'tree_joinLeaf.R'
     'tree_matTree.R'
     'tree_printNode.R'
     'tree_pruneTree.R'
     'tree_shareNode.R'
+    'tree_showNode.R'
     'tree_signalNode.R'
     'tree_toTree.R'
     'tree_trackNode.R'

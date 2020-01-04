@@ -12,6 +12,7 @@
 #' @importFrom S4Vectors head tail
 #' @importFrom dplyr arrange_all
 #' @importFrom ape reorder.phylo
+#' @importFrom stats reorder
 #' @return a phylo object
 #' @author Ruizhu HUANG
 #' @export
@@ -44,7 +45,7 @@ toTree <- function(data, edges = FALSE) {
     }
 }
 
-.toTree2 <- function(data, cache = FALSE) {
+.toTree2 <- function(data) {
     data <- as.matrix(data)
     if (!is.character(as.vector(data))) {
         stop("data should be a character matrix")
@@ -76,7 +77,7 @@ toTree <- function(data, edges = FALSE) {
     
     return(tree)
 }
-.toTree1 <- function(data, cache = FALSE) {
+.toTree1 <- function(data) {
 
     # ========== check ========================
     # arrange data
@@ -190,8 +191,6 @@ toTree <- function(data, edges = FALSE) {
                          Freq = as.vector(bt),
                          column = ct,
                          value = lt)
-        cat(dt)
-        message("Loops are detected in: \n", paste(dnn, collapse = "\n "))
         stop("The tree can't be built; loops detected in the tree.")
     }
 
