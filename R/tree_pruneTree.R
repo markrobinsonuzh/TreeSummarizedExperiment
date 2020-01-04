@@ -48,10 +48,15 @@
 #'     geom_text2(aes(label = label), color = "darkorange",
 #'                hjust = -0.1, vjust = -0.7) +
 #'     geom_point2()
+#'     
 
 pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
 
-
+    # if no leaves to be removed, the input tree is output.
+    if (is.null(rmLeaf) | length(rmLeaf) == 0) {
+        warning("No leaves are removed and the input tree is output")
+        br <- tree
+    }
     # Use the node number
     if (is.character(rmLeaf)) {
         rmLeaf <- transNode(tree = tree, node = rmLeaf)
@@ -98,7 +103,9 @@ pruneTree <- function(tree, rmLeaf, mergeSingle = TRUE){
             which(nmt == x, arr.ind = TRUE)
         })
         li <- lapply(locI, FUN = function(x) {
-            nrow(x) == 1})
+            x[, "col"] <- x[, "col"] - 1
+            length(unique(nmt[x])) == 1
+            })
         li <- unlist(li)
         locII <- do.call(rbind, locI[li])
 
