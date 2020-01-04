@@ -38,6 +38,9 @@ findAncestor <- function(tree, node, level,
         stop("tree: should be a phylo object")
     }
 
+    if (!length(node)) {
+        stop("Please provide at least one node on the tree.")
+    }
     # convert a tree to a matrix
     # each row is a path connecting the root and a leaf
     treeMat <- matTree(tree)
