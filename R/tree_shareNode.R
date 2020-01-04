@@ -48,9 +48,12 @@ shareNode <- function(tree, node,
     }
 
     if (!is.atomic(node)) {
-        stop("node is a vector")
+        stop("node should be a vector")
     }
 
+    if (!length(node)) {
+        stop("node: at least one node should be given.")
+    }
     # transfer node label to node number
     if (is.character(node)) {
         node <- transNode(tree, node = node,
@@ -64,7 +67,7 @@ shareNode <- function(tree, node,
     ind <- apply(mat, 1, FUN = function(x) {
         any(x %in% node)
     })
-    matN <- mat[ind, ]
+    matN <- mat[ind, ,drop = FALSE]
     path <- lapply(seq_len(nrow(matN)), FUN = function(x) {
         xx <- matN[x, ]
         xx[!is.na(xx)]
