@@ -3,22 +3,20 @@
 #' \code{toTree} translates a data frame to a phylo object
 #'
 #' @param data A data frame or matrix.
-#' @param cache A logical value, TRUE or FALSE. The default is FALSE. If TRUE,
-#'   the output `phylo` has 6 elements (edge, tip.label, edge.length, Nnode,
-#'   node.label, and cache). The \strong{cache} is a list that has the length
-#'   equals to the number of internal node, and each of its element stores the
-#'   descendant leaves. The list is named with the alias labels of internal
-#'   nodes. The alias labels are created by prefixing the node numbers with
-#'   \code{alias_}
+#' @param edges A logical value, TRUE or FALSE. The default is FALSE. If TRUE,
+#'   the input data should be a matrix of edges (A matrix with two columns). The
+#'   first column is the parent and the second is the child. If FALSE,
+#'   \code{data} should be a taxonomic table (see examples).
 #'
 #' @details The last column is used as the leaf nodes
 #' @importFrom S4Vectors head tail
 #' @importFrom dplyr arrange_all
+#' @importFrom ape reorder.phylo
 #' @return a phylo object
 #' @author Ruizhu HUANG
 #' @export
 #' @examples
-#'
+#' # data is a taxonomic table
 #' taxTab <- data.frame(R1 = rep("A", 5),
 #' R2 = c("B1", rep("B2", 4)),
 #' R3 = c("C1", "C2", "C3", "C3", "C4"))
@@ -27,11 +25,58 @@
 #' R2 = c("B1", rep("B2", 2), NA, "B2"),
 #' R3 = c("C1", "C2", "C3", NA, "C4"))
 #'
-#' tree <- toTree(data = taxTab)
-#'
+#' tree <- toTree(data = taxTab, edges = FALSE)
+#' 
+#' 
+#' # data is a matrix of edges
+#' # the matrix should be in character
+#'  mat <- tree$edge
+#'  mat <- apply(mat, 2, function(x){
+#'           transNode(tree, node = x)})
+#'  tree2 <- toTree(mat, edges = TRUE)
+#'  
 
+toTree <- function(data, edges = FALSE) {
+    if (edges) {
+        out <- .toTree2(data)
+    } else {
+        out <- .toTree1(data)
+    }
+}
 
-toTree <- function(data, cache = FALSE) {
+.toTree2 <- function(data, cache = FALSE) {
+    data <- as.matrix(data)
+    if (!is.character(as.vector(data))) {
+        stop("data should be a character matrix")
+    }
+    
+    # leaf nodes
+    leaf <- setdiff(data[, 2], data[, 1])
+    
+    # internal nodes
+    inNode <- setdiff(data[, 1], leaf)
+    
+    # all nodes
+    nodeLab <- c(leaf, inNode)
+    node <- seq_along(nodeLab)
+    names(node) <- nodeLab
+    
+    # edges
+    edges <- apply(data, 2, FUN = function(x) {node[x]})
+    
+    # tree
+    tree <- list(
+        edge = edges,
+        tip.label= leaf,
+        Nnode = length(node),
+        node.label = inNode)
+    
+    class(tree)<-"phylo"
+    tree <- reorder.phylo(tree)
+    
+    return(tree)
+}
+.toTree1 <- function(data, cache = FALSE) {
 
     # ========== check ========================
     # arrange data
@@ -165,14 +210,7 @@ toTree <- function(data, cache = FALSE) {
     #treeList$edge.length <- runif(nrow(mat3))
     treeList$Nnode <- length(numI)
     class(treeList) <- "phylo"
-    attr(treeList, "order") <- "cladewise"
-
-    # keep cache
-    desA2 <- findOS(tree = treeList, node = numI, only.leaf = TRUE)
-    desA1 <- split(numL, names(numL))
-    desA <- c(desA1, desA2)
-
-    if (cache) {treeList$cache <- desA}
+    treeList <- reorder(treeList)
 
     return(treeList)
 }
