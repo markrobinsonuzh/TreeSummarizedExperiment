@@ -67,36 +67,80 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
 #'
 setMethod("[", signature(x = "TreeSummarizedExperiment"),
           function(x, i, j, ..., drop = TRUE){
-
-             # Subset the traditional slots from SummarizedExperiment
-              nx <- callNextMethod()
-
+              
               # Subset the rowLinks
               lr <- rowLinks(x)
               rt <- rowTree(x)
               if (!missing(i) & !is.null(rt)) {
+                  # match with rownames 
+                  # multiple rows in assays might have the same name
+                  if (is.character(i)) {
+                      isRn <- all(i %in% rownames(x))
+                      if (isRn) {
+                          i <- which(rownames(x) %in% i)
+                      } else {
+                          stop(i, " can't be found in rownames")
+                      }
+                  }
+                  
                   nlr <- lr[i, , drop = FALSE]
               } else {
                   nlr <- lr
               }
-
+              
               # Subset the colLinks
               lc <- colLinks(x)
               ct <- colTree(x)
               if (!missing(j) & !is.null(ct)) {
+                  # match with colnames
+                  # multiple columns in assays might have the same name
+                  if (is.character(j)) {
+                      isCn <- all(j %in% colnames(x))
+                      if (isCn) {
+                          j <- which(colnames(x) %in% j)
+                      } else {
+                          stop(j, " can't be found in colnames")
+                      }
+                  }
                   nlc <- lc[j, , drop = FALSE]
               } else {
                   nlc <- lc
               }
-
-
+              
+              
+              # Subset the traditional slots from SummarizedExperiment
+              nx <- callNextMethod()
+              
               # update slots
               final <- BiocGenerics:::replaceSlots(nx,
                                                    rowLinks = nlr,
                                                    colLinks = nlc)
-
+              
               return(final)
           })
+
+#' @importFrom methods callNextMethod
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
+                 function(x, value){
+                     x <- callNextMethod()
+                     rownames(x@rowLinks) <- value
+                     x
+                 }
+)
+
+#' @importFrom methods callNextMethod
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
+                 function(x, value){
+                     x <- callNextMethod()
+                     rownames(x@colLinks) <- value
+                     x
+                 }
+)
+
 
 #' @keywords internal
 #' @importFrom methods callNextMethod

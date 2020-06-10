@@ -360,8 +360,10 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
 
     if (onRow) {
         sce <- sce[isIn, ]
+        rn <- rownames(sce)
     } else {
         sce <- sce[, isIn]
+        rn <- colnames(sce)
     }
 
 
@@ -379,7 +381,8 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
                        nodeLab_alias = faLab,
                        nodeNum = nd,
                        isLeaf = nd %in% leaf)
-
+    
+    rownames(linkD) <- rn
 
     out <- list(link = linkD, isKeep = isIn)
     return(out)

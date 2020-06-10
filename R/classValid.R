@@ -66,14 +66,22 @@
                            nrow(object))
             errors <- c(errors, msg)
         }
+        if (!all(rownames(object@rowLinks) == rownames(object))) {
+            msg <- "rowLinks: rownames do not match rownames of experiment"
+            errors <- c(errors, msg)
+        }
     }
 
     if (!is.null(cTree)) {
         colEq <- nrow(object@colLinks) == ncol(object)
 
         if (!colEq) {
-            msg <- sprintf("rowLinks: %d rows are expected",
+            msg <- sprintf("colLinks: %d cols are expected",
                            ncol(object))
+            errors <- c(errors, msg)
+        }
+        if (!all(rownames(object@colLinks) == colnames(object))) {
+            msg <- "colLinks: rownames do not match colnames of experiment"
             errors <- c(errors, msg)
         }
     }

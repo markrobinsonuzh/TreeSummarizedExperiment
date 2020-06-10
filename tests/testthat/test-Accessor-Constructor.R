@@ -66,3 +66,13 @@ test_that("row data could be written successfully", {
 test_that("column data could be extracted successfully", {
     expect_equal(colData(tse), colInf)
 })
+
+
+test_that("row data could be subset successfully", {
+    expect_equal(nrow(tse[1,]),1L)
+    expect_equal(nrow(tse[rownames(tse)[1],]),1L)
+})
+test_that("column data could be subset successfully", {
+    expect_equal(ncol(tse[,1]),1L)
+    expect_equal(ncol(tse[,colnames(tse)[1]]),1L)
+})
