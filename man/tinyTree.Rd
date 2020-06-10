@@ -4,15 +4,17 @@
 \name{tinyTree}
 \alias{tinyTree}
 \title{A simulated phylogenetic tree with 10 tips and 9 internal nodes}
-\format{A phylo object with 10 tips and 9 internal nodes:
+\format{
+A phylo object with 10 tips and 9 internal nodes:
 \describe{
   \item{Tip labels}{t1, t2, ..., t10.}
   \item{Node labels}{Node_11, Node_12, ..., Node_19}
-}}
+}
+}
 \usage{
 tinyTree
 }
 \description{
-A random phylo object created using the function \code{\link[ape]{rtree}}
+A random phylo object created using the function \code{\link[ape:rtree]{rtree}}
 }
 \keyword{datasets}

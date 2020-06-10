@@ -6,9 +6,9 @@
 \title{An S4 class TreeSummarizedExperiment}
 \description{
 The class \strong{TreeSummarizedExperiment} is an extension class of standard
-\code{\link[SingleCellExperiment]{SingleCellExperiment}} class. It has
+\code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}} class. It has
 four more slots that are not in
-\code{\link[SingleCellExperiment]{SingleCellExperiment}} class:
+\code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}} class:
 \code{rowTree}, \code{rowLinks} \code{colTree} and \code{colLinks}. The
 hierarchical information of rows (columns) is stored in \code{rowTree}
 (\code{colTree}) and the link between the rows (columns) of \code{assays}
@@ -43,7 +43,7 @@ the nodes of the \code{rowTree} and the rows of \code{assays} tables.}
 the nodes of the \code{colTree} and the columns of \code{assays} tables.}
 
 \item{\code{...}}{Other slots from
-\code{\link[SingleCellExperiment]{SingleCellExperiment}}}
+\code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}}}
 }}
 
 \section{Constructor}{
@@ -60,5 +60,5 @@ See \code{\link{TreeSummarizedExperiment-accessor}} for accessor functions.
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
   \code{\link{TreeSummarizedExperiment-accessor}}
-  \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+  \code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}}
 }
