@@ -18,7 +18,7 @@ LinkDataFrame(nodeLab, nodeLab_alias, nodeNum, isLeaf, ...)
 \item{isLeaf}{A logical vector}
 
 \item{...}{All arguments accepted by
-\code{\link[S4Vectors]{DataFrame-class}}.}
+\code{\link[S4Vectors:DataFrame-class]{DataFrame-class}}.}
 }
 \value{
 A LinkDataFrame object
@@ -37,6 +37,6 @@ Construct a LinkDataFrame object
                      right = 1:5))
 }
 \seealso{
-\code{\link{LinkDataFrame-class}}
-  \code{\link[S4Vectors]{DataFrame-class}}
+\code{\link[=LinkDataFrame-class]{LinkDataFrame}}
+  \code{\link[S4Vectors:DataFrame-class]{DataFrame}}
 }

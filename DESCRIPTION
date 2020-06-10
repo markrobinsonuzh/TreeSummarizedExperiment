@@ -26,7 +26,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 7.0.0
+RoxygenNote: 7.1.0
 Collate: 
     'classValid.R'
     'allClass.R'
