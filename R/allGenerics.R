@@ -98,6 +98,29 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               return(final)
           })
 
+#' @importFrom methods callNextMethod
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
+                 function(x, value){
+                     x <- callNextMethod()
+                     rownames(x@rowLinks) <- value
+                     x
+                 }
+)
+
+#' @importFrom methods callNextMethod
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
+                 function(x, value){
+                     x <- callNextMethod()
+                     rownames(x@colLinks) <- value
+                     x
+                 }
+)
+
+
 #' @keywords internal
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SingleCellExperiment show
