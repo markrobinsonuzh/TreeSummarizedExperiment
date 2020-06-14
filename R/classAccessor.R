@@ -10,7 +10,7 @@
 #' TreeSummarizedExperiment-accessors
 #'
 #' All accessor functions that work on
-#' \code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}} should work on
+#' \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
 #' \strong{TreeSummarizedExperiment}. Additionally, new accessors
 #' \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 #' function are available for \strong{TreeSummarizedExperiment}.
@@ -21,12 +21,12 @@
 #' @param drop A logical value, TRUE or FALSE. The argument from the subset
 #'   function \code{[]}
 #' @param value the new rownames or colnames as a \code{character} value. 
-#'   See \code{\link[BiocGenerics:row+colnames]{BiocGenerics}}.
+#'   See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.
 #' @param ... The argument from the subset function \code{[]}
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}
-#'   \code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}}
+#'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 #'
 #' @author Ruizhu HUANG
 #' @examples

@@ -49,14 +49,14 @@ subset function \code{[]}}
 function \code{[]}}
 
 \item{value}{the new rownames or colnames as a \code{character} value. 
-See \code{\link[BiocGenerics:row+colnames]{BiocGenerics}}.}
+See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.
 }
 \description{
 All accessor functions that work on
-\code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}} should work on
+\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
 \strong{TreeSummarizedExperiment}. Additionally, new accessors
 \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 function are available for \strong{TreeSummarizedExperiment}.
@@ -111,7 +111,7 @@ toy_tse <- TreeSummarizedExperiment(assays = list(y),
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
-  \code{\link[SingleCellExperiment:SingleCellExperiment-class]{SingleCellExperiment}}
+  \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 }
 \author{
 Ruizhu HUANG
