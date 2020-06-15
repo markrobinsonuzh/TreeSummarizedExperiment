@@ -47,14 +47,14 @@ setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #' @param nodeNum A numeric vector
 #' @param isLeaf A logical vector
 #' @param ... All arguments accepted by
-#'   \code{\link[S4Vectors]{DataFrame-class}}.
+#'   \code{\link[S4Vectors:DataFrame-class]{DataFrame-class}}.
 #'
 #' @importFrom S4Vectors DataFrame
 #' @name LinkDataFrame-constructor
 #' @export
 #' @return A LinkDataFrame object
-#' @seealso \code{\link{LinkDataFrame-class}}
-#'   \code{\link[S4Vectors]{DataFrame-class}}
+#' @seealso \code{\link[=LinkDataFrame-class]{LinkDataFrame}}
+#'   \code{\link[S4Vectors:DataFrame-class]{DataFrame}}
 #' @examples
 #'
 #'
@@ -77,9 +77,9 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' An S4 class TreeSummarizedExperiment
 #'
 #' The class \strong{TreeSummarizedExperiment} is an extension class of standard
-#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} class. It has
+#' \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} class. It has
 #' four more slots that are not in
-#' \code{\link[SingleCellExperiment]{SingleCellExperiment}} class:
+#' \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} class:
 #' \code{rowTree}, \code{rowLinks} \code{colTree} and \code{colLinks}. The
 #' hierarchical information of rows (columns) is stored in \code{rowTree}
 #' (\code{colTree}) and the link between the rows (columns) of \code{assays}
@@ -94,7 +94,7 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' @slot colLinks A LinkDataFrame. It gives information about the link between
 #'   the nodes of the \code{colTree} and the columns of \code{assays} tables.
 #' @slot ... Other slots from
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 #'
 #' @section Constructor:
 #' See \code{\link{TreeSummarizedExperiment-constructor}} for constructor
@@ -122,7 +122,7 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' @exportClass TreeSummarizedExperiment
 #' @seealso \code{\link{TreeSummarizedExperiment}}
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 setClass("TreeSummarizedExperiment",
          representation(rowTree = "list_Or_NULL",
                         colTree = "list_Or_NULL",
@@ -156,7 +156,7 @@ setClass("TreeSummarizedExperiment",
 #'
 #' @details The output TreeSummarizedExperiment object has very similar
 #'   structure as the
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}. The
+#'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}. The
 #'   differences are summarized be as below.
 #'   \itemize{
 #'   \item \strong{rowTree} A slot exists in \code{TreeSummarizedExperiment}
@@ -167,7 +167,7 @@ setClass("TreeSummarizedExperiment",
 #'   \code{treeData} to provide the hiearchical information about the rows of
 #'   the \code{assays} table, the \code{rowData} would be a
 #'   \code{\link{LinkDataFrame-class}} instead of
-#'   \code{\link[S4Vectors]{DataFrame-class}}. The data on the right side of the
+#'   \code{\link[S4Vectors:DataFrame-class]{DataFrame}}. The data on the right side of the
 #'   vertical line provides the link information between the \code{assays} rows
 #'   and the tree \code{phylo} object, and could be accessed via
 #'   \code{linkData}; The data on the left side is the original \code{rowData}
@@ -192,9 +192,9 @@ setClass("TreeSummarizedExperiment",
 #' @return a TreeSummarizedExperiment object
 #' @name TreeSummarizedExperiment-constructor
 #' @author Ruizhu HUANG
-#' @seealso \code{\link{TreeSummarizedExperiment-class}}
-#'   \code{\link{TreeSummarizedExperiment-accessor}}
-#'   \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+#' @seealso \code{\link[=TreeSummarizedExperiment-class]{TreeSummarizedExperiment}}
+#'   \code{\link[=TreeSummarizedExperiment-accessor]{TreeSummarizedExperiment-accessor}}
+#'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 #' @examples
 #'
 #' data("tinyTree")
@@ -360,8 +360,10 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
 
     if (onRow) {
         sce <- sce[isIn, ]
+        rn <- rownames(sce)
     } else {
         sce <- sce[, isIn]
+        rn <- colnames(sce)
     }
 
 
@@ -379,7 +381,8 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
                        nodeLab_alias = faLab,
                        nodeNum = nd,
                        isLeaf = nd %in% leaf)
-
+    
+    rownames(linkD) <- rn
 
     out <- list(link = linkD, isKeep = isIn)
     return(out)
