@@ -1,7 +1,7 @@
 
 #' A simulated phylogenetic tree with 10 tips and 9 internal nodes
 #'
-#' A random phylo object created using the function \code{\link[ape]{rtree}}
+#' A random phylo object created using the function \code{\link[ape:rtree]{rtree}}
 #' @importFrom ape rtree
 #' @format A phylo object with 10 tips and 9 internal nodes:
 #' \describe{

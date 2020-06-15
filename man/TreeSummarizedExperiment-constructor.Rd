@@ -14,7 +14,7 @@ TreeSummarizedExperiment(
 )
 }
 \arguments{
-\item{...}{Arguments passed to the \code{\link[SingleCellExperiment]{SummarizedExperiment}} constructor to fill the slots of the base class.}
+\item{...}{Arguments passed to the \code{\link{SummarizedExperiment}} constructor to fill the slots of the base class.}
 
 \item{rowTree}{A phylo object that provides hiearchical information of rows
 of assay tables.}
@@ -39,7 +39,7 @@ a TreeSummarizedExperiment object
 \details{
 The output TreeSummarizedExperiment object has very similar
   structure as the
-  \code{\link[SingleCellExperiment]{SingleCellExperiment}}. The
+  \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}. The
   differences are summarized be as below.
   \itemize{
   \item \strong{rowTree} A slot exists in \code{TreeSummarizedExperiment}
@@ -50,7 +50,7 @@ The output TreeSummarizedExperiment object has very similar
   \code{treeData} to provide the hiearchical information about the rows of
   the \code{assays} table, the \code{rowData} would be a
   \code{\link{LinkDataFrame-class}} instead of
-  \code{\link[S4Vectors]{DataFrame-class}}. The data on the right side of the
+  \code{\link[S4Vectors:DataFrame-class]{DataFrame}}. The data on the right side of the
   vertical line provides the link information between the \code{assays} rows
   and the tree \code{phylo} object, and could be accessed via
   \code{linkData}; The data on the left side is the original \code{rowData}
@@ -88,9 +88,9 @@ tse <- TreeSummarizedExperiment(assays = list(count),
 
 }
 \seealso{
-\code{\link{TreeSummarizedExperiment-class}}
-  \code{\link{TreeSummarizedExperiment-accessor}}
-  \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+\code{\link[=TreeSummarizedExperiment-class]{TreeSummarizedExperiment}}
+  \code{\link[=TreeSummarizedExperiment-accessor]{TreeSummarizedExperiment-accessor}}
+  \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 }
 \author{
 Ruizhu HUANG

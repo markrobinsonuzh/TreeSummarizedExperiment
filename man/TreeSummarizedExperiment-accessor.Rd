@@ -10,6 +10,8 @@
 \alias{colTree}
 \alias{colTree,TreeSummarizedExperiment-method}
 \alias{[,TreeSummarizedExperiment,ANY,ANY,ANY-method}
+\alias{rownames<-,TreeSummarizedExperiment-method}
+\alias{colnames<-,TreeSummarizedExperiment-method}
 \alias{TreeSummarizedExperiment-accessor}
 \title{TreeSummarizedExperiment-accessors}
 \usage{
@@ -30,6 +32,10 @@ colTree(x)
 \S4method{colTree}{TreeSummarizedExperiment}(x)
 
 \S4method{[}{TreeSummarizedExperiment,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+
+\S4method{rownames}{TreeSummarizedExperiment}(x) <- value
+
+\S4method{colnames}{TreeSummarizedExperiment}(x) <- value
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
@@ -41,13 +47,16 @@ subset function \code{[]}}
 
 \item{drop}{A logical value, TRUE or FALSE. The argument from the subset
 function \code{[]}}
+
+\item{value}{the new rownames or colnames as a \code{character} value. 
+See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.
 }
 \description{
 All accessor functions that work on
-\code{\link[SingleCellExperiment]{SingleCellExperiment}} should work on
+\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
 \strong{TreeSummarizedExperiment}. Additionally, new accessors
 \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 function are available for \strong{TreeSummarizedExperiment}.
@@ -102,7 +111,7 @@ toy_tse <- TreeSummarizedExperiment(assays = list(y),
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
-  \code{\link[SingleCellExperiment]{SingleCellExperiment}}
+  \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 }
 \author{
 Ruizhu HUANG
