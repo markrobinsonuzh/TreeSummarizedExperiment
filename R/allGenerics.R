@@ -141,6 +141,36 @@ setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  }
 )
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("subsetByNode", function(x, rowNode, colNode)
+    standardGeneric("subsetByNode")
+)
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
+          function(x, rowNode, colNode){
+              # row link
+              rl <- rowLinks(x)
+              if (!missing(rowNode)) {
+                  if (!is.numeric(rowNode)) {
+                      rowNode <- transNode(tree = rowTree(x), node = rowNode)
+                  }
+                  x <- x[which(rl$nodeNum %in% rowNode),]
+              }
+              
+              # column link
+              cl <- colLinks(x)
+              if (!missing(colNode)) {
+                  if (!is.numeric(colNode)) {
+                      colNode <- transNode(tree = colTree(x), node = colNode)
+                  }
+                  x <- x[, which(cl$nodeNum %in% colNode)]
+              }
+              return(x) 
+          }
+)
 
 #' @keywords internal
 #' @importFrom methods callNextMethod
