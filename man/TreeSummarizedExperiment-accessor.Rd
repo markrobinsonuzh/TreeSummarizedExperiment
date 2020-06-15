@@ -39,9 +39,11 @@ colTree(x)
 
 \S4method{colnames}{TreeSummarizedExperiment}(x) <- value
 
+
 subsetByNode(x, rowNode, colNode)
 
 \S4method{subsetByNode}{TreeSummarizedExperiment}(x, rowNode, colNode)
+
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
@@ -57,6 +59,7 @@ function \code{[]}}
 \item{value}{the new rownames or colnames as a \code{character} value. 
 See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
 
+
 \item{rowNode}{A vector of nodes that are used to subset rows. One could use
 the node number, the node label or the node alias to specify nodes, but not
 a mixture of them.}
@@ -64,6 +67,7 @@ a mixture of them.}
 \item{colNode}{A vector of nodes that are used to subset columns. One could
 use the node number, the node label or the node alias to specify nodes, but
 not a mixture of them.}
+
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.

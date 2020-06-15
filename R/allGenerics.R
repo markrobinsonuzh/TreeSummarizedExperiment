@@ -141,6 +141,7 @@ setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  }
 )
 
+
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setGeneric("subsetByNode", function(x, rowNode, colNode)
