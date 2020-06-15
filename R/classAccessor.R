@@ -23,6 +23,12 @@
 #' @param value the new rownames or colnames as a \code{character} value. 
 #'   See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.
 #' @param ... The argument from the subset function \code{[]}
+#' @param rowNode A vector of nodes that are used to subset rows. One could use
+#'   the node number, the node label or the node alias to specify nodes, but not
+#'   a mixture of them.
+#' @param colNode A vector of nodes that are used to subset columns. One could
+#'   use the node number, the node label or the node alias to specify nodes, but
+#'   not a mixture of them.
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}
