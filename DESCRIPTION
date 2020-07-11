@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment: a S4 Class for Data with Tree Structures 
-Version: 1.5.3
+Version: 1.5.4
 Authors@R: 
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
       role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945")),
@@ -29,12 +29,14 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Collate: 
+    'aboutLoop.R'
     'classValid.R'
     'allClass.R'
     'aggValue.R'
     'allGenerics.R'
+    'changeTree.R'
     'classAccessor.R'
     'data.R'
     'tree_addLabel.R'
@@ -47,7 +49,6 @@ Collate:
     'tree_findOS.R'
     'tree_findSibling.R'
     'tree_isLeaf.R'
-    'tree_joinLeaf.R'
     'tree_matTree.R'
     'tree_printNode.R'
     'tree_pruneTree.R'
@@ -57,3 +58,4 @@ Collate:
     'tree_toTree.R'
     'tree_trackNode.R'
     'tree_transNode.R'
+    'tree_unionLeaf.R'

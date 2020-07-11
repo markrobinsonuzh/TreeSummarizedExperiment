@@ -1,6 +1,6 @@
 #' list leaf nodes that are the descendants of at least one specified node
 #'
-#' \code{joinLeaf} list the leaf nodes that are the desendants of (at least one)
+#' \code{unionLeaf} list the leaf nodes that are the desendants of (at least one)
 #' specified nodes.
 #'
 #' @param tree A phylo object.

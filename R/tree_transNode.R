@@ -43,8 +43,9 @@ transNode <- function(tree, node, use.alias = FALSE,
     }
 
     if (is.factor(node)) {
-        stop("factor detected; The node label is required to be character or
-             numeric.")
+        node <- as.character(node)
+        warning("node: factor is converted to character")
+        warning("The input 'node' is considered as labels of nodes.")
     }
     # node number & tip number
     mat <- tree$edge
@@ -64,12 +65,12 @@ transNode <- function(tree, node, use.alias = FALSE,
     # node labels
     nodeLab <- c(tree$tip.label, tree$node.label)
     nodeLab_alias <- paste("alias_", c(tip, nodI), sep = "")
-    if (message) {
-        if (any(duplicated(nodeLab))) {
-            cat("There are more than one nodes using a same label or
-                without any label.\n")
+    
+    if (any(duplicated(nodeLab))) {
+        warnings("Multiple nodes use the same label or
+                have no label.\n")
         }
-        }
+        
 
     # check whether the input node number exists in the provided tree
     if (is.numeric(node)) {
@@ -85,10 +86,13 @@ transNode <- function(tree, node, use.alias = FALSE,
     inAlias <- all(node %in% nodeLab_alias)
     if (is.character(node)) {
         if (!any(inLab, inAlias)) {
-            cat(setdiff(node, nodeLab),
-                " can't be matched to any node label of the tree. \n")
-            stop("Either the node label or the alias of node label should be
-                 provided, but not a mixture of them. \n")
+            wrongNode <- setdiff(node, nodeLab)
+            if (any(startsWith(wrongNode, "alias_"))) {
+                message("Not allowed to mix using node labels and alias labels")
+            }
+            stop(length(wrongNode), " nodes mismatch with the tree: ",
+                    head(wrongNode), " ...")
+            
 
         }
     }
