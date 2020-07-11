@@ -417,7 +417,7 @@ taxa <- data.frame(Kindom = rep("A", 5),
                      Class = c("C1", "C2", "C3", "C3", NA),
                      OTU = c("D1", "D2", "D3", "D4", NA))
 # convert to a phylo tree
-taxa_tree <- toTree(data = taxa, edges = FALSE)
+taxa_tree <- toTree(data = taxa)
 ggtree(taxa_tree)+
 geom_text2(aes(label = node), color = "darkblue",
                 hjust = -0.5, vjust = 0.7, size = 6) +
