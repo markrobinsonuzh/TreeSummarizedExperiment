@@ -4,7 +4,16 @@
 \alias{aggValue}
 \title{Perform data aggregations based on the available tree structures}
 \usage{
-aggValue(x, rowLevel = NULL, colLevel = NULL, FUN = sum, message = FALSE)
+aggValue(
+  x,
+  rowLevel = NULL,
+  rowBlock = NULL,
+  colLevel = NULL,
+  colBlock = NULL,
+  FUN = sum,
+  assay = NULL,
+  message = FALSE
+)
 }
 \arguments{
 \item{x}{A \code{TreeSummarizedExperiment} object.}
@@ -14,13 +23,22 @@ It provides the level on the tree that data is aggregated to. The
 aggregation is on the row dimension. The default is \code{rowLevel = NULL},
 and no aggregation is performed.}
 
+\item{rowBlock}{A column name in the \code{rowData} to separate the
+aggregation.}
+
 \item{colLevel}{A numeric (node numbers) or character (node labels) vector.
 It provides the level on the tree that data is aggregated to. The
 aggregation is on the column dimension. The default is \code{colLevel =
 NULL}, and no aggregation is performed.}
 
+\item{colBlock}{A column name in the \code{colData} to separate the
+aggregation.}
+
 \item{FUN}{A function to be applied on the aggregation. It's similar to the
 \code{FUN} in \code{\link[base]{apply}}}
+
+\item{assay}{A integer scalar or string indicating which assay of \code{x} to
+use in the aggregation.}
 
 \item{message}{A logical value. The default is TRUE. If TRUE, it will print
 out the running process.}

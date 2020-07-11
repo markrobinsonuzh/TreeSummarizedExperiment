@@ -11,10 +11,16 @@
 #'   It provides the level on the tree that data is aggregated to. The
 #'   aggregation is on the row dimension. The default is \code{rowLevel = NULL},
 #'   and no aggregation is performed.
+#' @param rowBlock A column name in the \code{rowData} to separate the
+#'   aggregation.
 #' @param colLevel A numeric (node numbers) or character (node labels) vector.
 #'   It provides the level on the tree that data is aggregated to. The
 #'   aggregation is on the column dimension. The default is \code{colLevel =
 #'   NULL}, and no aggregation is performed.
+#' @param colBlock A column name in the \code{colData} to separate the
+#'   aggregation.
+#' @param assay A integer scalar or string indicating which assay of \code{x} to
+#'   use in the aggregation.
 #' @param FUN A function to be applied on the aggregation. It's similar to the
 #'   \code{FUN} in \code{\link[base]{apply}}
 #' @param message A logical value. The default is TRUE. If TRUE, it will print
@@ -70,14 +76,15 @@
 #'
 #' assays(aggCol)[[1]]
 #'
-aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
-                     FUN = sum, message = FALSE) {
+aggValue <- function(x, rowLevel = NULL, rowBlock = NULL, 
+                     colLevel = NULL, colBlock = NULL, 
+                     FUN = sum, assay = NULL,
+                     message = FALSE) {
     ## --------------------- check input before run ---------------------------
     ## If x is a TreeSummarizedExperiment, rowTree and colTree should be set to
     ## NULL
     if (!is(x, "TreeSummarizedExperiment")) {
         stop("x should be a TreeSummarizedExperiment")
-        
     }
     
     ## The provided rowLevel or colLevel should be a numeric or character vector
@@ -97,6 +104,9 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     
     ## The assay tables
     mat <- assays(x)
+    if (!is.null(assay)) {
+        mat <- mat[assay]
+    }
     
     ## The trees
     rTree <- rowTree(x)
@@ -142,6 +152,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                         dimData = rD,
                         linkData = rL,
                         level = unique(rowLevel),
+                        block = rowBlock,
                         FUN = FUN,
                         message = message)
         nrD <- outR$newDD
@@ -170,6 +181,7 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
                         dimData = cD,
                         linkData = cL,
                         level = unique(colLevel),
+                        block = colBlock,
                         FUN = FUN, message = message)
         ncD <- outC$newDD
         ncD <- ncD[, setdiff(colnames(ncD), "nodeLab")]
@@ -201,10 +213,19 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
 ########################### version 2 ##############################
 
 .aggFun <- function(tree, assayTab, dimData, linkData,
-                    level = NULL, FUN, message = FALSE) {
+                    level = NULL, block = NULL, FUN, 
+                    message = FALSE) {
     
-    # nodeNum
+    # nodeNum & block
     numR <- linkData$nodeNum
+    if (!is.null(block)) {
+        bk <- dimData[[block]]  
+    } else {
+        bk <- rep(1, length(numR))
+    }
+    
+    nodeBk <- data.frame(numR, bk, stringsAsFactors = FALSE)
+    
     
     # All node numbers on the tree
     ed <- tree$edge
@@ -259,46 +280,38 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
         }
         
         # assay table
-        # ri <- match(desR[[i]], numR)
-        ri <- lapply(desR[[i]], FUN = function(x) {
-            which(numR == x)
+        ri <- which(numR %in% desR[[i]])
+        sri <- split(ri, nodeBk[ri, "bk"])
+        
+        ax <- lapply(sri, FUN = function(x) {
+            xx <- mtab[x, , drop = FALSE]
+            fx <- apply(xx, 2, FUN = FUN)
+            fx <- rbind(fx)
+            rownames(fx) <- NULL
+            fx
         })
-        ri <- unlist(ri)
-        mi <- mtab[ri, , drop = FALSE]
-        ax <- apply(mi, 2, FUN = FUN)
-        if (is.list(ax)) {
-            stop("The output of FUN:", deparse(substitute(FUN)),
-                 "has different lengths")
-        }
-        ax <- rbind(ax)
-        rownames(ax) <- NULL
-        #rownames(ax) <- rep(names(desR)[i], nrow(ax))
-        assayL[[i]] <- ax
+        
+        assayL[[i]] <- do.call(rbind, ax)
         
         #dimension data
-        li <- nrow(ax)
-        ll[i] <- li
+        li <- lapply(ax, nrow)
+        ll[[i]] <- sum(unlist(li))
         
         if (ncol(dimData)) {
-            dl <- as.list(dimData[ri, , drop = FALSE])
-            # this is to fix the issue when the nominated node in the specified level has no data
-            if (!length(ri)) {
-                dl <- as.list(dimData[1, , drop = FALSE])
-                dl <- lapply(dl, FUN = function(x) {NA})
-            }
-            ru <- lapply(dl, FUN = function(x) {
-                ux <- unique(x)
-                if (length(ux) > 1) {
-                    ui <- NA
+            dl <- lapply(sri, FUN = function(x) {
+                if (!length(x)) {
+                    xx <- dimData[1, , drop = FALSE]
+                    xx[] <- NA
+                    xx
                 } else {
-                    ui <- ux
+                    xx <- as.list(dimData[x, , drop = FALSE])
+                    ux <- lapply(xx, .unique_or_na)
+                    do.call(cbind.data.frame, ux)
                 }
-                rep(ui, li)
             })
-            annL[[i]] <- do.call(cbind.data.frame, ru)
-        }
-        
-    }
+            ru <- mapply(.rep_df, df = dl, n=li, SIMPLIFY = FALSE)
+            annL[[i]] <- do.call(rbind, ru)
+        }}
     
     # separate the results into the original number of assays tables as input
     if (message) {
@@ -315,7 +328,6 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     }
     
     # use the same row names as outR
-    
     if (ncol(dimData)) {
         newDD <- do.call(rbind, annL)
     } else {
@@ -328,4 +340,17 @@ aggValue <- function(x, rowLevel = NULL, colLevel = NULL,
     
     out <- list(dataTab = outR, newDD = newDD)
     return(out)
+}
+
+.unique_or_na <- function(x) {
+    xx <- unique(x)
+    if (length(xx) > 1) {
+        NA
+    } else {
+        xx
+    }
+}
+
+.rep_df <- function(df, n){
+    df[rep(seq_len(nrow(df)), each = n), ]
 }
