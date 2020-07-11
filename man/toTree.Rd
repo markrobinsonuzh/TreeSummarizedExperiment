@@ -4,15 +4,14 @@
 \alias{toTree}
 \title{Translate a data frame to a phylo object}
 \usage{
-toTree(data, edges = FALSE)
+toTree(data, column_order = NULL)
 }
 \arguments{
 \item{data}{A data frame or matrix.}
 
-\item{edges}{A logical value, TRUE or FALSE. The default is FALSE. If TRUE,
-the input data should be a matrix of edges (A matrix with two columns). The
-first column is the parent and the second is the child. If FALSE,
-\code{data} should be a taxonomic table (see examples).}
+\item{column_order}{A vector that includes the column names of data to
+reorder columns of \code{data}. Default is NULL, the original order of
+\code{data} is kept.}
 }
 \value{
 a phylo object
@@ -24,25 +23,60 @@ a phylo object
 The last column is used as the leaf nodes
 }
 \examples{
-# data is a taxonomic table
+
+library(ggtree)
+# Example 1:
 taxTab <- data.frame(R1 = rep("A", 5),
-R2 = c("B1", rep("B2", 4)),
-R3 = c("C1", "C2", "C3", "C3", "C4"))
+                     R2 = c("B1", rep("B2", 4)),
+                     R3 = paste0("C", 1:5))
+# Internal nodes: their labels are prefixed with colnames of taxTab
+#  e.g., R2:B2
+tree <- toTree(data = taxTab)
+# viz the tree           
+ ggtree(tree) + 
+ geom_text2(aes(label = label), color = "red", vjust = 1) + 
+ geom_nodepoint()
 
+# Example 2: duplicated rows in the 3rd and 4th rows
 taxTab <- data.frame(R1 = rep("A", 5),
-R2 = c("B1", rep("B2", 2), NA, "B2"),
-R3 = c("C1", "C2", "C3", NA, "C4"))
+                     R2 = c("B1", rep("B2", 4)),
+                     R3 = c("C1", "C2", "C3", "C3", "C4"))
+# duplicated rows are removed with warnings
+tree <- toTree(data = taxTab)
 
-tree <- toTree(data = taxTab, edges = FALSE)
+# Example 3: NA values in R2 column 
+# results: the internal node with the label 'R2:'
+taxTab <- data.frame(R1 = rep("A", 5),
+                     R2 = c("B1", rep("B2", 2), NA, "B2"),
+                     R3 = c("C1", "C2", "C3", NA, "C4"))
+tree <- toTree(data = taxTab)
+# viz the tree           
+ ggtree(tree) + 
+ geom_text2(aes(label = label), color = "red", vjust = 1) + 
+ geom_nodepoint()
 
+# Example 4: duplicated values in the leaf column (R4)
+# Not allowed and give errors
+# taxTab <- data.frame(R1 = rep("A", 5),
+#                      R2 = c("B1", rep("B2", 3), "B3"),
+#                      R3 = c("C1", "C2", "C3", "C3",NA),
+#                      R4 = c("D1", "D2", "D3", NA, NA))
 
-# data is a matrix of edges
-# the matrix should be in character
- mat <- tree$edge
- mat <- apply(mat, 2, function(x){
-          transNode(tree, node = x)})
- tree2 <- toTree(mat, edges = TRUE)
+# Example 5: loops caused by missing values in B2-C4, B3-C4
+taxTab <- data.frame(R1 = rep("A", 6),
+                     R2 = c("B1", rep("B2", 4), "B3"),
+                     R3 = c("C1", "C2", "C3", "C3", "C4", "C4"),
+                     R4 = c("D1", "D2", "D3", "D3", "D4" , "D4"),
+                     R5 = paste0("E", 1:6))
+ # resolove loops before run to Tree
+ # Suffix are adding to C4
+ taxNew <- resolveLoop(taxTab)           
+ tree <- toTree(data = taxNew)
  
+ # viz the tree           
+ ggtree(tree) + 
+ geom_text2(aes(label = label), color = "red", vjust = 1) + 
+ geom_nodepoint()
 }
 \author{
 Ruizhu HUANG
