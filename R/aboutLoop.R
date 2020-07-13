@@ -5,6 +5,7 @@
 #'   columns from the left to the right correspond nodes from the root to the
 #'   leaf.
 #' @importFrom dplyr '%>%' mutate_if
+#' @importFrom rlang .data
 #' @export
 #' @author ruizhu Huang
 #' @return a data frame
@@ -36,8 +37,11 @@
 detectLoop <- function(tax_tab){
     
     tax_tab <- tax_tab %>%
-        mutate_if(is.factor, as.character) %>%
-        replace(is.na(.), "NA")
+        mutate_if(is.factor, as.character) #%>%
+        #replace(is.na(.data), "NA")
+    # using piping this crashes if used with .data
+    tax_tab <- replace(tax_tab, is.na(tax_tab), "NA")
+    
     nc <- ncol(tax_tab)
     cnam <- colnames(tax_tab)
     
@@ -78,6 +82,7 @@ detectLoop <- function(tax_tab){
 #'   columns from the left to the right correspond nodes from the root to the
 #'   leaf.
 #' @importFrom dplyr '%>%' mutate_if group_by mutate row_number
+#' @importFrom rlang .data
 #' @export
 #' @author ruizhu Huang
 #' @return a data frame
@@ -135,12 +140,14 @@ resolveLoop <- function(tax_tab) {
 .solveLoop <- function(tax_tab){
     # change factor to character
     tax_tab <- tax_tab %>%
-        mutate_if(is.factor, as.character) %>%
-        replace(is.na(.), "NA")
+        mutate_if(is.factor, as.character) #%>%
+        #replace(is.na(.data), "NA")
+    # using piping this crashes if used with .data
+    tax_tab <- replace(tax_tab, is.na(tax_tab), "NA")
     
     df <- detectLoop(tax_tab = tax_tab) 
     if (nrow(df)) {
-        df <- df %>% group_by(child) %>% mutate(count = row_number())
+        df <- df %>% group_by(.data$child) %>% mutate(count = row_number())
         df_list <- split(df, seq(nrow(df)))
         
         tax_x <- tax_tab

@@ -19,6 +19,7 @@ Imports:
     methods,
     utils,
     ape,
+    rlang,
     dplyr,
     SummarizedExperiment
 VignetteBuilder: knitr
