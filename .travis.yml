@@ -1,4 +1,3 @@
-warnings_are_errors: false
 language: r
 r:
   - bioc-devel
@@ -11,6 +10,8 @@ r_packages:
   - magick
 cache:
   packages: true
+after_success:
+  - Rscript -e 'covr::codecov()'
 #notifications:
 #  email:
 #    recipients:
