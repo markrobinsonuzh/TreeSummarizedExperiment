@@ -74,11 +74,11 @@ changeTree <- function(x,
                 warning(nm, " columns are removed due to mismatch")}
             x <- x[, colNodeLab]
         }
-        nrLink <- .updateLinks(newTree = rowTree, newLab = rowNodeLab)
-        rownames(nrLink) <- colnames(x)
+        ncLink <- .updateLinks(newTree = colTree, newLab = colNodeLab)
+        rownames(ncLink) <- colnames(x)
         x <- BiocGenerics:::replaceSlots(x,
                                          colLinks = ncLink,
-                                         colTree = list(phylo = rowTree))
+                                         colTree = list(phylo = colTree))
     }
     
     
