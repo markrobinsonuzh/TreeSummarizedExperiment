@@ -9,6 +9,7 @@
 #' @details The last column is used as the leaf nodes
 #' @importFrom S4Vectors head tail
 #' @importFrom dplyr arrange_all
+#' @importFrom rlang .data
 #' @importFrom ape reorder.phylo
 #' @importFrom stats reorder
 #' @return a phylo object
@@ -74,8 +75,9 @@
 toTree <- function(data, column_order = NULL) {
     
     data <- data %>% data.frame() %>%
-        mutate_if(is.factor, as.character) %>%
-        replace(is.na(.), "NA")
+        mutate_if(is.factor, as.character) 
+    
+    data <- replace(data, is.na(data), "NA")
     
     # remove duplicated rows
     isDup <- duplicated(data)

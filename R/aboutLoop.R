@@ -44,6 +44,7 @@ detectLoop <- function(tax_tab){
     
     tax_tab <- tax_tab %>%
         mutate_if(is.factor, as.character) 
+
     nc <- ncol(tax_tab)
     cnam <- colnames(tax_tab)
     
@@ -84,6 +85,7 @@ detectLoop <- function(tax_tab){
 #'   columns from the left to the right correspond nodes from the root to the
 #'   leaf.
 #' @importFrom dplyr '%>%' mutate_if group_by mutate row_number
+#' @importFrom rlang .data
 #' @export
 #' @author ruizhu Huang
 #' @return a data frame
@@ -141,18 +143,17 @@ resolveLoop <- function(tax_tab) {
 .solveLoop <- function(tax_tab){
     # change factor to character
     tax_tab <- tax_tab %>%
-        mutate_if(is.factor, as.character) %>%
-        replace(is.na(.), "NA")
+        mutate_if(is.factor, as.character) 
     
     df <- detectLoop(tax_tab = tax_tab) 
     if (nrow(df)) {
-        df <- df %>% group_by(child) %>% mutate(count = row_number())
+        df <- df %>% group_by(.data$child) %>% mutate(count = row_number())
         df_list <- split(df, seq(nrow(df)))
         
         tax_x <- tax_tab
         for (i in seq_along(df_list)){
             df_i <- df_list[[i]]
-            ind_c <- tax_x[[df_i$child_column]] == as.character(df_i$child)
+            ind_c <- tax_x[[df_i$child_column]] %in% df_i$child
             ind_p <- tax_x[[df_i$parent_column]] == df_i$parent
             ind <- which(ind_p & ind_c)
             tax_x[ind, df_i$child_column] <- paste(tax_x[ind, df_i$child_column], 
