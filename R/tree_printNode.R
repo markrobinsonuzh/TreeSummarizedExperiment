@@ -50,7 +50,7 @@ printNode <- function(tree, type = "leaf"){
     labL <- tree$tip.label
 
     outL <- data.frame(nodeLab = labL,
-                       nodeLab_alias = paste0("alias", leaf),
+                       nodeLab_alias = paste0("alias_", leaf),
                        nodeNum = leaf,
                        isLeaf = TRUE,
                        stringsAsFactors = FALSE)
