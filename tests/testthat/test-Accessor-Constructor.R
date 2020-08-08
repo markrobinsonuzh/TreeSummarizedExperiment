@@ -22,14 +22,14 @@ tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 rowTree = tinyTree)
 test_that("TreeSummarizedExperiment constuctor works", {
     # TreeSummarizedExperiment
-    expect_is(tse,
-              "TreeSummarizedExperiment")
+    expect_s4_class(tse,
+                    "TreeSummarizedExperiment")
 
     # without tree
-    expect_is(TreeSummarizedExperiment(assays = list(toyTable),
-                                       rowData = rowInf,
-                                       colData = colInf),
-              "TreeSummarizedExperiment")
+    expect_s4_class(TreeSummarizedExperiment(assays = list(toyTable),
+                                             rowData = rowInf,
+                                             colData = colInf),
+                    "TreeSummarizedExperiment")
 
     expect_warning(TreeSummarizedExperiment(assays = list(toyTable),
                                           rowData = rowInf,
