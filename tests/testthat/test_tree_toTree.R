@@ -44,3 +44,28 @@ test_that("toTree give warnings", {
     expect_warning(toTree(data = df[, 1:2]))
     
 })
+
+
+test_that("toTree loop resolving", {
+    actual <- expect_warning(detectLoop(tax_tab = df),
+                             "Detected R4 from different R3")
+    expect_s3_class(actual,"data.frame")
+    expect_equal(nrow(actual),5L)
+    expect_true(all(is.na(actual$child)))
+    
+    df <- data.frame(A = rep("a", 8),
+                     B = rep (c("b1", "b2", "b3", "b4"), each = 2),
+                     C = paste0("c", c(1, 2, 2, 3:7)),
+                     D = paste0("d", 1:8))
+    actual <- expect_warning(detectLoop(tax_tab = df),
+                             "Detected C from different B")
+    expect_s3_class(actual,"data.frame")
+    expect_equal(nrow(actual),2L)
+    expect_true(all(actual$child == "c2"))
+    
+    actual <- expect_warning(resolveLoop(tax_tab = df),
+                             "Detected C from different B")
+    expect_equal(nrow(df),nrow(actual))
+    expect_equal(actual$C[2L],"c2_1")
+    expect_equal(actual$C[3L],"c2_2")
+})
