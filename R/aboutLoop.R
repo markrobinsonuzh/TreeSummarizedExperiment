@@ -6,7 +6,7 @@
 #'   leaf.
 #' @importFrom dplyr '%>%' mutate_if
 #' @export
-#' @author ruizhu Huang
+#' @author Ruizhu Huang
 #' @return a data frame
 #' @examples 
 #' 
