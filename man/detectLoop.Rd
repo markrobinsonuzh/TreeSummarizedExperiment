@@ -52,5 +52,5 @@ df <- data.frame(R1 = rep("A", 7),
 detectLoop(tax_tab = df) 
 }
 \author{
-ruizhu Huang
+Ruizhu Huang
 }
