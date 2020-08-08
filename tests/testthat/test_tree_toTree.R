@@ -10,6 +10,9 @@ test_that("toTree could convert a data frame to a phylo", {
     expect_phylo_output <- function(df, truth) {
         out <- toTree(data = df)
         expect_setequal(class(out), truth)
+        out <- addLabel(out)
+        expect_equal(out$tip.label,as.character(seq_len(length(out))))
+        expect_equal(out,addLabel(out,as.character(seq_len(length(out) + length(out$node.label)))))
     }
     expect_phylo_nodes <- function(df, truth, use_leaf) {
         out <- toTree(data = df)
