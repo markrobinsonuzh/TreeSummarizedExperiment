@@ -28,8 +28,13 @@
 #' (pn2 <- printNode(tinyTree, type = "internal"))
 #' (pn3 <- printNode(tinyTree, type = "all"))
 #'
-printNode <- function(tree, type = "leaf"){
-
+printNode <- function(tree, type = c("leaf","internal","all")){
+    
+    # ===========check inputs =================
+    if (!is(tree, "phylo")) {
+        stop("tree should be a phylo object")
+    }
+    type <- match.arg(type)
     # edges
     edge <- tree$edge
 

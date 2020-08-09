@@ -26,10 +26,13 @@
 #'     geom_text2(aes(label = node), vjust = -0.8,
 #'                hjust = -0.3, color = 'blue')
 
-
-
-
 trackNode <- function(tree) {
+    
+    # ===========check inputs =================
+    if (!is(tree, "phylo")) {
+        stop("tree should be a phylo object")
+    }
+    
     # The node number of all nodes
     ed <- tree$edge
     leaf <- setdiff(ed[, 2], ed[, 1])
