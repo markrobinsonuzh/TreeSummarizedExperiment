@@ -87,7 +87,7 @@ detectLoop <- function(tax_tab){
 #' @importFrom dplyr '%>%' mutate_if group_by mutate row_number
 #' @importFrom rlang .data
 #' @export
-#' @author ruizhu Huang
+#' @author Ruizhu Huang
 #' @return a data frame
 #' @examples 
 #' # example 1
