@@ -24,7 +24,11 @@
 #' distNode(tree = tinyTree, node = c(12, 14))
 
 distNode <- function(tree, node) {
-
+    
+    if (!inherits(tree, "phylo")) {
+        stop("tree: should be a phylo object. \n")
+    }
+    
     if (is.character(node)) {
         node <- transNode(tree = tree, node = node)
     }
