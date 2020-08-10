@@ -127,4 +127,12 @@ test_that("other setters work", {
     expect_true(all(rownames(colLinks(tse)) != cn))
     colnames(tse) <- cn
     expect_true(all(rownames(colLinks(tse)) == cn))
+    
+    tse <- TreeSummarizedExperiment(assays = list(toyTable),
+                                    rowData = rowInf,
+                                    colData = colInf)
+    rownames(tse) <- rn
+    colnames(tse) <- cn
+    expect_true(all(rownames(tse) == rn))
+    expect_true(all(colnames(tse) == cn))
 })
