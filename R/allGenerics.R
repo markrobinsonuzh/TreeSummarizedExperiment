@@ -125,7 +125,9 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
 setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
                      x <- callNextMethod()
-                     rownames(x@rowLinks) <- value
+                     if(!is.null(x@rowLinks)){
+                         rownames(x@rowLinks) <- value
+                     }
                      x
                  }
 )
@@ -136,7 +138,9 @@ setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
 setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
                      x <- callNextMethod()
-                     rownames(x@colLinks) <- value
+                     if(!is.null(x@colLinks)){
+                         rownames(x@colLinks) <- value
+                     }
                      x
                  }
 )

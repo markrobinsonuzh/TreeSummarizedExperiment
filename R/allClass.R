@@ -245,6 +245,11 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     ## columns of assay tables
     isRow <- !is.null(rowTree)
     isCol <- !is.null(colTree)
+    
+    # # if not tree information are given, return a SingleCellExperiment
+    # if(!isRow && !isCol){
+    #     return(sce)
+    # }
 
     # -------------------------------------------------------------------------
     ## check whether the input tree has the correct form
