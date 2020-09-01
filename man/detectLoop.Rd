@@ -46,5 +46,5 @@ detectLoop(tax_tab = df)
 
 }
 \author{
-ruizhu Huang
+Ruizhu Huang
 }

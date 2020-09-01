@@ -10,6 +10,9 @@ test_that("toTree could convert a data frame to a phylo", {
     expect_phylo_output <- function(df, truth) {
         out <- toTree(data = df)
         expect_setequal(class(out), truth)
+        out <- addLabel(out)
+        expect_equal(out$tip.label,as.character(seq_len(length(out))))
+        expect_equal(out,addLabel(out,as.character(seq_len(length(out) + length(out$node.label)))))
     }
     expect_phylo_nodes <- function(df, truth, use_leaf) {
         out <- toTree(data = df)
@@ -43,4 +46,29 @@ test_that("toTree give warnings", {
     expect_error(toTree(data = df))
     expect_warning(toTree(data = df[, 1:2]))
     
+})
+
+
+test_that("toTree loop resolving", {
+    actual <- expect_warning(detectLoop(tax_tab = df),
+                             "Detected R4 from different R3")
+    expect_s3_class(actual,"data.frame")
+    expect_equal(nrow(actual),5L)
+    expect_true(all(is.na(actual$child)))
+    
+    df <- data.frame(A = rep("a", 8),
+                     B = rep (c("b1", "b2", "b3", "b4"), each = 2),
+                     C = paste0("c", c(1, 2, 2, 3:7)),
+                     D = paste0("d", 1:8))
+    actual <- expect_warning(detectLoop(tax_tab = df),
+                             "Detected C from different B")
+    expect_s3_class(actual,"data.frame")
+    expect_equal(nrow(actual),2L)
+    expect_true(all(actual$child == "c2"))
+    
+    actual <- expect_warning(resolveLoop(tax_tab = df),
+                             "Detected C from different B")
+    expect_equal(nrow(df),nrow(actual))
+    expect_equal(actual$C[2L],"c2_1")
+    expect_equal(actual$C[3L],"c2_2")
 })
