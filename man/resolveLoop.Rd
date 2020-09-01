@@ -61,5 +61,5 @@ resolveLoop(tax_tab = taxTab)
 
 }
 \author{
-ruizhu Huang
+Ruizhu Huang
 }

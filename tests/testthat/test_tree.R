@@ -64,9 +64,9 @@ test_that("tree functions", {
     actual <- unionLeaf(tree = tinyTree, node = c("t2","Node_19"))
     expect_equal(actual, c(1L, seq.int(7L, 8L)))
     
-    # pruneTree
-    actual <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5), mergeSingle = FALSE)
-    expect_equal(countNode(actual),16L)
-    actual <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5), mergeSingle = TRUE)
-    expect_equal(countNode(actual),15L)
+    # # pruneTree
+    # actual <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5), mergeSingle = FALSE)
+    # expect_equal(countNode(actual),16L)
+    # actual <- pruneTree(tree = tinyTree, rmLeaf = c(4, 5), mergeSingle = TRUE)
+    # expect_equal(countNode(actual),15L)
 })

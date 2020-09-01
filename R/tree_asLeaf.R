@@ -59,7 +59,7 @@ asLeaf <- function(tree, node) {
   # ============remove descendants ============
   # set descendant nodes as NA
   if (is(node, "character")) {
-    node <- transNode(tree = tree, node = node)
+    node <- convertNode(tree = tree, node = node)
   }
   mat <- matTree(tree = tree)
 
@@ -138,7 +138,7 @@ asLeaf <- function(tree, node) {
   })
 
  # new node labels
-  labN <- transNode(tree = tree, node = pair[, "old"])
+  labN <- convertNode(tree = tree, node = pair[, "old"])
   nodeA <- pair[, "new"]
   names(nodeA) <- labN
   nodeA <- sort(nodeA, decreasing = FALSE)

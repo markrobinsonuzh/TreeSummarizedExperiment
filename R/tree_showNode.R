@@ -64,7 +64,7 @@ showNode <- function(tree, only.leaf = FALSE,
     }
     
     # final output
-    names(out) <- transNode(tree = tree, node = out,
+    names(out) <- convertNode(tree = tree, node = out,
                             use.alias = use.alias,
                             message = FALSE)
     return(out)
