@@ -75,9 +75,8 @@
 toTree <- function(data, column_order = NULL) {
     
     data <- data %>% data.frame() %>%
-        mutate_if(is.factor, as.character) #%>%
-        #replace(is.na(.data), "NA")
-    # using piping this crashes if used with .data
+        mutate_if(is.factor, as.character) 
+    
     data <- replace(data, is.na(data), "NA")
     
     # remove duplicated rows

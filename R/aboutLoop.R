@@ -33,11 +33,18 @@
 #'                      R5 = paste0("E", 1:7))
 #' detectLoop(tax_tab = df)
 #' 
+#' df <- data.frame(R1 = rep("A", 7),
+#'                      R2 = c("B1", rep("B2", 4), "B3", "B3"),
+#'                      R3 = c("C1", "C2", "C3", NA, NA, NA, NA),
+#'                      R4 = c("D1", "D2", "D3", NA, NA, NA, NA),
+#'                      R5 = paste0("E", 1:7))
+#' detectLoop(tax_tab = df) 
+
 detectLoop <- function(tax_tab){
     
     tax_tab <- tax_tab %>%
         mutate_if(is.factor, as.character) 
-    
+
     nc <- ncol(tax_tab)
     cnam <- colnames(tax_tab)
     
