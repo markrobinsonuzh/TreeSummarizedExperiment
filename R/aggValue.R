@@ -233,19 +233,19 @@ aggValue <- function(x, rowLevel = NULL, rowBlock = NULL,
     
     # The aggregation level
     if (is.character(level)) {
-        level <- transNode(tree = tree, node = level,
+        level <- convertNode(tree = tree, node = level,
                            use.alias = FALSE, message = FALSE)
     }
     
     # The descendants of the aggregation level
     if (is.null(tree$cache)) {
-        desR <- findOS(tree = tree, node = level,
+        desR <- findDescendant(tree = tree, node = level,
                        only.leaf = TRUE, self.include = TRUE)
-        names(desR) <- transNode(tree = tree, node = level,
+        names(desR) <- convertNode(tree = tree, node = level,
                                  use.alias = TRUE, message = FALSE)
     } else {
         desR <- tree$cache[level]
-        names(desR) <- transNode(tree = tree, node = level,
+        names(desR) <- convertNode(tree = tree, node = level,
                                  use.alias = TRUE, message = FALSE)
     }
     
@@ -254,7 +254,7 @@ aggValue <- function(x, rowLevel = NULL, rowBlock = NULL,
     if (length(miR)) {
         warning(length(miR), 
                 " leaves couldn't be found from the assay table.\n")
-        miR <- transNode(tree = tree, node = miR,
+        miR <- convertNode(tree = tree, node = miR,
                          use.alias = FALSE, message = FALSE)
         warning("Missing leaves: ", paste(head(miR), collapse = " "), " ...")
     }

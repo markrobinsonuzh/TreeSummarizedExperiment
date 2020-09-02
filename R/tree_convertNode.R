@@ -1,6 +1,6 @@
 #' Transfer between node number and node label
 #'
-#' \code{transNode} does the transformation between the number and the label of
+#' \code{convertNode} does the transformation between the number and the label of
 #' a node on a tree
 #'
 #' @param tree A phylo object
@@ -30,12 +30,12 @@
 #' hjust = -0.3, color = 'blue')
 #'
 #' #check whether the node number and node label are matched
-#' transNode(tinyTree, node = c(11, 2, 4, 15))
+#' convertNode(tinyTree, node = c(11, 2, 4, 15))
 #'
-#' transNode(tree = tinyTree, node = c("Node_16", "Node_11"))
-#' transNode(tree = tinyTree, node = c("alias_16", "alias_11"))
+#' convertNode(tree = tinyTree, node = c("Node_16", "Node_11"))
+#' convertNode(tree = tinyTree, node = c("alias_16", "alias_11"))
 
-transNode <- function(tree, node, use.alias = FALSE,
+convertNode <- function(tree, node, use.alias = FALSE,
                       message = FALSE) {
 
     if (!inherits(tree, "phylo")) {

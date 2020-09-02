@@ -36,7 +36,7 @@ unionLeaf <- function(tree, node) {
   }
   # ============remove descendants ============
   if (is(node, "character")) {
-    node <- transNode(tree = tree, node = node)
+    node <- convertNode(tree = tree, node = node)
   }
 
   # all paths that connecting leaves and the root

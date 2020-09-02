@@ -30,7 +30,7 @@ distNode <- function(tree, node) {
     }
     
     if (is.character(node)) {
-        node <- transNode(tree = tree, node = node)
+        node <- convertNode(tree = tree, node = node)
     }
 
     mat <- matTree(tree)

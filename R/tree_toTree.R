@@ -82,7 +82,7 @@ toTree <- function(data, column_order = NULL) {
     # remove duplicated rows
     isDup <- duplicated(data)
     if (any(isDup)) {
-       warning(sum(isDup), " duplacted rows are removed")
+       warning(sum(isDup), " duplicated rows are removed")
         data <- data[!isDup, , drop = FALSE]
     }
     

@@ -45,9 +45,9 @@ test_that("aggValue works correctly", {
         expect_error(aggValue(x = tse2, colLevel = level),
                      "The tree on columns doesn't exist")
 
-        level_char <- transNode(tree = rowTree(tse), node = level,
+        level_char <- convertNode(tree = rowTree(tse), node = level,
                                 use.alias = FALSE, message = FALSE)
-        expect_equal(xx,aggValue(x = tse, rowLevel = level_char))
+        expect_equal(xx, aggValue(x = tse, rowLevel = level_char))
     }
 
 
