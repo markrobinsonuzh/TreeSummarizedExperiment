@@ -59,7 +59,7 @@ asLeaf <- function(tree, node) {
   # ============remove descendants ============
   # set descendant nodes as NA
   if (is(node, "character")) {
-    node <- transNode(tree = tree, node = node)
+    node <- convertNode(tree = tree, node = node)
   }
   mat <- matTree(tree = tree)
 
@@ -72,20 +72,25 @@ asLeaf <- function(tree, node) {
   rnd <- apply(ind, 1, FUN = function(x) {
     xx <- cbind(row = rep(x["row"], x["col"]-1),
                 col = seq_len(x["col"]-1))
-    return(xx)
+    # return data.frame, since matrix can get coerced
+    # to vector, if length of results are all equal
+    return(data.frame(xx))
   })
   rnd <- do.call(rbind, rnd)
+  colnames(rnd) <- NULL
+  rownames(rnd) <- NULL
+  rnd <- as.matrix(rnd)
   mat[rnd] <- NA
 
   # move NA to the end for each row
   nat <- apply(mat, 1, FUN = function(x) {
     xx <- x[!is.na(x)]
-    xx <- c(xx, rep(NA, length(x)-length(xx)))
+    c(xx, rep(NA, length(x)-length(xx)))
   })
   nat <- t(nat)
 
   # remove duplicated rows
-  natO <- nat[!duplicated(nat), ]
+  natO <- nat[!duplicated(nat), ,drop=FALSE]
 
   # update node number
   natN <- natO
@@ -101,9 +106,13 @@ asLeaf <- function(tree, node) {
   old <- as.vector(natO)
   new <- as.vector(natNN)
   pair <- cbind(old, new)
-  pair <- pair[!duplicated(pair), ]
-  pair <- pair[rowSums(is.na(pair)) != ncol(pair), ]
+  pair <- pair[!duplicated(pair), , drop = FALSE]
+  pair <- pair[rowSums(is.na(pair)) != ncol(pair), , drop = FALSE]
 
+  if(nrow(pair) == 1L){
+    stop("Selected root node of tree.")
+  }
+  
   # ==============Update phylo object =============================
   # new edge (edn)
   edo <- lapply(seq_len(nrow(natO)), FUN = function(y) {
@@ -117,7 +126,7 @@ asLeaf <- function(tree, node) {
   })
   edo <- do.call(rbind, edo)
   rownames(edo) <- NULL
-  edo <- edo[!duplicated(edo), ]
+  edo <- edo[!duplicated(edo), , drop = FALSE]
   edn <- apply(edo, 2, FUN = function(x) {
     ind <- match(x, pair[, "old"])
     pair[ind, "new"]
@@ -129,7 +138,7 @@ asLeaf <- function(tree, node) {
   })
 
  # new node labels
-  labN <- transNode(tree = tree, node = pair[, "old"])
+  labN <- convertNode(tree = tree, node = pair[, "old"])
   nodeA <- pair[, "new"]
   names(nodeA) <- labN
   nodeA <- sort(nodeA, decreasing = FALSE)

@@ -31,7 +31,7 @@ isLeaf <- function(tree, node){
 
     # the input node
     if (is.character(node)) {
-        node <- transNode(tree, node = node,
+        node <- convertNode(tree, node = node,
                            message = FALSE)
     } else {
         if (is.numeric(node)) {

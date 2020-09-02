@@ -125,7 +125,9 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
 setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
                      x <- callNextMethod()
-                     rownames(x@rowLinks) <- value
+                     if(!is.null(x@rowLinks)){
+                         rownames(x@rowLinks) <- value
+                     }
                      x
                  }
 )
@@ -136,7 +138,9 @@ setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
 setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
                      x <- callNextMethod()
-                     rownames(x@colLinks) <- value
+                     if(!is.null(x@colLinks)){
+                         rownames(x@colLinks) <- value
+                     }
                      x
                  }
 )
@@ -156,7 +160,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
               rl <- rowLinks(x)
               if (!missing(rowNode)) {
                   if (!is.numeric(rowNode)) {
-                      rowNode <- transNode(tree = rowTree(x), node = rowNode)
+                      rowNode <- convertNode(tree = rowTree(x), node = rowNode)
                   }
                   x <- x[which(rl$nodeNum %in% rowNode),]
               }
@@ -165,7 +169,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
               cl <- colLinks(x)
               if (!missing(colNode)) {
                   if (!is.numeric(colNode)) {
-                      colNode <- transNode(tree = colTree(x), node = colNode)
+                      colNode <- convertNode(tree = colTree(x), node = colNode)
                   }
                   x <- x[, which(cl$nodeNum %in% colNode)]
               }

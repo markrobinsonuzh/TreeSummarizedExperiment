@@ -1,6 +1,6 @@
 #' Find descendants (or offsprings)
 #'
-#' \code{findOS} finds descendants of a node.
+#' \code{findDescendant} finds descendants of a node.
 #'
 #' @param node An internal node. It could be the node number or the node
 #'   label.
@@ -32,9 +32,9 @@
 #' geom_text2(aes(label = label), color = "darkorange",
 #'            hjust = -0.1, vjust = -0.7)
 #'
-#' (tips <- findOS(tree = tinyTree, node = c(17), only.leaf = TRUE))
+#' (tips <- findDescendant(tree = tinyTree, node = c(17), only.leaf = TRUE))
 
-findOS <- function(tree,
+findDescendant <- function(tree,
                    node,
                    only.leaf = TRUE,
                    self.include = FALSE,
@@ -58,7 +58,7 @@ findOS <- function(tree,
     matN <- matTree(tree = tree)
     
     if (is.character(node)) {
-        numA <- transNode(tree = tree, node = node,
+        numA <- convertNode(tree = tree, node = node,
                           use.alias = TRUE,
                           message = FALSE)
     } else {
@@ -142,7 +142,7 @@ findOS <- function(tree,
     # out[o] <- dList
     o <- match(numA, unique(desd[, "node"]))
     out <- dList[o]
-    names(out) <- transNode(tree = tree, node = numA,
+    names(out) <- convertNode(tree = tree, node = numA,
                             use.alias = use.alias)
     return(out)
 }

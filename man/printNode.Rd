@@ -4,7 +4,7 @@
 \alias{printNode}
 \title{To print out the node labels}
 \usage{
-printNode(tree, type = "leaf")
+printNode(tree, type = c("leaf", "internal", "all"))
 }
 \arguments{
 \item{tree}{A phylo object.}

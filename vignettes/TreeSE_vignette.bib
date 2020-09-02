@@ -1,25 +1,46 @@
- @Article{ape2018,
-    title = {ape 5.0: an environment for modern phylogenetics and evolutionary analyses in {R}},
-    author = {E. Paradis and K. Schliep},
-    journal = {Bioinformatics},
-    year = {2018},
-    volume = {35},
-    pages = {526-528},
-  }
- @Article{Yu2017,
-    title = {ggtree: an R package for visualization and annotation of phylogenetic trees with their covariates and other associated data.},
-    author = {Guangchuang Yu and David Smith and Huachen Zhu and Yi Guan and Tommy Tsan-Yuk Lam},
-    year = {2017},
-    journal = {Methods in Ecology and Evolution},
-    volume = {8},
-    issue = {1},
-    pages = {28-36},
-    doi = {10.1111/2041-210X.12628},
-    url = {http://onlinelibrary.wiley.com/doi/10.1111/2041-210X.12628/abstract},
-  }
-@Manual{Aaron2019,
-    title = {SingleCellExperiment: S4 Classes for Single Cell Data},
-    author = {Aaron Lun and Davide Risso},
-    year = {2019},
-    note = {R package version 1.4.1},
-  }
+@article{Wang2019,
+abstract = {Phylogenetic trees and data are often stored in incompatible and inconsistent formats. The outputs of software tools that contain trees with analysis findings are often not compatible with each other, making it hard to integrate the results of different analyses in a comparative study. The treeio package is designed to connect phylogenetic tree input and output. It supports extracting phylogenetic trees as well as the outputs of commonly used analytical software. It can link external data to phylogenies and merge tree data obtained from different sources, enabling analyses of phylogeny-associated data from different disciplines in an evolutionary context. Treeio also supports export of a phylogenetic tree with heterogeneous-associated data to a single tree file, including BEAST compatible NEXUS and jtree formats; these facilitate data sharing as well as file format conversion for downstream analysis. The treeio package is designed to work with the tidytree and ggtree packages. Tree data can be processed using the tidy interface with tidytree and visualized by ggtree. The treeio package is released within the Bioconductor and rOpenSci projects. It is available at https://www.bioconductor.org/packages/treeio/.},
+author = {Wang, Li-Gen and Lam, Tommy Tsan-Yuk and Xu, Shuangbin and Dai, Zehan and Zhou, Lang and Feng, Tingze and Guo, Pingfan and Dunn, Casey W and Jones, Bradley R and Bradley, Tyler and Zhu, Huachen and Guan, Yi and Jiang, Yong and Yu, Guangchuang},
+doi = {10.1093/molbev/msz240},
+issn = {0737-4038},
+journal = {Molecular Biology and Evolution},
+number = {2},
+pages = {599--603},
+title = {{Treeio: An R Package for Phylogenetic Tree Input and Output with Richly Annotated and Associated Data}},
+volume = {37},
+year = {2019}
+}
+@misc{LunA2020,
+annote = {From Duplicate 2 (SingleCellExperiment: S4 Classes for Single Cell Data - Lun, Aaron; Risso, Davide)
+
+R package version 1.10.1},
+author = {Lun, Aaron and Risso, Davide},
+title = {{SingleCellExperiment: S4 Classes for Single Cell Data.}},
+year = {2020}
+}
+@manual{R-tidytree,
+annote = {R package version 0.3.3},
+author = {Yu, Guangchuang},
+title = {{tidytree: A Tidy Tool for Phylogenetic Tree Data Manipulation}},
+year = {2020}
+}
+@article{Yu2017,
+abstract = {We present an r package, ggtree, which provides programmable visualization and annotation of phylogenetic trees. ggtree can read more tree file formats than other softwares, including newick, nexus, NHX, phylip and jplace formats, and support visualization of phylo, multiphylo, phylo4, phylo4d, obkdata and phyloseq tree objects defined in other r packages. It can also extract the tree/branch/node-specific and other data from the analysis outputs of beast, epa, hyphy, paml, phylodog, pplacer, r8s, raxml and revbayes software, and allows using these data to annotate the tree. The package allows colouring and annotation of a tree by numerical/categorical node attributes, manipulating a tree by rotating, collapsing and zooming out clades, highlighting user selected clades or operational taxonomic units and exploration of a large tree by zooming into a selected portion. A two-dimensional tree can be drawn by scaling the tree width based on an attribute of the nodes. A tree can be annotated with an associated numerical matrix (as a heat map), multiple sequence alignment, subplots or silhouette images. The package ggtree is released under the artistic-2.0 license. The source code and documents are freely available through bioconductor (http://www.bioconductor.org/packages/ggtree).},
+author = {Yu, Guangchuang and Smith, David K. and Zhu, Huachen and Guan, Yi and Lam, Tommy Tsan Yuk},
+journal = {Methods in Ecology and Evolution},
+keywords = {annotation,bioconductor,evolution,phylogeny,r package,visualization},
+number = {1},
+pages = {28--36},
+publisher = {British Ecological Society},
+title = {ggtree: an r package for visualization and annotation of phylogenetic trees with their covariates and other associated data},
+volume = {8},
+year = {2017}
+}
+@article{ape2019,
+author = {Paradis, E and Schliep, K},
+journal = {Bioinformatics},
+pages = {526--528},
+title = {{ape 5.0: an environment for modern phylogenetics and evolutionary analyses in R}},
+volume = {35},
+year = {2019}
+}

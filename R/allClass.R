@@ -245,6 +245,11 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     ## columns of assay tables
     isRow <- !is.null(rowTree)
     isCol <- !is.null(colTree)
+    
+    # # if not tree information are given, return a SingleCellExperiment
+    # if(!isRow && !isCol){
+    #     return(sce)
+    # }
 
     # -------------------------------------------------------------------------
     ## check whether the input tree has the correct form
@@ -326,7 +331,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     # the labels and the alias of the labels
     treeLab <- c(tree$tip.label, tree$node.label)
     nodeA <- unique(as.vector(tree$edge))
-    treeLab_alias <- transNode(tree = tree, node = nodeA,
+    treeLab_alias <- convertNode(tree = tree, node = nodeA,
                                use.alias = TRUE, message = FALSE)
 
     # ------------------ labels from the assays table -------------------------
@@ -369,11 +374,11 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
 
     # create the link data
     labN <- lab[isIn]
-    nd <- transNode(tree = tree, node = labN, use.alias = FALSE,
+    nd <- convertNode(tree = tree, node = labN, use.alias = FALSE,
                     message = FALSE)
-    fLab <- transNode(tree = tree, node = nd, use.alias = FALSE,
+    fLab <- convertNode(tree = tree, node = nd, use.alias = FALSE,
                       message = FALSE)
-    faLab <- transNode(tree = tree, node = nd, use.alias = TRUE,
+    faLab <- convertNode(tree = tree, node = nd, use.alias = TRUE,
                        message = FALSE)
     leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
 

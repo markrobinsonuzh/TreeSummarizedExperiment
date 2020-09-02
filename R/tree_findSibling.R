@@ -7,9 +7,7 @@
 #' @param use.alias A logical value, TRUE or FALSE. The default is FALSE, and
 #'   the original node label would be used to name the output; otherwise, the
 #'   alias of node label would be used to name the output. The alias of node
-#'   label is created by adding a prefix \code{"Node_"} to the node number if
-#'   the node is an internal node or adding a prefix \code{"Leaf_"} if the node
-#'   is a leaf node.
+#'   label is created by adding a prefix \code{"alias_"} to the node number.
 #' @export
 #' @return A vector of nodes. The numeric value is the node number, and the
 #'   vector name is the corresponding node label. If a node has no label, it
@@ -31,7 +29,7 @@
 findSibling <- function(tree, node, use.alias = FALSE){
 
     if (is.character(node)) {
-        node <- transNode(tree = tree, node = node, message = FALSE)
+        node <- convertNode(tree = tree, node = node, message = FALSE)
     }
     matT <- matTree(tree = tree)
 
@@ -58,7 +56,7 @@ findSibling <- function(tree, node, use.alias = FALSE){
         })
     out <- unlist(sib)
 
-    names(out) <- transNode(tree = tree, node = out,
+    names(out) <- convertNode(tree = tree, node = out,
                             use.alias = use.alias,
                             message = FALSE)
     return(out)
