@@ -14,9 +14,7 @@ findSibling(tree, node, use.alias = FALSE)
 \item{use.alias}{A logical value, TRUE or FALSE. The default is FALSE, and
 the original node label would be used to name the output; otherwise, the
 alias of node label would be used to name the output. The alias of node
-label is created by adding a prefix \code{"Node_"} to the node number if
-the node is an internal node or adding a prefix \code{"Leaf_"} if the node
-is a leaf node.}
+label is created by adding a prefix \code{"alias_"} to the node number.}
 }
 \value{
 A vector of nodes. The numeric value is the node number, and the

@@ -15,7 +15,7 @@ label.}
 \item{use.alias}{A logical value, TRUE or FALSE. The default is FALSE, and
 the node label would be used to name the output; otherwise, the alias of
 node label would be used to name the output. The alias of node label is
-created by adding a prefix \code{"alia_"} to the node number.}
+created by adding a prefix \code{"alias_"} to the node number.}
 }
 \value{
 A vector of nodes. The numeric value is the node number, and the
