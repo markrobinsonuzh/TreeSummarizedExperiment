@@ -57,11 +57,11 @@ changeTree <- function(x,
                 warning(nm, " rows are removed due to mismatch")}
             x <- x[rowNodeLab, ]
         }
-        nrLink <- .updateLinks(newTree = rowTree, newLab = rowNodeLab)
-        rownames(nrLink) <- rownames(x)
-        x <- BiocGenerics:::replaceSlots(x,
-                                         rowLinks = nrLink,
-                                         rowTree = list(phylo = rowTree))
+        out <- .linkFun(tree = rowTree, sce = x, nodeLab = rowNodeLab,
+                        onRow = TRUE)
+        xx <- x[out$isKeep, ]
+        xx@rowTree <- list(phylo = rowTree)
+        xx@rowLinks <- out$link
     }
     
     if (!is.null(colTree)) {
@@ -74,24 +74,14 @@ changeTree <- function(x,
                 warning(nm, " columns are removed due to mismatch")}
             x <- x[, colNodeLab]
         }
-        ncLink <- .updateLinks(newTree = colTree, newLab = colNodeLab)
-        rownames(ncLink) <- colnames(x)
-        x <- BiocGenerics:::replaceSlots(x,
-                                         colLinks = ncLink,
-                                         colTree = list(phylo = colTree))
+        out <- .linkFun(tree = rowTree, sce = x, nodeLab = rowNodeLab,
+                        onRow = FALSE)
+        xx <- x[, out$isKeep]
+        xx@colTree <- list(phylo = rowTree)
+        xx@colLinks <- out$link
     }
     
     
-    return(x)
+    return(xx)
 }
 
-.updateLinks <- function(newTree, newLab) {
-    num <- convertNode(tree = newTree, node = newLab)
-    lab <- convertNode(tree = newTree, node = num)
-    alias <- convertNode(tree = newTree,
-                       node = num, 
-                       use.alias = TRUE)
-    ind <- isLeaf(tree = newTree, node = num)
-    LinkDataFrame(nodeLab = lab, nodeLab_alias = alias, 
-                  nodeNum = num, isLeaf = ind)
-}
