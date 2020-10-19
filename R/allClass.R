@@ -348,9 +348,16 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     # decide whether treeLab or treeLab_alias should be used
     sw <- startsWith(lab, "alias_")
     sw <- all(sw)
-
+    
+    sw2 <- startsWith(treeLab, "alias_")
+    notALL <- !all(sw2)
+    if (any(sw2) & notALL) {
+        warning("The tree has some node labels starting with 'alias_'. ")
+    }
+    
     # Match lab with the alias of the node labels on the tree
-    if (sw) {
+    # Unless all node labels start with 'alias_'
+    if (sw & notALL) {
         isIn <- lab %in% treeLab_alias
     } else {
         isIn <- lab %in% treeLab

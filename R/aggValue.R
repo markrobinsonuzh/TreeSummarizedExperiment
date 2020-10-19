@@ -352,5 +352,6 @@ aggValue <- function(x, rowLevel = NULL, rowBlock = NULL,
 }
 
 .rep_df <- function(df, n){
-    df[rep(seq_len(nrow(df)), each = n), ]
+    dff <- df[rep(seq_len(nrow(df)), each = n), ]
+    data.frame(dff)
 }
