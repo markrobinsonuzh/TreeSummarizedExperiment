@@ -40,6 +40,7 @@ Collate:
     'aboutLoop.R'
     'classValid.R'
     'allClass.R'
+    'coercion.R'
     'aggValue.R'
     'allGenerics.R'
     'changeTree.R'
