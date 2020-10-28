@@ -37,9 +37,25 @@ test_that("TreeSummarizedExperiment constuctor works", {
                     "TreeSummarizedExperiment")
 
     expect_warning(TreeSummarizedExperiment(assays = list(toyTable),
-                                          rowData = rowInf,
-                                          colData = colInf,
-                                          colTree = tinyTree))
+                                            rowData = rowInf,
+                                            colData = colInf,
+                                            colTree = tinyTree))
+})
+test_that("TreeSummarizedExperiment coercion works", {
+    # SummarizedExperiment
+    se <- SummarizedExperiment(assays = list(toyTable),
+                               rowData = rowInf,
+                               colData = colInf)
+    expect_s4_class(as(se,"TreeSummarizedExperiment"),
+                    "TreeSummarizedExperiment")
+    # RangedSummarizedExperiment
+    expect_s4_class(as(as(se,"RangedSummarizedExperiment"),
+                       "TreeSummarizedExperiment"),
+                    "TreeSummarizedExperiment")
+    # RangedSummarizedExperiment
+    expect_s4_class(as(as(se,"SingleCellExperiment"),
+                       "TreeSummarizedExperiment"),
+                    "TreeSummarizedExperiment")
 })
 
 
@@ -85,7 +101,7 @@ test_that("subsetting by node successfully", {
     expect_equal(nrow(subsetByNode(tse,"t2")),1L)
     expect_equal(subsetByNode(tse,"t2"),
                  subsetByNode(tse,1))
-    
+
     expect_equal(ncol(subsetByNode(tse, colNode = "A_1")),1L)
     expect_equal(subsetByNode(tse, colNode = "A_1"),
                  subsetByNode(tse, colNode = 1))
@@ -127,7 +143,7 @@ test_that("other setters work", {
     expect_true(all(rownames(colLinks(tse)) != cn))
     colnames(tse) <- cn
     expect_true(all(rownames(colLinks(tse)) == cn))
-    
+
     tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                     rowData = rowInf,
                                     colData = colInf)
