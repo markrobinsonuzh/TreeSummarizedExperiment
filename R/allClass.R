@@ -351,7 +351,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     
     sw2 <- startsWith(treeLab, "alias_")
     notALL <- !all(sw2)
-    if (any(sw2) & notALL) {
+    if (any(sw2, na.rm = TRUE) & notALL) {
         warning("The tree has some node labels starting with 'alias_'. ")
     }
     
