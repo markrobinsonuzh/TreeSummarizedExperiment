@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment: a S4 Class for Data with Tree Structures 
-Version: 1.6.0
+Version: 1.6.1
 Date: 2020-08-11
 Authors@R: 
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
@@ -44,6 +44,7 @@ Collate:
     'allGenerics.R'
     'changeTree.R'
     'classAccessor.R'
+    'coercion.R'
     'data.R'
     'deprecate_Fun.R'
     'tree_addLabel.R'
