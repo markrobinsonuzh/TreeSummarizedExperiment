@@ -10,11 +10,9 @@ extends SingleCellExperiment to include hierarchical information on the rows
 or columns of the rectangular data.
 }
 \details{
-In addition, the class \code{MicrobiomeExperiment} is also part of the
-package, which is geared towards the microbiome field and includes an
-additional slot for storing reference sequences.
+It also includes an additional slot for storing reference sequences per
+feature.
 }
 \seealso{
 \link[=TreeSummarizedExperiment-class]{TreeSummarizedExperiment} class
-\link[=MicrobiomeExperiment-class]{MicrobiomeExperiment} class
 }

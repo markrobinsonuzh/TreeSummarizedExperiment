@@ -43,7 +43,7 @@ data.
 ## Anatomy of TreeSummarizedExperiment
 
 ```{r strTSE, echo=FALSE, fig.cap= "The structure of the TreeSummarizedExperiment class."}
-knitr::include_graphics("tse.png")
+knitr::include_graphics("tse2.png")
 ```
 Compared to the `SingleCellExperiment` objects, `TreeSummarizedExperiment` has
 four additional slots:
@@ -251,6 +251,25 @@ The link data is automatically generated when constructing the
 manually; otherwise the link might be broken. For R packages developers, we show
 in the Section \@ref(modifyLink) about how to update the link.
 
+### Reference sequence data
+
+In addition to tree data, reference sequence data can be stored per feature in 
+a `TreeSummarizedExperiment` object.
+
+```{r}
+refSeq <- DNAStringSet(rep("AGCT", nrow(both_tse)))
+```
+
+The data must match the number of rows in the object and can either be added to
+the object upon creation or later on with the accessor function `referenceSeq`.
+
+```{r}
+referenceSeq(both_tse) <- refSeq
+referenceSeq(both_tse)
+```
+
+Both `DNAStringSet` or `DNAStringSetList` can be used, so that a single or 
+multiple sequences can be stored per feature.
 
 ## The subseting function
 

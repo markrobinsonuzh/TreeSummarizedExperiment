@@ -42,6 +42,11 @@ the nodes of the \code{rowTree} and the rows of \code{assays} tables.}
 \item{\code{colLinks}}{A LinkDataFrame. It gives information about the link between
 the nodes of the \code{colTree} and the columns of \code{assays} tables.}
 
+\item{\code{referenceSeq}}{A \code{DNAStringSet}/\code{DNAStringSetList} object or
+some object coercible to a \code{DNAStringSet}/\code{DNAStringSetList}
+object. See \code{\link[Biostrings:XStringSet-class]{DNAStringSet}} for
+more details.}
+
 \item{\code{...}}{Other slots from
 \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}}
 }}

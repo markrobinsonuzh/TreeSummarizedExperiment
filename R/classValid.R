@@ -102,6 +102,27 @@
         }
     }
 
+    object_nrow <- length(object)
+    if(!is.null(object@referenceSeq)){
+        if(is(object@referenceSeq, "DNAStringSet")){
+            referenceSeq_len <- length(object@referenceSeq)
+        } else if(is(object@referenceSeq, "DNAStringSetList")){
+            referenceSeq_len <- lengths(object@referenceSeq)
+            referenceSeq_len <- unique(referenceSeq_len)
+        }
+        if (length(referenceSeq_len) != 1L) {
+            msg <- "lengths of 'referenceSeq' must all be equal."
+            errors <- c(errors, msg)
+        }
+        if (referenceSeq_len != object_nrow) {
+            msg <- sprintf(
+                paste0("length(s) of 'referenceSeq' (%d) must equal nb of ",
+                       "rows in 'x' (%d)"),
+                referenceSeq_len, object_nrow)
+            errors <- c(errors, msg)
+        }
+    }
+
     # -------------------------------------------------------------------------
     # Note : duplicated value in nodeLab column is allowed because we might
     # have multiple rows corresponding to a same leaf.

@@ -38,11 +38,10 @@ Suggests:
     testthat
 RoxygenNote: 7.1.1
 Collate: 
-    'classValid.R'
-    'allClass.R'
-    'MicrobiomeExperiment-class.R'
     'TreeSummarizedExperiment.R'
     'aboutLoop.R'
+    'classValid.R'
+    'allClass.R'
     'aggValue.R'
     'allGenerics.R'
     'changeTree.R'

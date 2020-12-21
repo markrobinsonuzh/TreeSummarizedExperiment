@@ -20,8 +20,13 @@
 #'   subset function \code{[]}
 #' @param drop A logical value, TRUE or FALSE. The argument from the subset
 #'   function \code{[]}
-#' @param value the new rownames or colnames as a \code{character} value. 
-#'   See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.
+#' @param value
+#' \itemize{
+#'   \item{the new rownames or colnames as a \code{character} value. See
+#'     \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
+#'   \item{A \code{\link[Biostrings:XStringSet-class]{DNAStringSet}}
+#'     object or an object coercible to one}
+#' }
 #' @param ... The argument from the subset function \code{[]}
 #' @param rowNode A vector of nodes that are used to subset rows. One could use
 #'   the node number, the node label or the node alias to specify nodes, but not
@@ -82,5 +87,9 @@
 #' # on columns
 #' (colT <- colTree(x = toy_tse))
 #'
+#' # the referenceSeq data
+#' refSeq <- DNAStringSetList(one = DNAStringSet(rep("A",nrow(toy_tse))),
+#'                            two = DNAStringSet(rep("B",nrow(toy_tse))))
+#' referenceSeq(toy_tse) <- refSeq
+#' toy_tse
 NULL
-
