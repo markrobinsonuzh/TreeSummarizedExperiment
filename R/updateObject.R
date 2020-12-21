@@ -25,6 +25,10 @@ setMethod("updateObject", "TreeSummarizedExperiment",
         }
         object <- callNextMethod()
         if(!.hasSlot(object,"referenceSeq")){
+            if(verbose){
+                message("Updating ", class(object)[1], " object ...\n",
+                        appendLF = FALSE)
+            }
             object@referenceSeq <- NULL
         }
         object
