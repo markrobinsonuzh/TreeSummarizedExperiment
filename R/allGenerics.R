@@ -80,6 +80,7 @@ setGeneric("referenceSeq<-", signature = c("x"),
 #' @export
 setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
     function(x, value){
+        x <- updateObject(x)
         if(is.null(value)){
          value <- value
         } else if(!is(value,"DNAStringSet") &&
@@ -110,6 +111,7 @@ setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
 #' @export
 setMethod("[", signature(x = "TreeSummarizedExperiment"),
           function(x, i, j, ..., drop = TRUE){
+              x <- updateObject(x)
               # Subset the rowLinks
               lr <- rowLinks(x)
               rt <- rowTree(x)
@@ -185,6 +187,8 @@ setReplaceMethod("[",
     signature(x = "TreeSummarizedExperiment", "ANY", "ANY", 
               "TreeSummarizedExperiment"),
     function(x, i, j, ..., value){
+        x <- updateObject(x)
+        value <- updateObject(value)
         if (missing(i) && missing(j)) {
             # do callNextMethod because of objects potentially being updated
             return(callNextMethod())
@@ -231,6 +235,7 @@ setReplaceMethod("[",
 #' @export
 setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
+                     x <- updateObject(x)
                      x <- callNextMethod()
                      if(!is.null(x@rowLinks)){
                          rownames(x@rowLinks) <- value
@@ -244,6 +249,7 @@ setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
 #' @export
 setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
+                     x <- updateObject(x)
                      x <- callNextMethod()
                      if(!is.null(x@colLinks)){
                          rownames(x@colLinks) <- value
@@ -263,6 +269,7 @@ setGeneric("subsetByNode", function(x, rowNode, colNode)
 #' @export
 setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
           function(x, rowNode, colNode){
+              x <- updateObject(x)
               # row link
               rl <- rowLinks(x)
               if (!missing(rowNode)) {
@@ -288,6 +295,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SingleCellExperiment show
 setMethod("show", "TreeSummarizedExperiment", function(object) {
+    object <- updateObject(object)
     callNextMethod()
 
     rt <- rowTree(object)

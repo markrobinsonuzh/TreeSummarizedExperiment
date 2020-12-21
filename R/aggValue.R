@@ -86,6 +86,7 @@ aggValue <- function(x, rowLevel = NULL, rowBlock = NULL,
     if (!is(x, "TreeSummarizedExperiment")) {
         stop("x should be a TreeSummarizedExperiment")
     }
+    x <- updateObject(x)
     
     ## The provided rowLevel or colLevel should be a numeric or character vector
     isR <- (is.character(rowLevel) | is.numeric(rowLevel) |

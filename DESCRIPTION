@@ -68,3 +68,4 @@ Collate:
     'tree_toTree.R'
     'tree_trackNode.R'
     'tree_unionLeaf.R'
+    'updateObject.R'
