@@ -10,7 +10,8 @@ TreeSummarizedExperiment(
   rowTree = NULL,
   colTree = NULL,
   rowNodeLab = NULL,
-  colNodeLab = NULL
+  colNodeLab = NULL,
+  referenceSeq = NULL
 )
 }
 \arguments{
@@ -29,6 +30,11 @@ row names of the \code{assays} tables are used.}
 \item{colNodeLab}{A character string. It provides the labels of nodes that
 the columns of \code{assays} tables corresponding to. If NULL (default),
 the column names of the \code{assays} tables are used.}
+
+\item{referenceSeq}{A \code{DNAStringSet}/\code{DNAStringSetList} object or
+some object coercible to a \code{DNAStringSet}/\code{DNAStringSetList}
+object. See \code{\link[Biostrings:XStringSet-class]{DNAStringSet}} for
+more details.}
 }
 \value{
 a TreeSummarizedExperiment object

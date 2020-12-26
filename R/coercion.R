@@ -5,7 +5,8 @@
                rowTree = NULL,
                colTree = NULL,
                rowLinks = NULL,
-               colLinks = NULL)
+               colLinks = NULL,
+               referenceSeq = NULL)
     tse
 }
 

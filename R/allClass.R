@@ -93,6 +93,10 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #'   the nodes of the \code{rowTree} and the rows of \code{assays} tables.
 #' @slot colLinks A LinkDataFrame. It gives information about the link between
 #'   the nodes of the \code{colTree} and the columns of \code{assays} tables.
+#' @slot referenceSeq A \code{DNAStringSet}/\code{DNAStringSetList} object or
+#'   some object coercible to a \code{DNAStringSet}/\code{DNAStringSetList}
+#'   object. See \code{\link[Biostrings:XStringSet-class]{DNAStringSet}} for
+#'   more details.
 #' @slot ... Other slots from
 #'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
 #'
@@ -119,18 +123,32 @@ LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
 #' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @importClassesFrom S4Vectors DataFrame
 #' @name TreeSummarizedExperiment-class
-#' @exportClass TreeSummarizedExperiment
 #' @seealso \code{\link{TreeSummarizedExperiment}}
 #'   \code{\link{TreeSummarizedExperiment-accessor}}
 #'   \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
+NULL
+
+#' @importFrom Biostrings DNAStringSet DNAStringSetList
+setClassUnion("DNAStringSetList_OR_DNAStringSet_OR_NULL",
+              c("DNAStringSetList", "DNAStringSet","NULL"))
+
+#' @name TreeSummarizedExperiment-class
+#' @exportClass TreeSummarizedExperiment
 setClass("TreeSummarizedExperiment",
-         representation(rowTree = "list_Or_NULL",
-                        colTree = "list_Or_NULL",
-                        rowLinks = "LinkDataFrame_Or_NULL",
-                        colLinks = "LinkDataFrame_Or_NULL"),
          contains = "SingleCellExperiment",
+         slots = c(rowTree = "list_Or_NULL",
+                   colTree = "list_Or_NULL",
+                   rowLinks = "LinkDataFrame_Or_NULL",
+                   colLinks = "LinkDataFrame_Or_NULL",
+                   referenceSeq = "DNAStringSetList_OR_DNAStringSet_OR_NULL"),
+         prototype = list(referenceSeq = NULL),
          validity = .checkTSE)
 
+#' @rdname TreeSummarizedExperiment-internal
+#' @export
+setMethod("vertical_slot_names", "TreeSummarizedExperiment",
+          function(x) c("referenceSeq", callNextMethod())
+)
 
 
 
@@ -153,6 +171,10 @@ setClass("TreeSummarizedExperiment",
 #' @param colNodeLab A character string. It provides the labels of nodes that
 #'   the columns of \code{assays} tables corresponding to. If NULL (default),
 #'   the column names of the \code{assays} tables are used.
+#' @param referenceSeq A \code{DNAStringSet}/\code{DNAStringSetList} object or
+#'   some object coercible to a \code{DNAStringSet}/\code{DNAStringSetList}
+#'   object. See \code{\link[Biostrings:XStringSet-class]{DNAStringSet}} for
+#'   more details.
 #'
 #' @details The output TreeSummarizedExperiment object has very similar
 #'   structure as the
@@ -215,7 +237,8 @@ setClass("TreeSummarizedExperiment",
 #'                                 rowTree = tinyTree)
 #'
 TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
-                                     rowNodeLab = NULL, colNodeLab = NULL) {
+                                     rowNodeLab = NULL, colNodeLab = NULL,
+                                     referenceSeq = NULL) {
 
     if (!is.null(rowNodeLab)) {
         if (!is.character(rowNodeLab)) {
@@ -235,7 +258,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
         }
     }
 
-    
+
     # -------------------------------------------------------------------------
     ## create a SummarizedExperiment object
     sce <- SingleCellExperiment(...)
@@ -245,7 +268,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     ## columns of assay tables
     isRow <- !is.null(rowTree)
     isCol <- !is.null(colTree)
-    
+
     # # if not tree information are given, return a SingleCellExperiment
     # if(!isRow && !isCol){
     #     return(sce)
@@ -283,7 +306,9 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
 
     # -------------------------------------------------------------------------
     ## create the link data
-    tse <- new("TreeSummarizedExperiment", sce)
+    tse <- new("TreeSummarizedExperiment",
+               sce,
+               referenceSeq = referenceSeq)
 
     # the rows:
     if (isRow) {
@@ -348,13 +373,13 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     # decide whether treeLab or treeLab_alias should be used
     sw <- startsWith(lab, "alias_")
     sw <- all(sw)
-    
+
     sw2 <- startsWith(treeLab, "alias_")
     notALL <- !all(sw2)
     if (any(sw2, na.rm = TRUE) & notALL) {
         warning("The tree has some node labels starting with 'alias_'. ")
     }
-    
+
     # Match lab with the alias of the node labels on the tree
     # Unless all node labels start with 'alias_'
     if (sw & notALL) {
@@ -393,9 +418,9 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
                        nodeLab_alias = faLab,
                        nodeNum = nd,
                        isLeaf = nd %in% leaf)
-    
+
     rownames(linkD) <- rn
 
     out <- list(link = linkD, isKeep = isIn)
     return(out)
-    }
+}

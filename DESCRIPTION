@@ -14,7 +14,8 @@ Description: TreeSummarizedExperiment has extended SingleCellExperiment to
 Depends: 
     R(>= 3.6.0),
     SingleCellExperiment,
-    S4Vectors (>= 0.23.18)
+    S4Vectors (>= 0.23.18),
+    Biostrings
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
@@ -37,6 +38,7 @@ Suggests:
     testthat
 RoxygenNote: 7.1.1
 Collate: 
+    'TreeSummarizedExperiment.R'
     'aboutLoop.R'
     'classValid.R'
     'allClass.R'
@@ -66,3 +68,4 @@ Collate:
     'tree_toTree.R'
     'tree_trackNode.R'
     'tree_unionLeaf.R'
+    'updateObject.R'
