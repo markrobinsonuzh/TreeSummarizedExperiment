@@ -32,7 +32,7 @@ setMethod("colLinks", signature("TreeSummarizedExperiment"),
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("rowTree", function(x)
+setGeneric("rowTree", function(x, whichTree = 1)
     standardGeneric("rowTree")
 )
 
@@ -40,13 +40,14 @@ setGeneric("rowTree", function(x)
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setMethod("rowTree", signature("TreeSummarizedExperiment"),
-          function(x) {
-              x@rowTree$phylo
+          function(x, whichTree = 1) {
+              if (is.null(whichTree)) {return(x@rowTree)}
+              x@rowTree[[whichTree]]
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("colTree", function(x)
+setGeneric("colTree", function(x, whichTree = 1)
     standardGeneric("colTree")
 )
 
@@ -54,10 +55,86 @@ setGeneric("colTree", function(x)
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setMethod("colTree", signature("TreeSummarizedExperiment"),
-          function(x) {
-              x@colTree$phylo
+          function(x, whichTree = 1) {
+              if (is.null(whichTree)) {return(x@colTree)}
+              x@colTree[[whichTree]]
           })
 
+#' @importFrom methods callNextMethod
+#' @importMethodsFrom SummarizedExperiment rbind
+#' @rdname TreeSummarizedExperiment-combine
+#' @export
+#'
+setMethod("rbind", signature = "TreeSummarizedExperiment",
+          function(..., deparse.level = 1){
+              # For slots inherited from SCE & SE
+              nx <- callNextMethod()
+              
+              # a list of TSE
+              args <- list(...)
+              
+              # Column tree & link data should be consistent in TSEs
+              drop.colLinks  <- drop.rowLinks  <- FALSE
+              isEq <- .is_equal_link(args, dim = "col")
+              if (!isEq) {
+                  warning("colTree & colLinks differ in the provided TSEs.",
+                          "\n colTree & colLinks are dropped after 'rbind'")
+                  drop.colLinks <- TRUE
+              }
+              
+              # Row tree & link data should be all NULL or all non-NULL
+              tList <- lapply(args, rowTree, whichTree = NULL)
+              if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
+                  warning("rowTree should be all NULL or non-NULL in TSEs.",
+                          "\n rowTree & rowLinks are dropped after 'rbind'")
+                  drop.rowLinks <- TRUE
+              }
+              
+              final <- .combine_link_tree(x = nx, args = args, 
+                                          drop.rowLinks = drop.rowLinks,
+                                          drop.colLinks = drop.colLinks,
+                                          bind = "rbind")
+              return(final)
+           })
+
+#' @importFrom methods callNextMethod
+#' @importMethodsFrom SummarizedExperiment rbind
+#' @rdname TreeSummarizedExperiment-combine
+#' @export
+#'
+setMethod("cbind", signature = "TreeSummarizedExperiment",
+          function(..., deparse.level = 1){
+              
+              # For slots inherited from SCE & SE
+              nx <- callNextMethod()
+              
+              # a list of TSE
+              args <- list(...)
+              
+              # Row tree & link data should be consistent in TSEs
+              drop.colLinks  <- drop.rowLinks  <- FALSE
+              isEq <- .is_equal_link(args, dim = "row")
+              if (!isEq) {
+                  warning("rowTree & rowLinks differ in the provided TSEs.",
+                          "\n rowTree & rowLinks are dropped after 'cbind'")
+                  drop.rowLinks <- TRUE
+              }
+              
+              # Row tree & link data should be all NULL or all non-NULL
+              tList <- lapply(args, colTree, whichTree = NULL)
+              if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
+                  warning("colTree should be all NULL or non-NULL in TSEs.",
+                          "\n colTree & colLinks are dropped after 'cbind'")
+                  drop.colLinks <- TRUE
+              }
+              
+              final <- .combine_link_tree(x = nx, args = args, 
+                                          drop.rowLinks = drop.rowLinks,
+                                          drop.colLinks = drop.colLinks,
+                                          bind = "cbind")
+              
+              return(final)
+          })
 
 #' @importFrom methods callNextMethod
 #' @import SingleCellExperiment
@@ -115,9 +192,12 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               final <- BiocGenerics:::replaceSlots(nx,
                                                    rowLinks = nlr,
                                                    colLinks = nlc)
-              
+
               return(final)
           })
+
+
+
 
 #' @importFrom methods callNextMethod
 #' @rdname TreeSummarizedExperiment-accessor
@@ -183,8 +263,8 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
 setMethod("show", "TreeSummarizedExperiment", function(object) {
     callNextMethod()
 
-    rt <- rowTree(object)
-    ct <- colTree(object)
+    rt <- rowTree(object, whichTree = NULL)
+    ct <- colTree(object, whichTree = NULL)
 
 
 
@@ -201,9 +281,9 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
 
 
         # the number of leaf nodes & internal nodes
-        nlr <- countLeaf(rt)
-        nnr <- countNode(rt) - countLeaf(rt)
-        msg1b <- sprintf("rowTree: a %s (%d leaves)", class(rt), nlr)
+        nlr <- sum(unlist(lapply(rt, countLeaf)))
+        msg1b <- sprintf("rowTree: %d %s tree(s) (%d leaves)",
+                         length(rt), class(rt[[1]]), nlr)
     }
 
     # on column
@@ -214,9 +294,9 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
         msg2a <- sprintf("colLinks: a LinkDataFrame (%d %s)", nrow(clk), "rows")
 
         # the number of leaf nodes & internal nodes
-        nlc <- countLeaf(ct)
-        nnc <- countNode(ct) - countLeaf(ct)
-        msg2b <- sprintf("colTree: a %s (%d leaves)", class(ct), nlc)
+        nlc <- sum(unlist(lapply(ct, countLeaf)))
+        msg2b <- sprintf("colTree: %d %s tree(s) (%d leaves)",
+                         length(ct), class(ct[[1]]), nlc)
     }
 
     cat(msg1a, "\n", msg1b, "\n",
