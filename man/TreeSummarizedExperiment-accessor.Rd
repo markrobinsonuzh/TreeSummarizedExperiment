@@ -25,13 +25,13 @@ colLinks(x)
 
 \S4method{colLinks}{TreeSummarizedExperiment}(x)
 
-rowTree(x)
+rowTree(x, whichTree = 1)
 
-\S4method{rowTree}{TreeSummarizedExperiment}(x)
+\S4method{rowTree}{TreeSummarizedExperiment}(x, whichTree = 1)
 
-colTree(x)
+colTree(x, whichTree = 1)
 
-\S4method{colTree}{TreeSummarizedExperiment}(x)
+\S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1)
 
 \S4method{[}{TreeSummarizedExperiment,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
 
@@ -45,6 +45,10 @@ subsetByNode(x, rowNode, colNode)
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
+
+\item{whichTree}{A numeric indicator or name character to specify which tree
+in the \code{rowTree} or \code{colTree} to be extracted. The default is to
+extract the first tree.}
 
 \item{i, j}{The row, column index to subset \code{x}. The arguments of the
 subset function \code{[]}}
@@ -70,8 +74,8 @@ Elements from \code{TreeSummarizedExperiment}.
 }
 \description{
 All accessor functions that work on
-\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
-\strong{TreeSummarizedExperiment}. Additionally, new accessors
+\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
+should work on \strong{TreeSummarizedExperiment}. Additionally, new accessors
 \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 function are available for \strong{TreeSummarizedExperiment}.
 }
