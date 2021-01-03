@@ -46,6 +46,7 @@ setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #' @param nodeLab_alias A character vector
 #' @param nodeNum A numeric vector
 #' @param isLeaf A logical vector
+#' @param whichTree A character vector
 #' @param ... All arguments accepted by
 #'   \code{\link[S4Vectors:DataFrame-class]{DataFrame-class}}.
 #'
@@ -62,11 +63,12 @@ setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #'                      nodeLab_alias = LETTERS[1:5],
 #'                      nodeNum = 1:5,
 #'                      isLeaf = TRUE,
+#'                      whichTree = LETTERS[1:5],
 #'                      right = 1:5))
 LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
-                          isLeaf, ...) {
+                          isLeaf, whichTree, ...) {
     df <- DataFrame(nodeLab, nodeLab_alias, nodeNum,
-                    isLeaf, ...)
+                    isLeaf, whichTree, ...)
 
     new("LinkDataFrame", df)
 }
@@ -316,8 +318,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     return(tse)
 }
 
-# An internal function to create the link data and added to the rowData or
-# colData
+# An internal function to create the link data 
 .linkFun <- function(tree, sce, nodeLab, onRow = TRUE) {
     if (onRow) {
         annDat <- rowData(sce)
@@ -389,10 +390,16 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
                        message = FALSE)
     leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
 
+    if (sum(isIn)) {
+        ind_tree <- "phylo"
+    } else {
+        ind_tree <- character(0)
+    }
     linkD <- LinkDataFrame(nodeLab = fLab,
-                       nodeLab_alias = faLab,
-                       nodeNum = nd,
-                       isLeaf = nd %in% leaf)
+                           nodeLab_alias = faLab,
+                           nodeNum = nd,
+                           isLeaf = nd %in% leaf,
+                           whichTree = ind_tree)
     
     rownames(linkD) <- rn
 
