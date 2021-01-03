@@ -72,7 +72,7 @@ test_that("assays could be written successfully", {
 test_that("row data could be extracted successfully", {
     expect_equal(colnames(rowData(tse)), colnames(rowInf))
     expect_setequal(colnames(rowLinks(tse)), c("nodeLab", "nodeLab_alias",
-                                         "nodeNum", "isLeaf"))
+                                         "nodeNum", "isLeaf", "whichTree"))
     expect_equal(rowTree(tse), tinyTree)
 
 })
@@ -115,11 +115,11 @@ test_that("other accessors work", {
     expect_output(show(tse),
                   "rowLinks: a LinkDataFrame")
     expect_output(show(tse),
-                  "rowTree: a phylo")
+                  "rowTree:")
     expect_output(show(tse),
                   "colLinks: a LinkDataFrame")
     expect_output(show(tse),
-                  "colTree: a phylo")
+                  "colTree:")
     x <- TreeSummarizedExperiment(assays = list(toyTable),
                                   rowData = rowInf,
                                   colData = colInf)
