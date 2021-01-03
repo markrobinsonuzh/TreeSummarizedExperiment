@@ -19,21 +19,32 @@ colTree <- rtree(4)
 colTree$tip.label <- colnames(toyTable)
 colTree$node.label <- c("All", "GroupA", "GroupB")
 
+refSeq <- DNAStringSetList(one = DNAStringSet(rep("A",nrow(toyTable))),
+                           two = DNAStringSet(rep("B",nrow(toyTable))))
+
 tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 rowData = rowInf,
                                 rowNodeLab = tinyTree$tip.label,
                                 colData = colInf,
                                 rowTree = tinyTree,
-                                colTree = colTree)
+                                colTree = colTree,
+                                referenceSeq = refSeq)
 test_that("TreeSummarizedExperiment constuctor works", {
     # TreeSummarizedExperiment
     expect_s4_class(tse,
                     "TreeSummarizedExperiment")
-
-    # without tree
+    
+    # without tree and refseq
     expect_s4_class(TreeSummarizedExperiment(assays = list(toyTable),
                                              rowData = rowInf,
                                              colData = colInf),
+                    "TreeSummarizedExperiment")
+    
+    # without tree
+    expect_s4_class(TreeSummarizedExperiment(assays = list(toyTable),
+                                             rowData = rowInf,
+                                             colData = colInf,
+                                             referenceSeq = refSeq),
                     "TreeSummarizedExperiment")
 
     expect_warning(TreeSummarizedExperiment(assays = list(toyTable),
@@ -57,8 +68,6 @@ test_that("TreeSummarizedExperiment coercion works", {
                        "TreeSummarizedExperiment"),
                     "TreeSummarizedExperiment")
 })
-
-
 
 test_that("assays could extract table successfully", {
     expect_equal(assays(tse)[[1]], toyTable)
@@ -107,7 +116,7 @@ test_that("subsetting by node successfully", {
                  subsetByNode(tse, colNode = 1))
 })
 
-test_that("other accessors work", {
+test_that("other accessors/setters work", {
     expect_error(tse["entity11",],
                  "entity11 can't be found in rownames")
     expect_error(tse[,"C_1"],
@@ -131,10 +140,7 @@ test_that("other accessors work", {
                   "colLinks: NULL")
     expect_output(show(x),
                   "colTree: NULL")
-})
-
-
-test_that("other setters work", {
+    
     rn <- paste("entity", seq.int(10L,19L), sep = "")
     expect_true(all(rownames(rowLinks(tse)) != rn))
     rownames(tse) <- rn
@@ -151,4 +157,18 @@ test_that("other setters work", {
     colnames(tse) <- cn
     expect_true(all(rownames(tse) == rn))
     expect_true(all(colnames(tse) == cn))
+    
+    # reference seq
+    expect_error(referenceSeq(tse) <- refSeq[list(1:5,1:4)])
+    expect_error(referenceSeq(tse) <- refSeq[list(1:4,1:4)])
+    expect_error(referenceSeq(tse) <- refSeq[[1L]][1:4])
+    
+    referenceSeq(tse) <- refSeq
+    expect_s4_class(referenceSeq(tse),"DNAStringSetList")
+    referenceSeq(tse) <- as.list(refSeq)
+    expect_s4_class(referenceSeq(tse),"DNAStringSetList")
+    referenceSeq(tse) <- refSeq[[1L]]
+    expect_s4_class(referenceSeq(tse),"DNAStringSet")
+    referenceSeq(tse) <- as.character(refSeq[[1L]])
+    expect_s4_class(referenceSeq(tse),"DNAStringSet")
 })

@@ -20,8 +20,13 @@
 #'   subset function \code{[]}
 #' @param drop A logical value, TRUE or FALSE. The argument from the subset
 #'   function \code{[]}
-#' @param value the new rownames or colnames as a \code{character} value. 
-#'   See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.
+#' @param value
+#' \itemize{
+#'   \item{the new rownames or colnames as a \code{character} value. See
+#'     \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
+#'   \item{A \code{\link[Biostrings:XStringSet-class]{DNAStringSet}}
+#'     object or an object coercible to one}
+#' }
 #' @param whichTree A numeric indicator or name character to specify which tree
 #'   in the \code{rowTree} or \code{colTree} to be extracted. The default is to
 #'   extract the first tree. If \code{whichTree = NULL}, a list of all trees is
@@ -86,5 +91,9 @@
 #' # on columns
 #' (colT <- colTree(x = toy_tse))
 #'
+#' # the referenceSeq data
+#' refSeq <- DNAStringSetList(one = DNAStringSet(rep("A",nrow(toy_tse))),
+#'                            two = DNAStringSet(rep("B",nrow(toy_tse))))
+#' referenceSeq(toy_tse) <- refSeq
+#' toy_tse
 NULL
-

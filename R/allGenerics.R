@@ -60,6 +60,7 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
               x@colTree[[whichTree]]
           })
 
+
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SummarizedExperiment rbind
 #' @rdname TreeSummarizedExperiment-combine
@@ -136,20 +137,64 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
               return(final)
           })
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("referenceSeq", signature = c("x"),
+           function(x) standardGeneric("referenceSeq"))
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
+    function(x){
+        x@referenceSeq
+    }
+)
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("referenceSeq<-", signature = c("x"),
+           function(x, value) standardGeneric("referenceSeq<-"))
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
+    function(x, value){
+        x <- updateObject(x)
+        if(is.null(value)){
+         value <- value
+        } else if(!is(value,"DNAStringSet") &&
+               !is.list(value) &&
+               !is(value,"DNAStringSetList")){
+         value <- as(value,"DNAStringSet")
+        } else if(!is(value,"DNAStringSetList") &&
+               is.list(value)){
+         value <- DNAStringSetList(value)
+        }
+        x <- .set_referenceSeq(x, value)
+        validObject(x)
+        x
+    }
+)
+
+.set_referenceSeq <- function(x, value){
+    x@referenceSeq <- value
+    x
+}
+
+
 #' @importFrom methods callNextMethod
 #' @import SingleCellExperiment
 #' @importFrom S4Vectors metadata
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-#'
 setMethod("[", signature(x = "TreeSummarizedExperiment"),
           function(x, i, j, ..., drop = TRUE){
-              
+              x <- updateObject(x)
               # Subset the rowLinks
               lr <- rowLinks(x)
               rt <- rowTree(x)
               if (!missing(i) & !is.null(rt)) {
-                  # match with rownames 
+                  # match with rownames
                   # multiple rows in assays might have the same name
                   if (is.character(i)) {
                       isRn <- all(i %in% rownames(x))
@@ -159,12 +204,12 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
                           stop(i, " can't be found in rownames")
                       }
                   }
-                  
+
                   nlr <- lr[i, , drop = FALSE]
               } else {
                   nlr <- lr
               }
-              
+
               # Subset the colLinks
               lc <- colLinks(x)
               ct <- colTree(x)
@@ -183,18 +228,85 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               } else {
                   nlc <- lc
               }
-              
-              
+
+              #
+              refSeq <- referenceSeq(x)
+              if (!missing(i)) {
+                  refSeq <- referenceSeq(x)
+                  if(!is.null(refSeq)){
+                      if(is(refSeq,"DNAStringSetList")){
+                          ii <- rep(list(i),length(refSeq))
+                          refSeq <- refSeq[ii]
+                      } else {
+                          refSeq <- refSeq[i]
+                      }
+                  }
+              }
+
               # Subset the traditional slots from SummarizedExperiment
               nx <- callNextMethod()
-              
+
               # update slots
               final <- BiocGenerics:::replaceSlots(nx,
                                                    rowLinks = nlr,
-                                                   colLinks = nlc)
-
+                                                   colLinks = nlc,
+                                                   referenceSeq = refSeq)
+              validObject(final)
               return(final)
-          })
+          }
+)
+
+#' @importFrom methods callNextMethod
+#' @import SingleCellExperiment
+#' @importFrom S4Vectors metadata
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setReplaceMethod("[",
+    signature(x = "TreeSummarizedExperiment", "ANY", "ANY", 
+              "TreeSummarizedExperiment"),
+    function(x, i, j, ..., value){
+        x <- updateObject(x)
+        value <- updateObject(value)
+        if (missing(i) && missing(j)) {
+            # do callNextMethod because of objects potentially being updated
+            return(callNextMethod())
+        }
+
+
+        # TODO rowLinks
+        # TODO colLinks
+
+        if (!missing(i)) {
+            x_refSeq <- referenceSeq(x)
+            value_refSeq <- referenceSeq(value)
+            if((!is.null(x_refSeq) & is.null(value_refSeq)) ||
+               is.null(x_refSeq) & !is.null(value_refSeq) ||
+               !is(x_refSeq, class(value_refSeq))){
+                stop("'x' and 'value' must have the same type of ",
+                     "referenceSeq()", call. = FALSE)
+            }
+            if(!is.null(x_refSeq)){
+                if(is(x_refSeq,"DNAStringSetList")){
+                    if(length(referenceSeq(value)) != length(x_refSeq)){
+                        stop("DNAStringSetList as 'referenceSeq' must have ",
+                             "the same length to be merged.", call. = FALSE)
+                    }
+                    ii <- rep(list(i),length(x_refSeq))
+                    x_refSeq[ii] <- value_refSeq
+                } else {
+                    x_refSeq[i] <- value_refSeq
+                }
+            }
+        }
+
+        x <- callNextMethod()
+        x <- BiocGenerics:::replaceSlots(x,
+                                         referenceSeq = x_refSeq,
+                                         check = FALSE)
+        validObject(x)
+        x
+    }
+)
 
 
 
@@ -204,6 +316,7 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
 #' @export
 setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
+                     x <- updateObject(x)
                      x <- callNextMethod()
                      if(!is.null(x@rowLinks)){
                          rownames(x@rowLinks) <- value
@@ -217,6 +330,7 @@ setReplaceMethod("rownames", signature(x = "TreeSummarizedExperiment"),
 #' @export
 setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  function(x, value){
+                     x <- updateObject(x)
                      x <- callNextMethod()
                      if(!is.null(x@colLinks)){
                          rownames(x@colLinks) <- value
@@ -236,6 +350,7 @@ setGeneric("subsetByNode", function(x, rowNode, colNode)
 #' @export
 setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
           function(x, rowNode, colNode){
+              x <- updateObject(x)
               # row link
               rl <- rowLinks(x)
               if (!missing(rowNode)) {
@@ -244,7 +359,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
                   }
                   x <- x[which(rl$nodeNum %in% rowNode),]
               }
-              
+
               # column link
               cl <- colLinks(x)
               if (!missing(colNode)) {
@@ -253,7 +368,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
                   }
                   x <- x[, which(cl$nodeNum %in% colNode)]
               }
-              return(x) 
+              return(x)
           }
 )
 
@@ -261,6 +376,7 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SingleCellExperiment show
 setMethod("show", "TreeSummarizedExperiment", function(object) {
+    object <- updateObject(object)
     callNextMethod()
 
     rt <- rowTree(object, whichTree = NULL)
@@ -297,17 +413,25 @@ setMethod("show", "TreeSummarizedExperiment", function(object) {
         nlc <- sum(unlist(lapply(ct, countLeaf)))
         msg2b <- sprintf("colTree: %d %s tree(s) (%d leaves)",
                          length(ct), class(ct[[1]]), nlc)
+
     }
 
     cat(msg1a, "\n", msg1b, "\n",
         msg2a, "\n", msg2b, "\n",
         sep = "")
+
+    referenceSeq <- object@referenceSeq
+    if(!is.null(referenceSeq)){
+        if(is(referenceSeq,"DNAStringSetList")){
+            msg <- sprintf(paste0("referenceSeq: a ", class(referenceSeq),
+                                  " (%s x %s sequences each)\n"),
+                           length(referenceSeq),
+                           unique(lengths(referenceSeq)))
+        } else {
+            msg <- sprintf(paste0("referenceSeq: a ", class(referenceSeq),
+                                  " (%s sequences)\n"),
+                           length(referenceSeq))
+        }
+        cat(msg)
+    }
 })
-
-
-
-
-
-
-
-

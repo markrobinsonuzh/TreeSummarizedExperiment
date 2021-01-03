@@ -1,8 +1,8 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment: a S4 Class for Data with Tree Structures 
-Version: 1.7.1
-Date: 2020-08-11
+Version: 1.7.2
+Date: 2021-01-01
 Authors@R: 
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
       role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945")),
@@ -14,7 +14,8 @@ Description: TreeSummarizedExperiment has extended SingleCellExperiment to
 Depends: 
     R(>= 3.6.0),
     SingleCellExperiment,
-    S4Vectors (>= 0.23.18)
+    S4Vectors (>= 0.23.18),
+    Biostrings
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
@@ -37,6 +38,7 @@ Suggests:
     testthat
 RoxygenNote: 7.1.1
 Collate: 
+    'TreeSummarizedExperiment.R'
     'aboutLoop.R'
     'classValid.R'
     'allClass.R'
@@ -69,3 +71,4 @@ Collate:
     'tree_toTree.R'
     'tree_trackNode.R'
     'tree_unionLeaf.R'
+    'updateObject.R'

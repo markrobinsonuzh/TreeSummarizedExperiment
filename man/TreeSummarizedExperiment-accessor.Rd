@@ -9,7 +9,12 @@
 \alias{rowTree,TreeSummarizedExperiment-method}
 \alias{colTree}
 \alias{colTree,TreeSummarizedExperiment-method}
+\alias{referenceSeq}
+\alias{referenceSeq,TreeSummarizedExperiment-method}
+\alias{referenceSeq<-}
+\alias{referenceSeq<-,TreeSummarizedExperiment-method}
 \alias{[,TreeSummarizedExperiment,ANY,ANY,ANY-method}
+\alias{[<-,TreeSummarizedExperiment,ANY,ANY,TreeSummarizedExperiment-method}
 \alias{rownames<-,TreeSummarizedExperiment-method}
 \alias{colnames<-,TreeSummarizedExperiment-method}
 \alias{subsetByNode}
@@ -33,7 +38,17 @@ colTree(x, whichTree = 1)
 
 \S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1)
 
+referenceSeq(x)
+
+\S4method{referenceSeq}{TreeSummarizedExperiment}(x)
+
+referenceSeq(x) <- value
+
+\S4method{referenceSeq}{TreeSummarizedExperiment}(x) <- value
+
 \S4method{[}{TreeSummarizedExperiment,ANY,ANY,ANY}(x, i, j, ..., drop = TRUE)
+
+\S4method{[}{TreeSummarizedExperiment,ANY,ANY,TreeSummarizedExperiment}(x, i, j, ...) <- value
 
 \S4method{rownames}{TreeSummarizedExperiment}(x) <- value
 
@@ -46,9 +61,18 @@ subsetByNode(x, rowNode, colNode)
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
 
+<<<<<<< HEAD
 \item{whichTree}{A numeric indicator or name character to specify which tree
 in the \code{rowTree} or \code{colTree} to be extracted. The default is to
 extract the first tree.}
+=======
+\item{value}{\itemize{
+  \item{the new rownames or colnames as a \code{character} value. See
+    \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
+  \item{A \code{\link[Biostrings:XStringSet-class]{DNAStringSet}}
+    object or an object coercible to one}
+}}
+>>>>>>> origin/master
 
 \item{i, j}{The row, column index to subset \code{x}. The arguments of the
 subset function \code{[]}}
@@ -57,9 +81,6 @@ subset function \code{[]}}
 
 \item{drop}{A logical value, TRUE or FALSE. The argument from the subset
 function \code{[]}}
-
-\item{value}{the new rownames or colnames as a \code{character} value. 
-See \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
 
 \item{rowNode}{A vector of nodes that are used to subset rows. One could use
 the node number, the node label or the node alias to specify nodes, but not
@@ -126,6 +147,11 @@ toy_tse <- TreeSummarizedExperiment(assays = list(y),
 # on columns
 (colT <- colTree(x = toy_tse))
 
+# the referenceSeq data
+refSeq <- DNAStringSetList(one = DNAStringSet(rep("A",nrow(toy_tse))),
+                           two = DNAStringSet(rep("B",nrow(toy_tse))))
+referenceSeq(toy_tse) <- refSeq
+toy_tse
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
