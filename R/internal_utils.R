@@ -12,6 +12,12 @@
     length(ux) == 1
 }
 
+#' all elements in the list are NULL
+#' @keywords internal
+.all_null_in_list <- function(x) {
+    xl <- lapply(x, is.null)
+    all(unlist(xl))
+}
 #' name y with x
 #' @keywords internal
 #' @examples 
@@ -57,12 +63,6 @@
     any(unlist(xl))
 }
 
-#' all elements in the list are NULL
-#' @keywords internal
-.all_null_in_list <- function(x) {
-    xl <- lapply(x, is.null)
-    all(unlist(xl))
-}
 
 # drop tree & link data
 .drop_link <- function(args, drop.colLinks, drop.rowLinks){
@@ -186,7 +186,7 @@
 
 #' update links & trees when combine TSE
 #' @keywords internal
-.combine_link_tree <- function(x, args, 
+.replace_link_tree <- function(x, args, 
                                drop.rowLinks, drop.colLinks,
                                bind = "cbind") {
     
@@ -226,4 +226,58 @@
                                     colTree = nT)
     }
     
+}
+
+
+#' test all TSEs have DNAStringSet in the referenceSeq slot
+#' @keywords internal
+.all_have_DNAStringSet <- function(args){
+    refSeq <- lapply(args, FUN = function(x) {
+        is(x@referenceSeq, "DNAStringSet")
+    })
+    all(unlist(refSeq))
+}
+
+#' test all TSEs have DNAStringSetList in the referenceSeq slot
+#' @keywords internal
+.all_have_DNAStringSetList <- function(args){
+    refSeq <- lapply(args, FUN = function(x) {
+        is(x@referenceSeq, "DNAStringSetList")
+    })
+    all(unlist(refSeq))
+}
+
+#' rbind referenceSeq
+#' @keywords internal
+#' @importFrom methods is
+.rbind_refSeq <- function(args) {
+    
+    # all TSEs have NULL in the referenceSeq slot
+    seqList <-  lapply(args, FUN = function(x) {x@referenceSeq})
+    isNull <- .all_null_in_list(seqList)
+    if (isNull) {return(NULL)}
+    
+    isDNA <- .all_have_DNAStringSet(args)
+    isDNAList <- .all_have_DNAStringSetList(args)
+    
+    # To run rbind successfually, in the referenceSeq slot:
+    #   1) all TSEs have DNAStringSet 
+    #   2) all TSEs have DNAStringSetList
+    #   3) all TSEs have NULL
+    isV <- isNull | isDNA | isDNAList 
+    
+    if (!isV) {
+        stop("all TSEs should have the same class in the referenceSeq slot",
+        "NULL/DNAStringSet/DNAStringSetList ")
+    }
+    
+    if (isDNA) {
+        out <- do.call(c, seqList)
+        return(out)
+    } 
+    
+    if (isDNAList) {
+        out <- do.call(pc, seqList)
+        return(out)
+    }
 }

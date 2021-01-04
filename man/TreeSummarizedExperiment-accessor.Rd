@@ -61,18 +61,17 @@ subsetByNode(x, rowNode, colNode)
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
 
-<<<<<<< HEAD
 \item{whichTree}{A numeric indicator or name character to specify which tree
 in the \code{rowTree} or \code{colTree} to be extracted. The default is to
-extract the first tree.}
-=======
+extract the first tree. If \code{whichTree = NULL}, a list of all trees is
+extracted.}
+
 \item{value}{\itemize{
   \item{the new rownames or colnames as a \code{character} value. See
     \code{\link[BiocGenerics:row_colnames]{BiocGenerics}}.}
   \item{A \code{\link[Biostrings:XStringSet-class]{DNAStringSet}}
     object or an object coercible to one}
 }}
->>>>>>> origin/master
 
 \item{i, j}{The row, column index to subset \code{x}. The arguments of the
 subset function \code{[]}}

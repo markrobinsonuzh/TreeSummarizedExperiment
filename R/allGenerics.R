@@ -91,10 +91,17 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
                   drop.rowLinks <- TRUE
               }
               
-              final <- .combine_link_tree(x = nx, args = args, 
+              nnx <- .replace_link_tree(x = nx, args = args, 
                                           drop.rowLinks = drop.rowLinks,
                                           drop.colLinks = drop.colLinks,
                                           bind = "rbind")
+              
+              # rbind on the referenceSeq slot
+              refSeq <- .rbind_refSeq(args)
+              final <- BiocGenerics:::replaceSlots(nnx,
+                                                   referenceSeq = refSeq)
+              
+              
               return(final)
            })
 
@@ -129,7 +136,7 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
                   drop.colLinks <- TRUE
               }
               
-              final <- .combine_link_tree(x = nx, args = args, 
+              final <- .replace_link_tree(x = nx, args = args, 
                                           drop.rowLinks = drop.rowLinks,
                                           drop.colLinks = drop.colLinks,
                                           bind = "cbind")
