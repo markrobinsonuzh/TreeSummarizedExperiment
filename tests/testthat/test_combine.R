@@ -101,3 +101,28 @@ test_that("rbind TreeSummarizedExperiment successfully", {
     expect_equal(length(rowTree(tse_bb, whichTree = NULL)), 1)
 })
 
+test_that("rbind TreeSummarizedExperiment with referenceSeq successfully", {
+    library(BiocGenerics)
+    refSeq1 <- DNAStringSetList(one = DNAStringSet(rep("A", 10)),
+                                two = DNAStringSet(rep("B", 10)))
+    refSeq2 <- DNAStringSetList(one = DNAStringSet(rep("C", 10)),
+                                two = DNAStringSet(rep("D", 10)))
+    refSeq3 <- DNAStringSet(rep("C", 10))
+    
+    referenceSeq(tse_b) <- refSeq1
+    referenceSeq(tse_e) <- refSeq2
+    
+    # rbind TSEs with DNAStringSetList in the  referenceSeq slot
+    tse_be <- rbind(tse_b, tse_e)
+    expect_equal(lengths(referenceSeq(tse_be)), c(one = 20, two = 20))
+    
+    # Error: one TSE with DNAStringSetList & the other with DNAStringSet
+    referenceSeq(tse_e) <- refSeq3
+    expect_error(rbind(tse_b, tse_e),
+                 "all TSEs should have the same class in the referenceSeq")
+    
+    # Error: one TSE with DNAStringSetList & the other with NULL
+    referenceSeq(tse_e) <- NULL
+    expect_error(rbind(tse_b, tse_e),
+                 "all TSEs should have the same class in the referenceSeq")
+})
