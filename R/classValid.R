@@ -104,7 +104,7 @@ setValidity2("TreeSummarizedExperiment", function(object) {
             msg <- "lengths of 'referenceSeq' must all be equal."
             errors <- c(errors, msg)
         }
-        if (referenceSeq_len != object_nrow) {
+        if (any(referenceSeq_len != object_nrow)) {
             msg <- sprintf(
                 paste0("length(s) of 'referenceSeq' (%d) must equal nb of ",
                        "rows in 'x' (%d)"),
