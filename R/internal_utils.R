@@ -60,7 +60,7 @@
 #' @keywords internal
 .any_null_in_list <- function(x) {
     xl <- lapply(x, is.null)
-    any(unlist(xl))
+    any(unlist(xl), na.rm = TRUE)
 }
 
 
@@ -133,7 +133,7 @@
     return(x)
 }
 
-#' rbind the linkDataFrame
+#' combine the linkDataFrame
 #' @keywords internal
 .cb_links <- function(args, dim = "row") {
     
@@ -268,7 +268,7 @@
     
     if (!isV) {
         stop("all TSEs should have the same class in the referenceSeq slot",
-        "NULL/DNAStringSet/DNAStringSetList ")
+             "NULL/DNAStringSet/DNAStringSetList ")
     }
     
     if (isDNA) {
@@ -281,3 +281,8 @@
         return(out)
     }
 }
+
+
+
+
+
