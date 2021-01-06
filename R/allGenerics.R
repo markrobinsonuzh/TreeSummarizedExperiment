@@ -63,6 +63,86 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
               x@colTree[[whichTree]]
           })
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("rowTreeNames", function(x, value)
+    standardGeneric("rowTreeNames")
+)
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("rowTreeNames", signature("TreeSummarizedExperiment"),
+          function(x, value) {
+              rT <- rowTree(x, whichTree = NULL)
+              names(rT)
+          })
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("rowTreeNames<-", signature = c("x"),
+           function(x, value) standardGeneric("rowTreeNames<-"))
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("rowTreeNames<-", signature("TreeSummarizedExperiment"),
+          function(x, value) {
+              # the row tree
+              rT <- rowTree(x, whichTree = NULL)
+              namePair <- setNames(value, names(rT))
+              names(rT) <- value
+              
+              # the row link
+              rL <- rowLinks(x)
+              
+              
+              # update the column whichTree in the rowLinks
+              nrL <- .update_whichTree(rL, namePair)
+              
+              # update the row tree & link
+              BiocGenerics:::replaceSlots(x, rowTree = rT, rowLinks = nrL)
+          })
+
+
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("colTreeNames", function(x, value)
+    standardGeneric("colTreeNames")
+)
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("colTreeNames", signature("TreeSummarizedExperiment"),
+          function(x, value) {
+              cT <- colTree(x, whichTree = NULL)
+              names(cT)
+          })
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("colTreeNames<-", 
+           function(x, value) standardGeneric("colTreeNames<-"))
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("colTreeNames<-", signature("TreeSummarizedExperiment"),
+          function(x, value) {
+              # the column tree
+              cT <- colTree(x, whichTree = NULL)
+              namePair <- setNames(value, names(cT))
+              names(cT) <- value
+              
+              # the column link
+              cL <- colLinks(x)
+              
+              
+              # update the column whichTree in the colLinks
+              ncL <- .update_whichTree(cL, namePair)
+              
+              # update the row tree & link
+              BiocGenerics:::replaceSlots(x, colTree = cT, colLinks = ncL)
+          })
+
 
 
 #' @importFrom methods callNextMethod

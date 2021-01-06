@@ -9,6 +9,14 @@
 \alias{rowTree,TreeSummarizedExperiment-method}
 \alias{colTree}
 \alias{colTree,TreeSummarizedExperiment-method}
+\alias{rowTreeNames}
+\alias{rowTreeNames,TreeSummarizedExperiment-method}
+\alias{rowTreeNames<-}
+\alias{rowTreeNames<-,TreeSummarizedExperiment-method}
+\alias{colTreeNames}
+\alias{colTreeNames,TreeSummarizedExperiment-method}
+\alias{colTreeNames<-}
+\alias{colTreeNames<-,TreeSummarizedExperiment-method}
 \alias{referenceSeq}
 \alias{referenceSeq,TreeSummarizedExperiment-method}
 \alias{referenceSeq<-}
@@ -37,6 +45,22 @@ rowTree(x, whichTree = 1)
 colTree(x, whichTree = 1)
 
 \S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1)
+
+rowTreeNames(x, value)
+
+\S4method{rowTreeNames}{TreeSummarizedExperiment}(x, value)
+
+rowTreeNames(x) <- value
+
+\S4method{rowTreeNames}{TreeSummarizedExperiment}(x) <- value
+
+colTreeNames(x, value)
+
+\S4method{colTreeNames}{TreeSummarizedExperiment}(x, value)
+
+colTreeNames(x) <- value
+
+\S4method{colTreeNames}{TreeSummarizedExperiment}(x) <- value
 
 referenceSeq(x)
 
