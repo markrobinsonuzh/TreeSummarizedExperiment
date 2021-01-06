@@ -40,12 +40,12 @@ RoxygenNote: 7.1.1
 Collate: 
     'TreeSummarizedExperiment.R'
     'aboutLoop.R'
-    'classValid.R'
     'allClass.R'
     'aggValue.R'
     'allGenerics.R'
     'changeTree.R'
     'classAccessor.R'
+    'classValid.R'
     'coercion.R'
     'combine.R'
     'data.R'

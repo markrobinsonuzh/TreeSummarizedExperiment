@@ -1,15 +1,5 @@
-#' valid TreeSummarizedExperiment class
-#'
-#' \code{validTSE} is to valid TreeSummarizedExperiment object.
-#'
-#'
-#' @param object A TreeSummarizedExperiment object
-#'
 #' @import SingleCellExperiment S4Vectors
-#' @return TRUE or a character string.
-#' @keywords internal
-#'
-.checkTSE <- function(object){
+setValidity2("TreeSummarizedExperiment", function(object) {
 
     errors <- character()
     # -------------------------------------------------------------------------
@@ -127,19 +117,12 @@
     # Note : duplicated value in nodeLab column is allowed because we might
     # have multiple rows corresponding to a same leaf.
     if (length(errors)) {stop("\n", errors)} else {TRUE}
-}
+})
 
-# =============================================================================
-# valid the LinkDataFrame class
-# =============================================================================
-#' \code{validLDF} is to valid a \code{LinkDataFrame} object.
-#'
-#' @param object A \code{LinkDataFrame} object
+
+
 #' @import SingleCellExperiment S4Vectors
-#' @return TRUE or a character string.
-#' @keywords internal
-#'
-.checkLDF <- function(object){
+setValidity2("LinkDataFrame", function(object) {
 
     errors <- character()
     # -------------------------------------------------------------------------
@@ -197,4 +180,4 @@
         stop("\n", errors)
     } else { TRUE }
 
-}
+})

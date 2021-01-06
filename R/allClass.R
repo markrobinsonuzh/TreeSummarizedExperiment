@@ -34,8 +34,7 @@ setClassUnion("list_Or_NULL", c("list", "NULL"))
 #' functions.
 #'
 setClass("LinkDataFrame",
-         contains = "DFrame",
-         validity = .checkLDF)
+         contains = "DFrame")
 
 setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #-------------------------------------------------------------------------------
@@ -143,8 +142,7 @@ setClass("TreeSummarizedExperiment",
                    rowLinks = "LinkDataFrame_Or_NULL",
                    colLinks = "LinkDataFrame_Or_NULL",
                    referenceSeq = "DNAStringSetList_OR_DNAStringSet_OR_NULL"),
-         prototype = list(referenceSeq = NULL),
-         validity = .checkTSE)
+         prototype = list(referenceSeq = NULL))
 
 #' @rdname TreeSummarizedExperiment-internal
 #' @export
@@ -212,7 +210,7 @@ setMethod("vertical_slot_names", "TreeSummarizedExperiment",
 #' @importFrom S4Vectors DataFrame
 #' @importFrom methods new is as
 #' @export
-#' @include classValid.R
+# #' @include classValid.R
 #' @return a TreeSummarizedExperiment object
 #' @name TreeSummarizedExperiment-constructor
 #' @author Ruizhu HUANG

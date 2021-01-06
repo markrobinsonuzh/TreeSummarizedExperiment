@@ -36,7 +36,6 @@ setGeneric("rowTree", function(x, whichTree = 1)
     standardGeneric("rowTree")
 )
 
-
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setMethod("rowTree", signature("TreeSummarizedExperiment"),
@@ -44,6 +43,10 @@ setMethod("rowTree", signature("TreeSummarizedExperiment"),
               if (is.null(whichTree)) {return(x@rowTree)}
               x@rowTree[[whichTree]]
           })
+
+
+
+
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
@@ -61,19 +64,27 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
           })
 
 
+
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SummarizedExperiment rbind
 #' @rdname TreeSummarizedExperiment-combine
 #' @export
-#'
 setMethod("rbind", signature = "TreeSummarizedExperiment",
           function(..., deparse.level = 1){
+              
+              old <- S4Vectors:::disableValidity()
+              if (!isTRUE(old)) {
+                  S4Vectors:::disableValidity(TRUE)
+                  on.exit(S4Vectors:::disableValidity(old))
+              }
+              
               # For slots inherited from SCE & SE
               nx <- callNextMethod()
-              
-              # a list of TSE
+             
+              # For slots only in TSE:
+              # ------------------------------------------------------------
               args <- list(...)
-              
+
               # Column tree & link data should be consistent in TSEs
               drop.colLinks  <- drop.rowLinks  <- FALSE
               isEq <- .is_equal_link(args, dim = "col")
@@ -82,7 +93,7 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
                           "\n colTree & colLinks are dropped after 'rbind'")
                   drop.colLinks <- TRUE
               }
-              
+
               # Row tree & link data should be all NULL or all non-NULL
               tList <- lapply(args, rowTree, whichTree = NULL)
               if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
@@ -90,19 +101,17 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
                           "\n rowTree & rowLinks are dropped after 'rbind'")
                   drop.rowLinks <- TRUE
               }
-              
-              nnx <- .replace_link_tree(x = nx, args = args, 
+
+              nnx <- .replace_link_tree(x = nx, args = args,
                                           drop.rowLinks = drop.rowLinks,
                                           drop.colLinks = drop.colLinks,
                                           bind = "rbind")
-              
+
               # rbind on the referenceSeq slot
               refSeq <- .rbind_refSeq(args)
-              final <- BiocGenerics:::replaceSlots(nnx,
-                                                   referenceSeq = refSeq)
-              
-              
-              return(final)
+              BiocGenerics:::replaceSlots(nnx,
+                                          referenceSeq = refSeq,
+                                          check = FALSE)
            })
 
 #' @importFrom methods callNextMethod
@@ -113,12 +122,19 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
 setMethod("cbind", signature = "TreeSummarizedExperiment",
           function(..., deparse.level = 1){
               
+              old <- S4Vectors:::disableValidity()
+              if (!isTRUE(old)) {
+                  S4Vectors:::disableValidity(TRUE)
+                  on.exit(S4Vectors:::disableValidity(old))
+              }
+              
               # For slots inherited from SCE & SE
               nx <- callNextMethod()
               
-              # a list of TSE
+              # For slots only in TSE:
+              # ------------------------------------------------------------
               args <- list(...)
-              
+
               # Row tree & link data should be consistent in TSEs
               drop.colLinks  <- drop.rowLinks  <- FALSE
               isEq <- .is_equal_link(args, dim = "row")
@@ -127,7 +143,7 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
                           "\n rowTree & rowLinks are dropped after 'cbind'")
                   drop.rowLinks <- TRUE
               }
-              
+
               # Row tree & link data should be all NULL or all non-NULL
               tList <- lapply(args, colTree, whichTree = NULL)
               if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
@@ -135,13 +151,13 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
                           "\n colTree & colLinks are dropped after 'cbind'")
                   drop.colLinks <- TRUE
               }
+
+              .replace_link_tree(x = nx, args = args,
+                                 drop.rowLinks = drop.rowLinks,
+                                 drop.colLinks = drop.colLinks,
+                                 bind = "cbind")
               
-              final <- .replace_link_tree(x = nx, args = args, 
-                                          drop.rowLinks = drop.rowLinks,
-                                          drop.colLinks = drop.colLinks,
-                                          bind = "cbind")
-              
-              return(final)
+             
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
