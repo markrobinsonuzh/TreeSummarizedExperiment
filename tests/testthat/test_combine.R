@@ -91,6 +91,9 @@ test_that("rbind TreeSummarizedExperiment successfully", {
     expect_equal(length(rowTree(tse_bbe, whichTree = NULL)), 2)
     expect_equal(nrow(tse_bbe), 30)
     expect_equal(ncol(tse_bbe), 4)
+    expect_equal(rowLinks(tse_bbe)$whichTree[1], "phylo")
+    expect_equal(rowLinks(tse_bbe)$whichTree[11], "phylo.1")
+    expect_equal(rowLinks(tse_bbe)$whichTree[21], "phylo")
     
     # rbind multiple TSEs
     tse_BBE <- rbind(tse_b, tse_e, tse_b)

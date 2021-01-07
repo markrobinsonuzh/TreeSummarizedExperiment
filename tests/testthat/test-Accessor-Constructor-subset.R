@@ -7,7 +7,8 @@ test_that("Subsetting", {
     rowData <- DataFrame(test = seq.int(1,5))
     refSeq <- DNAStringSetList(one = DNAStringSet(c("A","G","A","A","A")),
                                two = DNAStringSet(c("A","G","A","A","A")))
-    tse <- TreeSummarizedExperiment(SimpleList(counts = counts), rowData = rowData,
+    tse <- TreeSummarizedExperiment(SimpleList(counts = counts), 
+                                    rowData = rowData,
                                     referenceSeq = refSeq)
     
     expect_identical(tse[], tse)

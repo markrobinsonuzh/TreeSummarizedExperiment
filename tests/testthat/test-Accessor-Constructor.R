@@ -130,9 +130,9 @@ test_that("other accessors/setters work", {
     
     # check [
     expect_error(tse["entity11",],
-                 "entity11 can't be found in rownames")
+                 "specified rows can't be found")
     expect_error(tse[,"C_1"],
-                 "C_1 can't be found in colnames")
+                 "specified cols can't be found")
     
     # check show
     expect_output(show(tse),
@@ -191,3 +191,4 @@ test_that("other accessors/setters work", {
     
    
     })
+
