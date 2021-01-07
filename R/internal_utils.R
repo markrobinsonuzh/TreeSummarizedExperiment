@@ -18,6 +18,14 @@
     xl <- lapply(x, is.null)
     all(unlist(xl))
 }
+
+#' all elements in the list are NULL
+#' @keywords internal
+.all_nonnull_in_list <- function(x) {
+    xl <- lapply(x, !is.null)
+    all(unlist(xl))
+}
+
 #' name y with x
 #' @keywords internal
 #' @examples 
@@ -111,20 +119,6 @@
 }
 
 
-#' combine trees in a list
-#' @keywords internal
-.cb_tree <- function(args, dim = "row", unnest = FALSE) {
-    if (dim == "row") {
-        out <- lapply(args, rowTree, whichTree = NULL)
-    } else {
-        out <- lapply(args, colTree, whichTree = NULL)
-    }
-    if (!unnest) {return(out)}
-    
-    out <- unlist(out, recursive = FALSE)
-    return(out)
-}
-
 #' rename a list automatically to avoid duplicated names
 #' @keywords internal
 .auto_rename_list <- function(x) {
@@ -133,38 +127,7 @@
     return(x)
 }
 
-#' combine the linkDataFrame
-#' @keywords internal
-.cb_links <- function(args, dim = "row") {
-    
-    # old trees & links
-    if (dim == "row") {
-        orL <- lapply(args, rowLinks)
-    } else {
-        orL <- lapply(args, colLinks)
-    }
-    oldTreeList <- .cb_tree(args = args, dim = dim, unnest = FALSE)
-    
-    # new trees & links (duplicated trees are removed)
-    if (.all_null_in_list(oldTreeList)) {return(NULL)} 
-    newTrees <- unlist(oldTreeList, recursive = FALSE)
-    newTrees <- newTrees[!duplicated(newTrees)]
-    names(newTrees) <- make.names(names(newTrees), 
-                                  unique = TRUE, allow_ = TRUE)
-    
-    # pair old names and new names of trees
-    ind <- lapply(oldTreeList, .match_phylo_list, y.phys = newTrees)
-    pair <- lapply(ind, FUN = function(x) {
-        setNames(names(newTrees)[x], names(x))
-     })
-    
-    # update the 'whichTree' column in the link data
-    nrL <- mapply(.update_whichTree, orL, pair)
-    
-    # stack up the link data
-    out <- do.call(rbind, nrL)
-    return(out)
-}
+
 
 #' match a phylo to a list of phylo
 #' @keywords internal
@@ -184,11 +147,34 @@
 }
 
 
-#' update links & trees when combine TSE
+.update_link_tree <- function(link_list, tree_list) {
+    
+    # new tree_list: unnest & remove duplicated trees & rename tree
+    names(tree_list) <- NULL
+    ntL <- unlist(tree_list, recursive = FALSE)
+    oname <- names(ntL)
+    ntL <- ntL[!duplicated(ntL)]
+    ntL <- .auto_rename_list(x = ntL)
+    
+    # pair names of old & new tree_list
+    ind <- lapply(tree_list, .match_phylo_list, y.phys = ntL)
+    pair <- lapply(ind, FUN = function(x) {
+        setNames(names(ntL)[x], names(x))
+    })
+    
+    # update whichTree in the link data corresponding to ntL
+    nlL <- mapply(.update_whichTree, link_list, pair)
+    
+    # new link data and list of trees
+    out <- list(new_link = nlL, new_tree = ntL)
+    return(out)
+}
+
+#' bind links & trees when combine TSE
 #' @keywords internal
-.replace_link_tree <- function(x, args, 
-                               drop.rowLinks, drop.colLinks,
-                               bind = "cbind") {
+.bind_link_tree <- function(x, args, 
+                            drop.rowLinks, drop.colLinks,
+                            bind = "cbind") {
     
     if (bind == "rbind") { dim <- "row" } else { dim <- "col"}
     
@@ -197,23 +183,23 @@
                        drop.colLinks = drop.colLinks,
                        drop.rowLinks = drop.rowLinks)
     
-    
-    
-    # combine trees from TSEs as a list
-    nT <- oT <- .cb_tree(args, dim = dim, unnest = TRUE)
-    if (!is.null(oT)) {
-        nT <- .auto_rename_list(x = oT)
-        
-        # check whether duplicated row trees exist
-        if(anyDuplicated(nT)) {
-            nT <- nT[!duplicated(nT)]
-        }
+    # old trees & links
+    if (dim == "row") {
+        orL <- lapply(args, rowLinks)
+        otL <- lapply(args, rowTree, whichTree = NULL)
+    } else {
+        orL <- lapply(args, colLinks)
+        otL <- lapply(args, colTree, whichTree = NULL)
     }
     
-    # update links 
-    nL <- .cb_links(args = args, dim = dim)
-    
-    
+    # new trees & links (duplicated trees are removed)
+    if (.all_null_in_list(otL)) {
+        nT <- nL <- NULL
+    } else {
+        out <- .update_link_tree(link_list = orL, tree_list = otL)
+        nL <- do.call(rbind, out$new_link)
+        nT <- out$new_tree
+    }
     
     # update slots
     if (bind == "rbind") {
@@ -282,7 +268,54 @@
     }
 }
 
+#' convert char. indicator to num. indicator
+#' 
+#' This differs to \code{match} with that the duplicated values in dy are not
+#' ignored.
+#' 
+#' @param x A vector. The values to be matched.
+#' @param dy A vector. The values to be matched agaist. 
+#' 
+#' @keywords internal
+#' @author Ruizhu Huang
+.match_x_dupY <- function(x, dy) {
+    ul <- lapply(x, FUN = function(x) { which(dy %in% x)})
+    unlist(ul)
+}
 
-
+#' convert char. indicator to num. indicator
+#' 
+#' @param ij A character or numeric indicator on rows/columns of \code{x}
+#' @param x It provides row/col names for \code{ij} to be matched against.
+#' @param dim "row" or "col" to specify row/col names of \code{x} to be matched
+#'   against.
+#' @keywords internal
+#' @importFrom S4Vectors head
+#' @author Ruizhu Huang
+.numeric_ij <- function(ij, x, dim = "row") {
+    # row/col names
+    if (dim == "row") {
+        char_name <- rownames(x)
+    } else {
+        char_name <- colnames(x)
+    }
+    
+    if(!is.character(ij)) {return(ij)}
+    
+    # convert to numeric indicator
+    isA <- all(ij %in% char_name)
+    dff <- setdiff(ij, char_name)
+    if (!isA) {
+        stop(length(dff), " specified ", dim, "s can't be found.",
+             call. = FALSE)
+    }
+    len <- sum(char_name %in% ij, na.rm = TRUE)
+    ij <- match(ij, char_name)
+    
+    if (len > length(ij)) {
+        warning("For rows/cols with the same name, only one is output")
+    }
+    return(ij)
+}
 
 

@@ -160,11 +160,11 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
               
               # For slots inherited from SCE & SE
               nx <- callNextMethod()
-             
+              
               # For slots only in TSE:
               # ------------------------------------------------------------
               args <- list(...)
-
+              
               # Column tree & link data should be consistent in TSEs
               drop.colLinks  <- drop.rowLinks  <- FALSE
               isEq <- .is_equal_link(args, dim = "col")
@@ -173,7 +173,7 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
                           "\n colTree & colLinks are dropped after 'rbind'")
                   drop.colLinks <- TRUE
               }
-
+              
               # Row tree & link data should be all NULL or all non-NULL
               tList <- lapply(args, rowTree, whichTree = NULL)
               if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
@@ -181,18 +181,18 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
                           "\n rowTree & rowLinks are dropped after 'rbind'")
                   drop.rowLinks <- TRUE
               }
-
-              nnx <- .replace_link_tree(x = nx, args = args,
-                                          drop.rowLinks = drop.rowLinks,
-                                          drop.colLinks = drop.colLinks,
-                                          bind = "rbind")
-
+              
+              nnx <- .bind_link_tree(x = nx, args = args,
+                                        drop.rowLinks = drop.rowLinks,
+                                        drop.colLinks = drop.colLinks,
+                                        bind = "rbind")
+              
               # rbind on the referenceSeq slot
               refSeq <- .rbind_refSeq(args)
               BiocGenerics:::replaceSlots(nnx,
                                           referenceSeq = refSeq,
                                           check = FALSE)
-           })
+          })
 
 #' @importFrom methods callNextMethod
 #' @importMethodsFrom SummarizedExperiment rbind
@@ -214,7 +214,7 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
               # For slots only in TSE:
               # ------------------------------------------------------------
               args <- list(...)
-
+              
               # Row tree & link data should be consistent in TSEs
               drop.colLinks  <- drop.rowLinks  <- FALSE
               isEq <- .is_equal_link(args, dim = "row")
@@ -223,7 +223,7 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
                           "\n rowTree & rowLinks are dropped after 'cbind'")
                   drop.rowLinks <- TRUE
               }
-
+              
               # Row tree & link data should be all NULL or all non-NULL
               tList <- lapply(args, colTree, whichTree = NULL)
               if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
@@ -231,13 +231,13 @@ setMethod("cbind", signature = "TreeSummarizedExperiment",
                           "\n colTree & colLinks are dropped after 'cbind'")
                   drop.colLinks <- TRUE
               }
-
-              .replace_link_tree(x = nx, args = args,
+              
+              .bind_link_tree(x = nx, args = args,
                                  drop.rowLinks = drop.rowLinks,
                                  drop.colLinks = drop.colLinks,
                                  bind = "cbind")
               
-             
+              
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -293,55 +293,45 @@ setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
 setMethod("[", signature(x = "TreeSummarizedExperiment"),
           function(x, i, j, ..., drop = TRUE){
               x <- updateObject(x)
-              # Subset the rowLinks
-              lr <- rowLinks(x)
-              rt <- rowTree(x)
-              if (!missing(i) & !is.null(rt)) {
-                  # match with rownames
-                  # multiple rows in assays might have the same name
-                  if (is.character(i)) {
-                      isRn <- all(i %in% rownames(x))
-                      if (isRn) {
-                          i <- which(rownames(x) %in% i)
-                      } else {
-                          stop(i, " can't be found in rownames")
-                      }
-                  }
-
-                  nlr <- lr[i, , drop = FALSE]
-              } else {
-                  nlr <- lr
-              }
-
-              # Subset the colLinks
-              lc <- colLinks(x)
-              ct <- colTree(x)
-              if (!missing(j) & !is.null(ct)) {
-                  # match with colnames
-                  # multiple columns in assays might have the same name
-                  if (is.character(j)) {
-                      isCn <- all(j %in% colnames(x))
-                      if (isCn) {
-                          j <- which(colnames(x) %in% j)
-                      } else {
-                          stop(j, " can't be found in colnames")
-                      }
-                  }
-                  nlc <- lc[j, , drop = FALSE]
-              } else {
-                  nlc <- lc
-              }
-
-              #
+              
+              # Subset rowLinks & rowTree & referenceSeq
+              nlr <- lr <- rowLinks(x)
+              nrt <- rt <- rowTree(x, whichTree = NULL)
               refSeq <- referenceSeq(x)
+              
               if (!missing(i)) {
-                  refSeq <- referenceSeq(x)
-                  if(!is.null(refSeq)){
-                      if(is(refSeq,"DNAStringSetList")){
-                          ii <- rep(list(i),length(refSeq))
-                          refSeq <- refSeq[ii]
-                      } else {
-                          refSeq <- refSeq[i]
+                  i <- .numeric_ij(ij = i, x = x, dim = "row")
+                  
+                  if(!length(i) | !sum(i)) {
+                      refSeq <- nlr <- nrt <- NULL
+                  } else {
+                      # referenceSeq
+                      if(!is.null(refSeq)){
+                          if(is(refSeq,"DNAStringSetList")){
+                              ii <- rep(list(i),length(refSeq))
+                              refSeq <- refSeq[ii]
+                          } else {refSeq <- refSeq[i]}
+                      }
+                      # rowLinks & rowTree
+                      if (!is.null(rt)) {
+                          nlr <- lr[i, , drop = FALSE]
+                          nrt <- rt[unique(nlr$whichTree)]
+                      }
+                  }
+              }
+              
+
+              # Subset the colLinks & colTree
+              nlc <- lc <- colLinks(x)
+              nct <- ct <- colTree(x, whichTree = NULL)
+              if (!missing(j)) {
+                  j <- .numeric_ij(ij = j, x = x, dim = "col")
+                  if(!length(j) | !sum(j)) {
+                      nlc <- nct <- NULL
+                  } else {
+                      if (!is.null(ct)) {
+                          nlc <- lc[j, , drop = FALSE]
+                          nct <- ct[unique(nlc$whichTree)]
                       }
                   }
               }
@@ -353,6 +343,8 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
               final <- BiocGenerics:::replaceSlots(nx,
                                                    rowLinks = nlr,
                                                    colLinks = nlc,
+                                                   rowTree = nrt,
+                                                   colTree = nct,
                                                    referenceSeq = refSeq)
               validObject(final)
               return(final)
@@ -375,10 +367,10 @@ setReplaceMethod("[",
             return(callNextMethod())
         }
 
-
-        # TODO rowLinks
+        # TODO rowLinks and rowTree
         # TODO colLinks
-
+        
+        
         if (!missing(i)) {
             x_refSeq <- referenceSeq(x)
             value_refSeq <- referenceSeq(value)
