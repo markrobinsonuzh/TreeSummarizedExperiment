@@ -58,8 +58,16 @@ tse <- TreeSummarizedExperiment(assays = list(count),
 
 treeR2 <- drop.tip(phy = treeR, tip = c("t10", "t9", "t8"))
 
-use <- changeTree(x = tse, rowTree = treeR2)
+# if rownames are not used in node labels of the tree, provide rowNodeLab
+use <- changeTree(x = tse, rowTree = treeR2, 
+                  rowNodeLab = rep(treeR$tip.label, each =2))
 use
+
+# if rownames are used in node labels of tree, rowNodeLab is not required.
+
+rownames(tse) <- rep(treeR$tip.label, each =2)
+cse <- changeTree(x = tse, rowTree = treeR2)
+cse
 }
 \author{
 Ruizhu Huang
