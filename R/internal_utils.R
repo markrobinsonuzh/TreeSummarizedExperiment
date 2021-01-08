@@ -22,7 +22,8 @@
 #' all elements in the list are NULL
 #' @keywords internal
 .all_nonnull_in_list <- function(x) {
-    xl <- lapply(x, !is.null)
+    xl <- lapply(x, is.null)
+    xl <- lapply(xl, `!`)
     all(unlist(xl))
 }
 
@@ -166,7 +167,7 @@
     nlL <- mapply(.update_whichTree, link_list, pair)
     
     # new link data and list of trees
-    out <- list(new_link = nlL, new_tree = ntL)
+    out <- list(new_links = nlL, new_tree = ntL)
     return(out)
 }
 
@@ -197,7 +198,7 @@
         nT <- nL <- NULL
     } else {
         out <- .update_link_tree(link_list = orL, tree_list = otL)
-        nL <- do.call(rbind, out$new_link)
+        nL <- do.call(rbind, out$new_links)
         nT <- out$new_tree
     }
     
@@ -318,4 +319,119 @@
     return(ij)
 }
 
+#' replace row/col links & trees 
+#' @param x A TSE with \code{ij} rows/cols to be replaced by \code{value}
+#' @param value A TSE to replace some rows/cols of \code{x}.
+#' @param ij A character or numeric vector to specify which rows/cols to be replaced.
+#' @param dim "row" or "col" to specify the dimension is in rows or columns
+#' @keywords internal
+#' @author Ruizhu Huang
+#' 
+.replace_link_tree_1d <- function(x, value, ij, dim = "row") {
+    if (missing(ij)) {
+        return(NULL)
+    }
+    
+    # multiple rows in assays might have the same name
+    ij <- .numeric_ij(ij = ij, x = x, dim = dim)
+    
+    tseL <- list(x = x, value = value)
+    if (dim == "row") {
+        olL <- lapply(tseL, rowLinks)
+        otL <- lapply(tseL, rowTree, whichTree = NULL)
+        other <- "col"
+        msg1 <- " 'rowTree()'"
+        msg2 <- " 'colLinks()'"
+    } else {
+        olL <- lapply(tseL, colLinks)
+        otL <- lapply(tseL, colTree, whichTree = NULL)
+        other <- "row"
+        msg1 <- " 'colTree()'"
+        msg2 <- " 'rowLinks()'"
+    }
+    
+    
+    # check both w/wo tree(s) in dim
+    if (!.all_null_in_list(olL) &
+        !.all_nonnull_in_list(olL)) {
+        stop("x' and 'value' should have the same types of", msg1,
+             call. = FALSE)
+    }
+    # check both agrees on tree & links in the other dim
+    fail_cl <- !.is_equal_link(args = tseL, dim = other)
+    if (fail_cl) {
+        stop("x' and 'value' differ in", msg2, call. = FALSE)
+    }
+    
+    if (.all_nonnull_in_list(olL)) {
+        # update links & trees in 'dim'
+        out <- .update_link_tree(link_list = olL, 
+                                 tree_list = otL)
+        nlL <- out$new_links[["x"]]
+        nlL[ij, ] <- out$new_links[["value"]]
+        ntL <- out$new_tree[unique(nlL$whichTree)]
+    } else {
+        nlL <- ntL <- NULL
+    }
+    
+    out <- list(new_links = nlL, new_tree = ntL)
+    return(out)
+}
 
+
+
+.replace_link_tree_2d <- function(x, value, i, j) {
+    i <- .numeric_ij(ij = i, x = x, dim = "row")
+    j <- .numeric_ij(ij = j, x = x, dim = "col")
+    
+    tseL <- list(x = x, value = value)
+    orlL <- lapply(tseL, rowLinks)
+    ortL <- lapply(tseL, rowTree, whichTree = NULL)
+    oclL <- lapply(tseL, colLinks)
+    octL <- lapply(tseL, colTree, whichTree = NULL)
+    
+    
+    
+    # check both w/wo tree(s) in the rowLinks
+    if (!.all_null_in_list(orlL) &
+        !.all_nonnull_in_list(orlL)) {
+        stop("x' and 'value' should have the same types of 'rowLinks()'",
+             call. = FALSE)
+    }
+    # check both w/wo tree(s) in the colLinks
+    if (!.all_null_in_list(oclL) &
+        !.all_nonnull_in_list(oclL)) {
+        stop("x' and 'value' should have the same types of 'colLinks()'",
+             call. = FALSE)
+    }
+    
+    # update the row link & tree
+    if (.all_nonnull_in_list(orlL)) {
+        # update links & trees in 'dim'
+        res <- .update_link_tree(link_list = orlL, 
+                                 tree_list = ortL)
+        nrlL <- res$new_links[["x"]]
+        nrlL[i, ] <- res$new_links[["value"]]
+        nrtL <- res$new_tree[unique(nrlL$whichTree)]
+    } else {
+        nrlL <- nrtL <- NULL
+    }
+    
+    
+    # update the column link & tree
+    if (.all_nonnull_in_list(oclL)) {
+        # update links & trees in 'dim'
+        res <- .update_link_tree(link_list = oclL, 
+                                 tree_list = octL)
+        nclL <- res$new_links[["x"]]
+        nclL[j, ] <- res$new_links[["value"]]
+        nctL <- res$new_tree[unique(nclL$whichTree)]
+    } else {
+        nclL <- nctL <- NULL
+    }
+    
+    outR <- list(new_links = nrlL, new_tree = nrtL)
+    outC <- list(new_links = nclL, new_tree = nctL)
+    out <- list(outR = outR, outC = outC)
+    return(out)
+}

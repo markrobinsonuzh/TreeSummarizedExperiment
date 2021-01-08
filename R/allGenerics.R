@@ -308,7 +308,15 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
                       # referenceSeq
                       if(!is.null(refSeq)){
                           if(is(refSeq,"DNAStringSetList")){
-                              ii <- rep(list(i),length(refSeq))
+                              if (any(i < 0)) {
+                                  abs_i <- abs(i)
+                                  li <- lapply(lengths(refSeq), seq_len)
+                                  ii <- lapply(li, FUN = function(x) {
+                                      !x %in% abs_i
+                                  })
+                              } else {
+                                  ii <- rep(list(i),length(refSeq))  
+                              }
                               refSeq <- refSeq[ii]
                           } else {refSeq <- refSeq[i]}
                       }
@@ -357,52 +365,87 @@ setMethod("[", signature(x = "TreeSummarizedExperiment"),
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setReplaceMethod("[",
-    signature(x = "TreeSummarizedExperiment", "ANY", "ANY", 
-              "TreeSummarizedExperiment"),
-    function(x, i, j, ..., value){
-        x <- updateObject(x)
-        value <- updateObject(value)
-        if (missing(i) && missing(j)) {
-            # do callNextMethod because of objects potentially being updated
-            return(callNextMethod())
-        }
-
-        # TODO rowLinks and rowTree
-        # TODO colLinks
-        
-        
-        if (!missing(i)) {
-            x_refSeq <- referenceSeq(x)
-            value_refSeq <- referenceSeq(value)
-            if((!is.null(x_refSeq) & is.null(value_refSeq)) ||
-               is.null(x_refSeq) & !is.null(value_refSeq) ||
-               !is(x_refSeq, class(value_refSeq))){
-                stop("'x' and 'value' must have the same type of ",
-                     "referenceSeq()", call. = FALSE)
-            }
-            if(!is.null(x_refSeq)){
-                if(is(x_refSeq,"DNAStringSetList")){
-                    if(length(referenceSeq(value)) != length(x_refSeq)){
-                        stop("DNAStringSetList as 'referenceSeq' must have ",
-                             "the same length to be merged.", call. = FALSE)
-                    }
-                    ii <- rep(list(i),length(x_refSeq))
-                    x_refSeq[ii] <- value_refSeq
-                } else {
-                    x_refSeq[i] <- value_refSeq
-                }
-            }
-        }
-
-        x <- callNextMethod()
-        x <- BiocGenerics:::replaceSlots(x,
-                                         referenceSeq = x_refSeq,
-                                         check = FALSE)
-        validObject(x)
-        x
-    }
+                 signature(x = "TreeSummarizedExperiment", "ANY", "ANY", 
+                           "TreeSummarizedExperiment"),
+                 function(x, i, j, ..., value){
+                     x <- updateObject(x)
+                     value <- updateObject(value)
+                     if (missing(i) && missing(j)) {
+                         # do callNextMethod because of objects potentially being updated
+                         return(callNextMethod())
+                     }
+                     
+                     # TODO rowLinks and rowTree
+                     # TODO colLinks
+                     if ((sum(missing(i), missing(j)) == 1)) {
+                         outR <- .replace_link_tree_1d(x = x, value = value, ij = i,
+                                                       dim = "row")
+                         outC <- .replace_link_tree_1d(x = x, value = value,
+                                                       ij = j, dim = "col")
+                     } else {
+                         out <- .replace_link_tree_2d(x = x, value = value, 
+                                                      i = i, j = j)
+                         outR <- out$outR
+                         outC <- out$outC
+                     }
+                     
+                     
+                     x_refSeq <- referenceSeq(x)
+                     if (!missing(i)) {
+                         value_refSeq <- referenceSeq(value)
+                         if((!is.null(x_refSeq) & is.null(value_refSeq)) ||
+                            is.null(x_refSeq) & !is.null(value_refSeq) ||
+                            !is(x_refSeq, class(value_refSeq))){
+                             stop("'x' and 'value' must have the same type of ",
+                                  "referenceSeq()", call. = FALSE)
+                         }
+                         if(!is.null(x_refSeq)){
+                             if(is(x_refSeq,"DNAStringSetList")){
+                                 if(length(referenceSeq(value)) != length(x_refSeq)){
+                                     stop("DNAStringSetList as 'referenceSeq' must have ",
+                                          "the same length to be merged.", call. = FALSE)
+                                 }
+                                 if (any(i < 0)) {
+                                     abs_i <- abs(i)
+                                     li <- lapply(lengths(x_refSeq), seq_len)
+                                     ii <- lapply(li, FUN = function(x) {
+                                         !x %in% abs_i
+                                     })
+                                 } else {
+                                     ii <- rep(list(i),length(x_refSeq))  
+                                 }
+                                 x_refSeq[ii] <- value_refSeq
+                             } else {
+                                 x_refSeq[i] <- value_refSeq
+                             }
+                         }
+                     }
+                     
+                     x <- callNextMethod()
+                     x <- BiocGenerics:::replaceSlots(x,
+                                                      referenceSeq = x_refSeq,
+                                                      check = FALSE)
+                     if (!is.null(outR)) {
+                         nl <- outR$new_links
+                         rownames(nl) <- rownames(x)
+                         x <- BiocGenerics:::replaceSlots(x,
+                                                          rowTree = outR$new_tree,
+                                                          rowLinks = nl,
+                                                          check = FALSE)
+                     }
+                     
+                     if (!is.null(outC)) {
+                         nl <- outC$new_links
+                         rownames(nl) <- colnames(x)
+                         x <- BiocGenerics:::replaceSlots(x,
+                                                          colTree = outC$new_tree,
+                                                          colLinks = nl,
+                                                          check = FALSE)
+                     }
+                     validObject(x)
+                     x
+                 }
 )
-
 
 
 
