@@ -9,6 +9,14 @@
 \alias{rowTree,TreeSummarizedExperiment-method}
 \alias{colTree}
 \alias{colTree,TreeSummarizedExperiment-method}
+\alias{rowTreeNames}
+\alias{rowTreeNames,TreeSummarizedExperiment-method}
+\alias{rowTreeNames<-}
+\alias{rowTreeNames<-,TreeSummarizedExperiment-method}
+\alias{colTreeNames}
+\alias{colTreeNames,TreeSummarizedExperiment-method}
+\alias{colTreeNames<-}
+\alias{colTreeNames<-,TreeSummarizedExperiment-method}
 \alias{referenceSeq}
 \alias{referenceSeq,TreeSummarizedExperiment-method}
 \alias{referenceSeq<-}
@@ -30,13 +38,29 @@ colLinks(x)
 
 \S4method{colLinks}{TreeSummarizedExperiment}(x)
 
-rowTree(x)
+rowTree(x, whichTree = 1)
 
-\S4method{rowTree}{TreeSummarizedExperiment}(x)
+\S4method{rowTree}{TreeSummarizedExperiment}(x, whichTree = 1)
 
-colTree(x)
+colTree(x, whichTree = 1)
 
-\S4method{colTree}{TreeSummarizedExperiment}(x)
+\S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1)
+
+rowTreeNames(x, value)
+
+\S4method{rowTreeNames}{TreeSummarizedExperiment}(x, value)
+
+rowTreeNames(x) <- value
+
+\S4method{rowTreeNames}{TreeSummarizedExperiment}(x) <- value
+
+colTreeNames(x, value)
+
+\S4method{colTreeNames}{TreeSummarizedExperiment}(x, value)
+
+colTreeNames(x) <- value
+
+\S4method{colTreeNames}{TreeSummarizedExperiment}(x) <- value
 
 referenceSeq(x)
 
@@ -60,6 +84,11 @@ subsetByNode(x, rowNode, colNode)
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
+
+\item{whichTree}{A numeric indicator or name character to specify which tree
+in the \code{rowTree} or \code{colTree} to be extracted. The default is to
+extract the first tree. If \code{whichTree = NULL}, a list of all trees is
+extracted.}
 
 \item{value}{\itemize{
   \item{the new rownames or colnames as a \code{character} value. See
@@ -89,8 +118,8 @@ Elements from \code{TreeSummarizedExperiment}.
 }
 \description{
 All accessor functions that work on
-\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
-\strong{TreeSummarizedExperiment}. Additionally, new accessors
+\code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
+should work on \strong{TreeSummarizedExperiment}. Additionally, new accessors
 \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 function are available for \strong{TreeSummarizedExperiment}.
 }

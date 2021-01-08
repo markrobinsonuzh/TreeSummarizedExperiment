@@ -81,7 +81,7 @@ test_that("assays could be written successfully", {
 test_that("row data could be extracted successfully", {
     expect_equal(colnames(rowData(tse)), colnames(rowInf))
     expect_setequal(colnames(rowLinks(tse)), c("nodeLab", "nodeLab_alias",
-                                         "nodeNum", "isLeaf"))
+                                         "nodeNum", "isLeaf", "whichTree"))
     expect_equal(rowTree(tse), tinyTree)
 
 })
@@ -117,18 +117,34 @@ test_that("subsetting by node successfully", {
 })
 
 test_that("other accessors/setters work", {
+    # rowTreeNames & colTreeNames
+    expect_equal(rowTreeNames(tse), "phylo")
+    rowTreeNames(tse) <- "first_tree"
+    expect_equal(rowTreeNames(tse), "first_tree")
+    expect_equal(unique(rowLinks(tse)$whichTree), "first_tree")
+    
+    expect_equal(colTreeNames(tse), "phylo")
+    colTreeNames(tse) <- "second_tree"
+    expect_equal(colTreeNames(tse), "second_tree")
+    expect_equal(unique(colLinks(tse)$whichTree), "second_tree")
+    
+    # check [
     expect_error(tse["entity11",],
-                 "entity11 can't be found in rownames")
+                 "specified rows can't be found")
     expect_error(tse[,"C_1"],
-                 "C_1 can't be found in colnames")
+                 "specified cols can't be found")
+    
+    # check show
     expect_output(show(tse),
                   "rowLinks: a LinkDataFrame")
     expect_output(show(tse),
-                  "rowTree: a phylo")
+                  "rowTree:")
     expect_output(show(tse),
                   "colLinks: a LinkDataFrame")
     expect_output(show(tse),
-                  "colTree: a phylo")
+                  "colTree:")
+    
+    
     x <- TreeSummarizedExperiment(assays = list(toyTable),
                                   rowData = rowInf,
                                   colData = colInf)
@@ -141,6 +157,7 @@ test_that("other accessors/setters work", {
     expect_output(show(x),
                   "colTree: NULL")
     
+    # rownames & colnames
     rn <- paste("entity", seq.int(10L,19L), sep = "")
     expect_true(all(rownames(rowLinks(tse)) != rn))
     rownames(tse) <- rn
@@ -171,4 +188,7 @@ test_that("other accessors/setters work", {
     expect_s4_class(referenceSeq(tse),"DNAStringSet")
     referenceSeq(tse) <- as.character(refSeq[[1L]])
     expect_s4_class(referenceSeq(tse),"DNAStringSet")
-})
+    
+   
+    })
+

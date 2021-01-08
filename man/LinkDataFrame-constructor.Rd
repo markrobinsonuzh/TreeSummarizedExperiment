@@ -6,7 +6,7 @@
 \title{Construct a LinkDataFrame
 Construct a LinkDataFrame object}
 \usage{
-LinkDataFrame(nodeLab, nodeLab_alias, nodeNum, isLeaf, ...)
+LinkDataFrame(nodeLab, nodeLab_alias, nodeNum, isLeaf, whichTree, ...)
 }
 \arguments{
 \item{nodeLab}{A character vector}
@@ -16,6 +16,8 @@ LinkDataFrame(nodeLab, nodeLab_alias, nodeNum, isLeaf, ...)
 \item{nodeNum}{A numeric vector}
 
 \item{isLeaf}{A logical vector}
+
+\item{whichTree}{A character vector}
 
 \item{...}{All arguments accepted by
 \code{\link[S4Vectors:DataFrame-class]{DataFrame-class}}.}
@@ -34,6 +36,7 @@ Construct a LinkDataFrame object
                      nodeLab_alias = LETTERS[1:5],
                      nodeNum = 1:5,
                      isLeaf = TRUE,
+                     whichTree = LETTERS[1:5],
                      right = 1:5))
 }
 \seealso{

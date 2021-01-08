@@ -10,11 +10,11 @@
 #' TreeSummarizedExperiment-accessors
 #'
 #' All accessor functions that work on
-#' \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}} should work on
-#' \strong{TreeSummarizedExperiment}. Additionally, new accessors
+#' \code{\link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment}}
+#' should work on \strong{TreeSummarizedExperiment}. Additionally, new accessors
 #' \code{rowLinks} \code{colLinks}, \code{rowTree} and \code{colTree} accessor
 #' function are available for \strong{TreeSummarizedExperiment}.
-#'
+#' 
 #' @param x A TreeSummarizedExperiment object
 #' @param i,j The row, column index to subset \code{x}. The arguments of the
 #'   subset function \code{[]}
@@ -27,6 +27,10 @@
 #'   \item{A \code{\link[Biostrings:XStringSet-class]{DNAStringSet}}
 #'     object or an object coercible to one}
 #' }
+#' @param whichTree A numeric indicator or name character to specify which tree
+#'   in the \code{rowTree} or \code{colTree} to be extracted. The default is to
+#'   extract the first tree. If \code{whichTree = NULL}, a list of all trees is
+#'   extracted.
 #' @param ... The argument from the subset function \code{[]}
 #' @param rowNode A vector of nodes that are used to subset rows. One could use
 #'   the node number, the node label or the node alias to specify nodes, but not

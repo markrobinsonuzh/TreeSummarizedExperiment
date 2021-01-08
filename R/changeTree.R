@@ -40,9 +40,16 @@
 #' 
 #' treeR2 <- drop.tip(phy = treeR, tip = c("t10", "t9", "t8"))
 #' 
-#' use <- changeTree(x = tse, rowTree = treeR2)
+#' # if rownames are not used in node labels of the tree, provide rowNodeLab
+#' use <- changeTree(x = tse, rowTree = treeR2, 
+#'                   rowNodeLab = rep(treeR$tip.label, each =2))
 #' use
-
+#' 
+#' # if rownames are used in node labels of tree, rowNodeLab is not required.
+#' 
+#' rownames(tse) <- rep(treeR$tip.label, each =2)
+#' cse <- changeTree(x = tse, rowTree = treeR2)
+#' cse
 changeTree <- function(x, 
                        rowTree = NULL, rowNodeLab = NULL,
                        colTree = NULL, colNodeLab = NULL) {
@@ -50,38 +57,40 @@ changeTree <- function(x,
     if (!is.null(rowTree)) {
         rlab <- c(rowTree$tip.label, rowTree$node.label)
         if (is.null(rowNodeLab)) {
-            rowNodeLab <- intersect(rownames(x), rlab)
-            missLab <- setdiff(rownames(x), rlab)
-            nm <- length(missLab)
-            if (nm) {
-                warning(nm, " rows are removed due to mismatch")}
-            x <- x[rowNodeLab, ]
+            rowNodeLab <- rownames(x)
         }
-        out <- .linkFun(tree = rowTree, sce = x, nodeLab = rowNodeLab,
+        indR <- rowNodeLab %in% rlab
+        if (sum(!indR)) {
+            warning(sum(!indR), " rows are removed due to mismatch")}
+        
+        x <- x[indR, ]
+        out <- .linkFun(tree = rowTree, 
+                        sce = x,
+                        nodeLab = rowNodeLab[indR],
                         onRow = TRUE)
-        xx <- x[out$isKeep, ]
-        xx@rowTree <- list(phylo = rowTree)
-        xx@rowLinks <- out$link
+        x@rowTree <- list(phylo = rowTree)
+        x@rowLinks <- out$link
     }
     
     if (!is.null(colTree)) {
         clab <- c(colTree$tip.label, colTree$node.label)
         if (is.null(colNodeLab)) {
-            colNodeLab <- intersect(colnames(x), clab)
-            missLab <- setdiff(colnames(x), clab)
-            nm <- length(missLab)
-            if (nm) {
-                warning(nm, " columns are removed due to mismatch")}
-            x <- x[, colNodeLab]
+            colNodeLab <- colnames(x)[indC]
         }
-        out <- .linkFun(tree = rowTree, sce = x, nodeLab = rowNodeLab,
+        indC <- colNodeLab %in% clab
+        if (sum(!indC)) {
+            warning(sum(!indC), " cols are removed due to mismatch")}
+        
+        x <- x[, indC]
+        out <- .linkFun(tree = colTree,
+                        sce = x,
+                        nodeLab = colNodeLab[indC],
                         onRow = FALSE)
-        xx <- x[, out$isKeep]
-        xx@colTree <- list(phylo = rowTree)
-        xx@colLinks <- out$link
+        x@colTree <- list(phylo = colTree)
+        x@colLinks <- out$link
     }
     
     
-    return(xx)
+    return(x)
 }
 

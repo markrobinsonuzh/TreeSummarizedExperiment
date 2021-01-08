@@ -34,8 +34,7 @@ setClassUnion("list_Or_NULL", c("list", "NULL"))
 #' functions.
 #'
 setClass("LinkDataFrame",
-         contains = "DFrame",
-         validity = .checkLDF)
+         contains = "DFrame")
 
 setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #-------------------------------------------------------------------------------
@@ -46,6 +45,7 @@ setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #' @param nodeLab_alias A character vector
 #' @param nodeNum A numeric vector
 #' @param isLeaf A logical vector
+#' @param whichTree A character vector
 #' @param ... All arguments accepted by
 #'   \code{\link[S4Vectors:DataFrame-class]{DataFrame-class}}.
 #'
@@ -62,11 +62,12 @@ setClassUnion("LinkDataFrame_Or_NULL", c("LinkDataFrame", "NULL"))
 #'                      nodeLab_alias = LETTERS[1:5],
 #'                      nodeNum = 1:5,
 #'                      isLeaf = TRUE,
+#'                      whichTree = LETTERS[1:5],
 #'                      right = 1:5))
 LinkDataFrame <- function(nodeLab, nodeLab_alias, nodeNum,
-                          isLeaf, ...) {
+                          isLeaf, whichTree, ...) {
     df <- DataFrame(nodeLab, nodeLab_alias, nodeNum,
-                    isLeaf, ...)
+                    isLeaf, whichTree, ...)
 
     new("LinkDataFrame", df)
 }
@@ -141,8 +142,7 @@ setClass("TreeSummarizedExperiment",
                    rowLinks = "LinkDataFrame_Or_NULL",
                    colLinks = "LinkDataFrame_Or_NULL",
                    referenceSeq = "DNAStringSetList_OR_DNAStringSet_OR_NULL"),
-         prototype = list(referenceSeq = NULL),
-         validity = .checkTSE)
+         prototype = list(referenceSeq = NULL))
 
 #' @rdname TreeSummarizedExperiment-internal
 #' @export
@@ -210,7 +210,7 @@ setMethod("vertical_slot_names", "TreeSummarizedExperiment",
 #' @importFrom S4Vectors DataFrame
 #' @importFrom methods new is as
 #' @export
-#' @include classValid.R
+# #' @include classValid.R
 #' @return a TreeSummarizedExperiment object
 #' @name TreeSummarizedExperiment-constructor
 #' @author Ruizhu HUANG
@@ -341,8 +341,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     return(tse)
 }
 
-# An internal function to create the link data and added to the rowData or
-# colData
+# An internal function to create the link data 
 .linkFun <- function(tree, sce, nodeLab, onRow = TRUE) {
     if (onRow) {
         annDat <- rowData(sce)
@@ -414,10 +413,16 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
                        message = FALSE)
     leaf <- unique(setdiff(tree$edge[, 2], tree$edge[, 1]))
 
+    if (sum(isIn)) {
+        ind_tree <- "phylo"
+    } else {
+        ind_tree <- character(0)
+    }
     linkD <- LinkDataFrame(nodeLab = fLab,
-                       nodeLab_alias = faLab,
-                       nodeNum = nd,
-                       isLeaf = nd %in% leaf)
+                           nodeLab_alias = faLab,
+                           nodeNum = nd,
+                           isLeaf = nd %in% leaf,
+                           whichTree = ind_tree)
 
     rownames(linkD) <- rn
 
