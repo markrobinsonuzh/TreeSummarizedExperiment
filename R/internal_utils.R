@@ -435,3 +435,87 @@
     out <- list(outR = outR, outC = outC)
     return(out)
 }
+
+# specify which tree to be replaced In '[' replacement, i or/and j are
+# specified. For example, a set of rows ('S') are mapped to a row tree ('T') .
+# When 'i' is a subset of 'S', the tree ('T') can't be really removed or replace
+# because there are other rows mapped to it. That is why we don't use
+# .replace_link_tree_1d for the setters of rowTree/colTree
+
+.replace_tree <- function(x, value, whichTree, dim = "row") {
+    # Node labels of 'value'
+    lab <- c(value$tip.label, value$node.label)
+    empty <- c(NA, " ", "", "NA", "na")
+    
+    # the list of trees
+    if (dim == "row") {
+        tr <- rowTree(x, whichTree = NULL)
+        lk <- rowLinks(x)
+        nam <- rownames(x)
+    } else {
+        tr <- colTree(x, whichTree = NULL)
+        lk <- colLinks(x)
+        nam <- colnames(x)
+    }
+    
+    # trees to be replaced
+    if (!is.null(whichTree)) {
+        trRep <- tr[whichTree]  
+    } else {trRep <- tr}
+    namRep <- names(trRep)
+    
+    # 'value' takes the place of the first replaced tree
+    # the new list of the tree
+    tr[[namRep[1]]] <- value
+    ntr <- tr[!names(tr) %in% namRep[-1]]
+    
+    # ---------------------------------------------------------------
+    # update the link data
+    # ---------------------------------------------------------------
+    # indicate rows links to the tree to be replaced
+    ii <- which(lk$whichTree %in% namRep)
+    olab <- nam[ii]
+    
+    # indicate rows to be dropped
+    iDrop <- ii[!olab %in% lab]
+    iRep <- ii[olab %in% lab]
+        
+    # rows has empty labels and mismatch with nodes of 'value
+    mis <- olab %in% empty | !olab %in% lab
+    if (sum(mis) == length(olab)) {
+        stop(dim, "names of 'x' mismatch with node labels of 'value'",
+             " Try 'changeTree' and provide 'rowNodeLab' instead.",
+             call. = FALSE)
+    }
+    
+    if (length(iDrop)) {
+        warning(length(iDrop), " ", dim, 
+                "(s) are dropped due to mismatch with nodes of 'value'")
+    }
+    
+    # update columns in the link data:
+    nlk <- DataFrame(lk)
+    nlk$nodeLab[iRep] <- nam[iRep]
+    nlk$nodeNum[iRep] <- convertNode(tree = value, node = nam[iRep])
+    nlk$nodeLab_alias[iRep] <- convertNode(tree = value, 
+                                            node = nlk$nodeNum[iRep], 
+                                            use.alias = TRUE)
+    nlk$isLeaf[iRep] <- isLeaf(tree = value, 
+                                node = nlk$nodeNum[iRep])
+    nlk$whichTree[iRep] <- namRep[1]
+    
+    # drop rows
+    if (length(iDrop)) {nlk <- nlk[-iDrop, ]}
+    nlk <- as(nlk, "LinkDataFrame")
+    
+    out <- list(new_links = nlk, new_tree = ntr, drop = iDrop)
+    
+    return(out)
+   
+}
+
+
+
+
+
+

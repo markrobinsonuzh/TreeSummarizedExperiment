@@ -32,18 +32,45 @@ setMethod("colLinks", signature("TreeSummarizedExperiment"),
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("rowTree", function(x, whichTree = 1)
+setGeneric("rowTree", function(x, whichTree = 1, value)
     standardGeneric("rowTree")
 )
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setMethod("rowTree", signature("TreeSummarizedExperiment"),
-          function(x, whichTree = 1) {
+          function(x, whichTree = 1, value) {
               if (is.null(whichTree)) {return(x@rowTree)}
               x@rowTree[[whichTree]]
           })
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("rowTree<-", function(x, whichTree = 1, value)
+    standardGeneric("rowTree<-")
+)
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("rowTree<-", signature("TreeSummarizedExperiment"),
+          function(x, whichTree = 1, value) {
+              # 1) replace specified trees (e.g., whichTree = 1) 
+              # 2) replace all trees (whichTree = NULL)
+              
+              out <- .replace_tree(x = x, value = value,
+                                   whichTree = whichTree, 
+                                   dim = "row")
+              
+              # new data
+              drop <- out$drop
+              if (length(drop)) {x <- x[-drop, ]}
+              nlk <- out$new_links
+              rownames(nlk) <- rownames(x)
+              
+              # update the row tree & link
+              BiocGenerics:::replaceSlots(x, 
+                                          rowTree = out$new_tree, 
+                                          rowLinks = out$new_links)
+          })
 
 
 
@@ -61,6 +88,33 @@ setMethod("colTree", signature("TreeSummarizedExperiment"),
           function(x, whichTree = 1) {
               if (is.null(whichTree)) {return(x@colTree)}
               x@colTree[[whichTree]]
+          })
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("colTree<-", function(x, whichTree = 1, value)
+    standardGeneric("colTree<-")
+)
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setMethod("colTree<-", signature("TreeSummarizedExperiment"),
+          function(x, whichTree = 1, value) {
+              # 1) replace specified trees (e.g., whichTree = 1) 
+              # 2) replace all trees (whichTree = NULL)
+              
+              out <- .replace_tree(x = x, value = value,
+                                   whichTree = whichTree, 
+                                   dim = "col")
+              # new data
+              drop <- out$drop
+              if (length(drop)) {x <- x[, -drop]}
+              nlk <- out$new_links
+              rownames(nlk) <- colnames(x)
+              
+              # update the col tree & link
+              BiocGenerics:::replaceSlots(x, 
+                                          colTree = out$new_tree, 
+                                          colLinks = out$new_links)
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
