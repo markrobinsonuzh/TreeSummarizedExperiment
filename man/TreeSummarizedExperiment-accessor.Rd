@@ -7,8 +7,12 @@
 \alias{colLinks,TreeSummarizedExperiment-method}
 \alias{rowTree}
 \alias{rowTree,TreeSummarizedExperiment-method}
+\alias{rowTree<-}
+\alias{rowTree<-,TreeSummarizedExperiment-method}
 \alias{colTree}
 \alias{colTree,TreeSummarizedExperiment-method}
+\alias{colTree<-}
+\alias{colTree<-,TreeSummarizedExperiment-method}
 \alias{rowTreeNames}
 \alias{rowTreeNames,TreeSummarizedExperiment-method}
 \alias{rowTreeNames<-}
@@ -38,13 +42,21 @@ colLinks(x)
 
 \S4method{colLinks}{TreeSummarizedExperiment}(x)
 
-rowTree(x, whichTree = 1)
+rowTree(x, whichTree = 1, value)
 
-\S4method{rowTree}{TreeSummarizedExperiment}(x, whichTree = 1)
+\S4method{rowTree}{TreeSummarizedExperiment}(x, whichTree = 1, value)
+
+rowTree(x, whichTree = 1) <- value
+
+\S4method{rowTree}{TreeSummarizedExperiment}(x, whichTree = 1) <- value
 
 colTree(x, whichTree = 1)
 
 \S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1)
+
+colTree(x, whichTree = 1) <- value
+
+\S4method{colTree}{TreeSummarizedExperiment}(x, whichTree = 1) <- value
 
 rowTreeNames(x, value)
 
