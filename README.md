@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/fionarhuang/TreeSummarizedExperiment.svg?branch=master)](https://travis-ci.org/fionarhuang/TreeSummarizedExperiment)
 [![codecov](https://codecov.io/gh/fionarhuang/TreeSummarizedExperiment/branch/master/graph/badge.svg)](https://codecov.io/gh/fionarhuang/TreeSummarizedExperiment)
+![R-CMD-check](https://github.com/fionarhuang/TreeSummarizedExperiment/workflows/R-CMD-check/badge.svg?branch=CI-1)
 
 # Installation
 
