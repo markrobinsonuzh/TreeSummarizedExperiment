@@ -17,7 +17,7 @@ test_that("Test changeTree work properly", {
     expect_equal(nrow(tse_a1), nrow(tse_a))
     
     # rownames of TSE can't be found in node labels of the tree
-    expect_warning(changeTree(x = tse_a, rowTree = tree_2))
+    expect_error(changeTree(x = tse_a, rowTree = tree_2))
     tse_a2 <- changeTree(x = tse_a, rowTree = tree_2,
                          rowNodeLab = tree_2$tip.label)
     expect_equal(nrow(tse_a2), nrow(tse_a))
@@ -28,8 +28,7 @@ test_that("Test changeTree work properly", {
     expect_equal(nrow(tse_aa1), nrow(tse_aa))
     
     # duplicated rownames; rownames can't be found in node labels of the tree
-    expect_warning(changeTree(x = tse_aa, rowTree = tree_3))
-    tse_aa3 <- changeTree(x = tse_aa, rowTree = tree_3)
+    expect_warning(tse_aa3 <- changeTree(x = tse_aa, rowTree = tree_3))
     expect_equal(nrow(tse_aa3), nrow(tse_aa) - 6)
     
 })
