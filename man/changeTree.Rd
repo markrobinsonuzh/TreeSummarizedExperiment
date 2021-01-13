@@ -9,7 +9,9 @@ changeTree(
   rowTree = NULL,
   rowNodeLab = NULL,
   colTree = NULL,
-  colNodeLab = NULL
+  colNodeLab = NULL,
+  whichRowTree = 1,
+  whichColTree = 1
 )
 }
 \arguments{
@@ -26,6 +28,12 @@ names of the assays tables are used.}
 \item{colNodeLab}{A character string. It provides the labels of nodes that
 the columns of assays tables corresponding to. If NULL (default), the
 column names of the assays tables are used.}
+
+\item{whichRowTree}{Which row tree to be replaced? Default is 1 (the first
+tree in the \code{rowTree} slot).}
+
+\item{whichColTree}{Which column tree to be replaced? Default is 1 (the first
+tree in the \code{colTree} slot).}
 }
 \value{
 A TreeSummarizedExperiment object

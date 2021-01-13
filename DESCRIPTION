@@ -41,7 +41,7 @@ Collate:
     'TreeSummarizedExperiment.R'
     'aboutLoop.R'
     'allClass.R'
-    'aggValue.R'
+    'aggTSE.R'
     'allGenerics.R'
     'changeTree.R'
     'classAccessor.R'

@@ -21,3 +21,19 @@ transNode <- function(tree, node, use.alias = FALSE,
     convertNode(tree = tree, node = node, use.alias = use.alias,
                 message = message)
 }
+
+#' @rdname aggTSE
+#' @export
+aggValue <- function(x, rowLevel = NULL, rowBlock = NULL, 
+                     colLevel = NULL, colBlock = NULL, 
+                     FUN = sum, assay = NULL,
+                     message = FALSE){
+    .Deprecated("aggTSE")
+    aggTSE(x = x, 
+           rowLevel = rowLevel, rowBlock = rowBlock, 
+           colLevel = colLevel, colBlock = colBlock, 
+           FUN = sum, whichAssay = assay,
+           message = message,
+           whichRowTree = 1, whichColTree = 1,
+           rowFirst = TRUE)
+}
