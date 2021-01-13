@@ -442,7 +442,8 @@
 # because there are other rows mapped to it. That is why we don't use
 # .replace_link_tree_1d for the setters of rowTree/colTree
 
-.replace_tree <- function(x, value, whichTree, dim = "row") {
+.replace_tree <- function(x, value, whichTree, 
+                          nodeLab = NULL, dim = "row") {
     # Node labels of 'value'
     lab <- c(value$tip.label, value$node.label)
     empty <- c(NA, " ", "", "NA", "na")
@@ -474,17 +475,20 @@
     # ---------------------------------------------------------------
     # indicate rows links to the tree to be replaced
     ii <- which(lk$whichTree %in% namRep)
-    olab <- nam[ii]
+    if (is.null(nodeLab)) {
+        olab <- nam[ii]
+    } else {olab <- nodeLab}
+    
     
     # indicate rows to be dropped
     iDrop <- ii[!olab %in% lab]
     iRep <- ii[olab %in% lab]
-        
+    
     # rows has empty labels and mismatch with nodes of 'value
     mis <- olab %in% empty | !olab %in% lab
     if (sum(mis) == length(olab)) {
-        stop(dim, "names of 'x' mismatch with node labels of 'value'",
-             " Try 'changeTree' and provide 'rowNodeLab' instead.",
+        stop(dim, "names of 'x' mismatch with node labels of the tree \n",
+             " Try 'changeTree' with 'rowNodeLab' provided.",
              call. = FALSE)
     }
     
@@ -495,13 +499,13 @@
     
     # update columns in the link data:
     nlk <- DataFrame(lk)
-    nlk$nodeLab[iRep] <- nam[iRep]
-    nlk$nodeNum[iRep] <- convertNode(tree = value, node = nam[iRep])
+    nlk$nodeLab[iRep] <- olab[olab %in% lab]
+    nlk$nodeNum[iRep] <- convertNode(tree = value, node = nlk$nodeLab[iRep])
     nlk$nodeLab_alias[iRep] <- convertNode(tree = value, 
-                                            node = nlk$nodeNum[iRep], 
-                                            use.alias = TRUE)
+                                           node = nlk$nodeNum[iRep], 
+                                           use.alias = TRUE)
     nlk$isLeaf[iRep] <- isLeaf(tree = value, 
-                                node = nlk$nodeNum[iRep])
+                               node = nlk$nodeNum[iRep])
     nlk$whichTree[iRep] <- namRep[1]
     
     # drop rows
@@ -511,7 +515,7 @@
     out <- list(new_links = nlk, new_tree = ntr, drop = iDrop)
     
     return(out)
-   
+    
 }
 
 

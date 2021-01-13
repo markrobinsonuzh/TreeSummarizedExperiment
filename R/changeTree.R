@@ -12,6 +12,10 @@
 #' @param colNodeLab A character string. It provides the labels of nodes that
 #'   the columns of assays tables corresponding to. If NULL (default), the
 #'   column names of the assays tables are used.
+#' @param whichRowTree Which row tree to be replaced? Default is 1 (the first
+#'   tree in the \code{rowTree} slot).
+#' @param whichColTree Which column tree to be replaced? Default is 1 (the first
+#'   tree in the \code{colTree} slot).
 #' @return A TreeSummarizedExperiment object
 #' @importFrom stats setNames
 #' @export
@@ -52,44 +56,28 @@
 #' cse
 changeTree <- function(x, 
                        rowTree = NULL, rowNodeLab = NULL,
-                       colTree = NULL, colNodeLab = NULL) {
+                       colTree = NULL, colNodeLab = NULL,
+                       whichRowTree = 1, whichColTree = 1) {
     
     if (!is.null(rowTree)) {
-        rlab <- c(rowTree$tip.label, rowTree$node.label)
-        if (is.null(rowNodeLab)) {
-            rowNodeLab <- rownames(x)
-        }
-        indR <- rowNodeLab %in% rlab
-        if (sum(!indR)) {
-            warning(sum(!indR), " rows are removed due to mismatch")}
-        
-        x <- x[indR, ]
-        out <- .linkFun(tree = rowTree, 
-                        sce = x,
-                        nodeLab = rowNodeLab[indR],
-                        onRow = TRUE)
-        x@rowTree <- list(phylo = rowTree)
-        x@rowLinks <- out$link
+        out <- .replace_tree(x = x, value = rowTree, 
+                             whichTree = whichRowTree, 
+                             nodeLab = rowNodeLab, dim = "row")
+        if (length(out$drop)) {x <- x[-out$drop, ]}
+        x <- BiocGenerics:::replaceSlots(object = x, 
+                                         rowTree = out$new_tree,
+                                         rowLinks = out$new_links)
     }
     
     if (!is.null(colTree)) {
-        clab <- c(colTree$tip.label, colTree$node.label)
-        if (is.null(colNodeLab)) {
-            colNodeLab <- colnames(x)[indC]
-        }
-        indC <- colNodeLab %in% clab
-        if (sum(!indC)) {
-            warning(sum(!indC), " cols are removed due to mismatch")}
-        
-        x <- x[, indC]
-        out <- .linkFun(tree = colTree,
-                        sce = x,
-                        nodeLab = colNodeLab[indC],
-                        onRow = FALSE)
-        x@colTree <- list(phylo = colTree)
-        x@colLinks <- out$link
+        out <- .replace_tree(x = x, value = colTree, 
+                             whichTree = whichColTree, 
+                             nodeLab = colNodeLab, dim = "col")
+        if (length(out$drop)) {x <- x[, -out$drop]}
+        x <- BiocGenerics:::replaceSlots(object = x, 
+                                         colTree = out$new_tree,
+                                         colLinks = out$new_links)
     }
-    
     
     return(x)
 }
