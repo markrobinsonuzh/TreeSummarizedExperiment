@@ -319,16 +319,11 @@ aggTSE <- function(x,
     }
     
     # The descendants of the aggregation level
-    if (is.null(tree$cache)) {
-        desR <- findDescendant(tree = tree, node = level,
-                               only.leaf = TRUE, self.include = TRUE)
-        names(desR) <- convertNode(tree = tree, node = level,
-                                   use.alias = TRUE, message = FALSE)
-    } else {
-        desR <- tree$cache[level]
-        names(desR) <- convertNode(tree = tree, node = level,
-                                   use.alias = TRUE, message = FALSE)
-    }
+    desR <- findDescendant(tree = tree, node = level,
+                           only.leaf = TRUE, self.include = TRUE)
+    names(desR) <- convertNode(tree = tree, node = level,
+                               use.alias = TRUE, message = FALSE)
+    
     
     # Find the rows of the descendants
     miR <- setdiff(unique(unlist(desR)), numR)
