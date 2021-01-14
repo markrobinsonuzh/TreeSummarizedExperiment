@@ -1,4 +1,3 @@
-
 #' Perform data aggregations based on the available tree structures
 #'
 #' \code{aggTSE} aggregates values on the leaf nodes of a tree to a specific
@@ -34,15 +33,19 @@
 #'   column dim for \code{rowFirst = FALSE}.
 #' @param message A logical value. The default is TRUE. If TRUE, it will print
 #'   out the running process.
+#' @param BPPARAM Default is \code{NULL} and the computation isn't run in
+#'   parallel. To run computation parallelly, an optional
+#'   \code{\link[BiocParallel:BiocParallelParam-class]{BiocParallelParam}}
+#'   instance determining the parallel back-end to be used during evaluation, or
+#'   a list of BiocParallelParam instances, to be applied in sequence for nested
+#'   calls to \strong{BiocParallel} functions.
 #' @import SingleCellExperiment
 #' @importFrom utils flush.console
-#' @return A \code{TreeSummarizedExperiment} object or a
-#'   \code{matrix}. The output has the same class of the input \code{x}.
-#' @export
-#'
+#' @importFrom BiocParallel bplapply
 #' @include allClass.R
+#' @export
 #' @author Ruizhu HUANG
-#' @seealso \code{\link{TreeSummarizedExperiment}}
+#' @return A \code{\link{TreeSummarizedExperiment}} object 
 #' @examples
 #'
 #' # assays data
@@ -81,7 +84,7 @@
 #'                                 metadata = list(test = 1:4))
 #'
 #' aggCol <- aggTSE(x = tse, colLevel = c("GroupA", "GroupB"),
-#' FUN = sum)
+#'                  FUN = sum)
 #'
 #' assays(aggCol)[[1]]
 #'
@@ -91,10 +94,9 @@ aggTSE <- function(x,
                    FUN = sum, whichAssay = NULL,
                    message = FALSE,
                    whichRowTree = 1, whichColTree = 1,
-                   rowFirst = TRUE) {
+                   rowFirst = TRUE, BPPARAM = NULL) {
     ## --------------------- check input before run ---------------------------
-    ## If x is a TreeSummarizedExperiment, rowTree and colTree should be set to
-    ## NULL
+    ## x is a TreeSummarizedExperiment
     if (!is(x, "TreeSummarizedExperiment")) {
         stop("x should be a TreeSummarizedExperiment", call. = FALSE)
     }
@@ -168,12 +170,13 @@ aggTSE <- function(x,
     mat <- assays(x)
     if (!is.null(whichAssay)) {mat <- mat[whichAssay]}
     
+    ## -------------------- aggregation on row dimension -------------------
     if (rowFirst) {
-        ## -------------------- aggregation on row dimension -------------------
         x <- .agg_row(x = x, tree = rTree, assayTab = mat,
                       level = unique(rowLevel),
                       block = rowBlock, FUN = FUN, 
-                      message = message, onRow = onRow)
+                      message = message, onRow = onRow,
+                      BPPARAM = BPPARAM)
         ## Update the assay tables for the aggregation on the other dim.
         mat <- assays(x)
     }
@@ -181,18 +184,17 @@ aggTSE <- function(x,
     x <- .agg_col(x = x, tree = cTree, assayTab = mat,
                   level = unique(colLevel),
                   block = colBlock, FUN = FUN, 
-                  message = message, onCol = onCol)
-    
+                  message = message, onCol = onCol,
+                  BPPARAM = BPPARAM)
     
     if (!rowFirst) {
         ## Update the assay tables
         mat <- assays(x)
-        
-        # assasys, rowData
         x <- .agg_row(x = x, tree = rTree, assayTab = mat,
                       level = unique(rowLevel),
                       block = rowBlock, FUN = FUN, 
-                      message = message, onRow = onRow)
+                      message = message, onRow = onRow,
+                      BPPARAM = BPPARAM)
     }
     
     updateObject(x)
@@ -201,7 +203,7 @@ aggTSE <- function(x,
 
 
 .agg_row <- function(x, tree, assayTab, level,
-                     block, FUN, message, onRow) {
+                     block, FUN, message, onRow, BPPARAM) {
     
     if (onRow) {
         if (message) {
@@ -217,7 +219,8 @@ aggTSE <- function(x,
                         level = level,
                         block = block,
                         FUN = FUN,
-                        message = message)
+                        message = message,
+                        BPPARAM = BPPARAM)
         nrD <- outR$newDD
         nrD <- nrD[, setdiff(colnames(nrD), "nodeLab")]
         nLab <- outR$newDD$nodeLab
@@ -250,7 +253,8 @@ aggTSE <- function(x,
 
 
 .agg_col <- function(x, tree, assayTab, level,
-                     block, FUN, message, onCol) {
+                     block, FUN, message, onCol,
+                     BPPARAM) {
     
     if (onCol) {
         if (message) {
@@ -265,7 +269,9 @@ aggTSE <- function(x,
                         linkData = cL,
                         level = level,
                         block = block,
-                        FUN = FUN, message = message)
+                        FUN = FUN, 
+                        message = message,
+                        BPPARAM = BPPARAM)
         ncD <- outC$newDD
         ncD <- ncD[, setdiff(colnames(ncD), "nodeLab")]
         nLab <- outC$newDD$nodeLab
@@ -295,7 +301,7 @@ aggTSE <- function(x,
 
 .aggFun <- function(tree, assayTab, dimData, linkData,
                     level = NULL, block = NULL, FUN, 
-                    message = FALSE) {
+                    message = FALSE, BPPARAM) {
     
     # nodeNum & block
     numR <- linkData$nodeNum
@@ -346,54 +352,38 @@ aggTSE <- function(x,
     ncn <- colnames(assayTab[[1]])
     mtab <- do.call(cbind, assayTab)
     
-    assayL <- annL <- vector("list", length(desR))
-    ll <- rep(NA, length(desR))
-    for (i in seq_along(desR)) {
-        if (message) {
-            message(i, " out of ", length(desR),
-                    " finished", "\r", appendLF = FALSE)
-            flush.console()
-        }
+    if (is.null(BPPARAM)) {
+        # The computation is not run in parallel
+        # lapply is in some case much faster than `bplapply` 
+        # (https://gist.github.com/fionarhuang/c59c0d1eabd36d8b6fbfda61d06cb951)
         
-        # assay table
-        ri <- which(numR %in% desR[[i]])
-        sri <- split(ri, nodeBk[ri, "bk"])
-        
-        ax <- lapply(sri, FUN = function(x) {
-            xx <- mtab[x, , drop = FALSE]
-            fx <- apply(xx, 2, FUN = FUN)
-            fx <- rbind(fx)
-            rownames(fx) <- NULL
-            fx
-        })
-        
-        assayL[[i]] <- do.call(rbind, ax)
-        
-        #dimension data
-        li <- lapply(ax, nrow)
-        ll[[i]] <- sum(unlist(li))
-        
-        if (ncol(dimData)) {
-            dl <- lapply(sri, FUN = function(x) {
-                if (!length(x)) {
-                    xx <- dimData[1, , drop = FALSE]
-                    xx[] <- NA
-                    xx
-                } else {
-                    xx <- as.list(dimData[x, , drop = FALSE])
-                    ux <- lapply(xx, .unique_or_na)
-                    do.call(cbind.data.frame, ux)
-                }
-            })
-            ru <- mapply(.rep_df, df = dl, n=li, SIMPLIFY = FALSE)
-            annL[[i]] <- do.call(rbind, ru)
-        }}
+        res <- lapply(seq_along(desR), FUN = function(x) {
+            if (message) {
+                message(x, " out of ", length(desR),
+                        " finished", "\r", appendLF = FALSE)
+                flush.console()
+            }
+            .agg_assay(desd = desR[[x]], nodeRow = numR, 
+                       nodeBlock = nodeBk, assayTab = mtab,
+                       dimData = dimData, FUN = FUN)})
+    } else {
+        # The computation is run in parallel
+        res <- bplapply(desR, FUN = function(x) {
+            .agg_assay(desd = x, nodeRow = numR, 
+                       nodeBlock = nodeBk, assayTab = mtab,
+                       dimData = dimData, FUN = FUN)},
+            BPPARAM = BPPARAM)
+    }
+    
     
     # separate the results into the original number of assays tables as input
     if (message) {
         message("unwrap data ... ")}
     
-    assayL <- do.call(rbind, assayL)
+    assayL <- do.call(rbind, lapply(res, FUN = function(x) {x$new_assays}))
+    ll <- lapply(res, FUN = function(x) {x$new_n})
+    annL <- lapply(res, FUN = function(x) {x$new_dimData})
+    
     outR <- vector("list", length(assayTab))
     names(outR) <- names(assayTab)
     for (i in seq_along(outR)) {
@@ -417,6 +407,48 @@ aggTSE <- function(x,
     out <- list(dataTab = outR, newDD = newDD)
     return(out)
 }
+
+.agg_assay <- function(desd, nodeRow, nodeBlock, assayTab,
+                       dimData, FUN) {
+    # assay table
+    ri <- which(nodeRow %in% desd)
+    sri <- split(ri, nodeBlock[ri, "bk"])
+    
+    ax <- lapply(sri, FUN = function(x) {
+        xx <- assayTab[x, , drop = FALSE]
+        fx <- apply(xx, 2, FUN = FUN)
+        fx <- rbind(fx)
+        rownames(fx) <- NULL
+        fx
+    })
+    rax <- do.call(rbind, ax)
+    
+    
+    li <- lapply(ax, nrow)
+    sli <- sum(unlist(li))
+    
+    if (ncol(dimData)) {
+        dl <- lapply(sri, FUN = function(x) {
+            if (!length(x)) {
+                xx <- dimData[1, , drop = FALSE]
+                xx[] <- NA
+                xx
+            } else {
+                xx <- as.list(dimData[x, , drop = FALSE])
+                ux <- lapply(xx, .unique_or_na)
+                do.call(cbind.data.frame, ux)
+            }
+        })
+        ru <- mapply(.rep_df, df = dl, n=li, SIMPLIFY = FALSE)
+        rrd <- do.call(rbind, ru)
+    }
+    
+    out <- list(new_assays = rax,
+                new_n = sli,
+                new_dimData = rrd)
+    return(out)
+}
+
 
 .unique_or_na <- function(x) {
     xx <- unique(x)
