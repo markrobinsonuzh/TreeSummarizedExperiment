@@ -17,6 +17,28 @@ test_that("aggTSE works correctly", {
     expect_message(aggTSE(x = tse_a, rowLevel = 3, message = TRUE),
                    "Preparing data")
     
+    # test colBlock & rowBlock
+    set.seed(2)
+    tse_e <- cbind(tse_a, tse_a, tse_a)
+    colData(tse_e)$group <- sample(LETTERS[1:2], size = ncol(tse_e),
+                                   replace = TRUE)
+    
+    cl <- printNode(tree = colTree(tse_e), type = "internal")$nodeNum
+    tse_E <- aggTSE(x = tse_e, colLevel = cl, colBlock = "group") 
+    
+    expect_equal(dim(tse_E), c(10, 6))
+    # For alias_7 (2 sample1 & 1 sample2 in A group)
+    table(colData(tse_e)$group, colnames(tse_e))
+    cd <- colData(tse_E)
+    sel1 <- cd$group == "A" & colnames(tse_E) == "alias_7"
+    sel2 <- cd$group == "B" & colnames(tse_E) == "alias_7"
+    sel3 <- cd$group == "A" & colnames(tse_E) == "alias_5"
+    sel4 <- cd$group == "B" & colnames(tse_E) == "alias_5"
+    expect_equal(assays(tse_E["entity1", sel1])[[1]][1, 1], 13)
+    expect_equal(assays(tse_E["entity1", sel2])[[1]][1, 1], 23)
+    expect_equal(assays(tse_E["entity1", sel3])[[1]][1, 1], 117)
+    expect_equal(assays(tse_E["entity1", sel4])[[1]][1, 1], 75)
+    
     # aggregate on the row dim when one tree in 'rowTree'
     rlev <- printNode(tree = rowTree(tse_a), type = "all")$nodeNum
     tse_R <- aggTSE(x = tse_a, rowLevel = rlev, FUN = sum)
@@ -83,6 +105,24 @@ test_that("aggTSE works correctly", {
                      colLevel = cl, rowFirst = FALSE, whichAssay = "new")
     
     expect_false(identical(assays(tse_RF)[[1]], assays(tse_CF)[[1]]))
+    
+    
+    
+    
+    # test the parallel computation
+    set.seed(2)
+    tse_d <- makeTSE(nrow = 1000, ncol = 1000)
+    rl <- printNode(tree = rowTree(tse_d), type = "internal")$nodeNum
+    cl <- printNode(tree = colTree(tse_d), type = "internal")$nodeNum
+    
+    tse_D <- aggTSE(x = tse_d, rowLevel = rl, colLevel = cl)
+    tse_DD <- aggTSE(x = tse_d, rowLevel = rl, colLevel = cl, 
+                     BPPARAM = BiocParallel::MulticoreParam(workers = 2, 
+                                                            progressbar = TRUE))
+    expect_equal(tse_D, tse_DD)
+    
+    
+    
 })
 
 

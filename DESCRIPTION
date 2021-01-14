@@ -27,7 +27,8 @@ Imports:
     ape,
     rlang,
     dplyr,
-    SummarizedExperiment
+    SummarizedExperiment,
+    BiocParallel
 VignetteBuilder: knitr
 Suggests: 
     ggtree,

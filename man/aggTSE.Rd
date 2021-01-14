@@ -15,7 +15,8 @@ aggTSE(
   message = FALSE,
   whichRowTree = 1,
   whichColTree = 1,
-  rowFirst = TRUE
+  rowFirst = TRUE,
+  BPPARAM = NULL
 )
 }
 \arguments{
@@ -55,10 +56,16 @@ used in the aggregation. The first row tree is used as default.}
 \item{rowFirst}{TRUE or FALSE. If the aggregation is in both dims., it is
 performed firstly on the row dim for \code{rowFirst = TRUE} or on the
 column dim for \code{rowFirst = FALSE}.}
+
+\item{BPPARAM}{Default is \code{NULL} and the computation isn't run in
+parallel. To run computation parallelly, an optional
+\code{\link[BiocParallel:BiocParallelParam-class]{BiocParallelParam}}
+instance determining the parallel back-end to be used during evaluation, or
+a list of BiocParallelParam instances, to be applied in sequence for nested
+calls to \strong{BiocParallel} functions.}
 }
 \value{
-A \code{TreeSummarizedExperiment} object or a
-  \code{matrix}. The output has the same class of the input \code{x}.
+A \code{\link{TreeSummarizedExperiment}} object
 }
 \description{
 \code{aggTSE} aggregates values on the leaf nodes of a tree to a specific
@@ -104,13 +111,10 @@ tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 metadata = list(test = 1:4))
 
 aggCol <- aggTSE(x = tse, colLevel = c("GroupA", "GroupB"),
-FUN = sum)
+                 FUN = sum)
 
 assays(aggCol)[[1]]
 
-}
-\seealso{
-\code{\link{TreeSummarizedExperiment}}
 }
 \author{
 Ruizhu HUANG
