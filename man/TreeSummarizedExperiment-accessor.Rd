@@ -90,9 +90,9 @@ referenceSeq(x) <- value
 
 \S4method{colnames}{TreeSummarizedExperiment}(x) <- value
 
-subsetByNode(x, rowNode, colNode)
+subsetByNode(x, rowNode, colNode, whichRowTree, whichColTree)
 
-\S4method{subsetByNode}{TreeSummarizedExperiment}(x, rowNode, colNode)
+\S4method{subsetByNode}{TreeSummarizedExperiment}(x, rowNode, colNode, whichRowTree, whichColTree)
 }
 \arguments{
 \item{x}{A TreeSummarizedExperiment object}
@@ -124,6 +124,12 @@ a mixture of them.}
 \item{colNode}{A vector of nodes that are used to subset columns. One could
 use the node number, the node label or the node alias to specify nodes, but
 not a mixture of them.}
+
+\item{whichRowTree}{A numeric indicator or name character to specify which tree
+in the \code{rowTree}.}
+
+\item{whichColTree}{A numeric indicator or name character to specify which tree
+in the \code{colTree}.}
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.
