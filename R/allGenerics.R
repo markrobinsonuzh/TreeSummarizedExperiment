@@ -41,7 +41,11 @@ setGeneric("rowTree", function(x, whichTree = 1, value)
 setMethod("rowTree", signature("TreeSummarizedExperiment"),
           function(x, whichTree = 1, value) {
               if (is.null(whichTree)) {return(x@rowTree)}
-              x@rowTree[[whichTree]]
+              xx <- x@rowTree[whichTree]
+              if (length(xx) == 1) {
+                  xx <- xx[[1]]
+              }
+              return(xx)
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -87,7 +91,11 @@ setGeneric("colTree", function(x, whichTree = 1)
 setMethod("colTree", signature("TreeSummarizedExperiment"),
           function(x, whichTree = 1) {
               if (is.null(whichTree)) {return(x@colTree)}
-              x@colTree[[whichTree]]
+              xx <- x@colTree[whichTree]
+              if (length(xx) == 1) {
+                  xx <- xx[[1]]
+              }
+              return(xx)
           })
 
 #' @rdname TreeSummarizedExperiment-accessor
@@ -534,33 +542,70 @@ setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
-setGeneric("subsetByNode", function(x, rowNode, colNode)
+setGeneric("subsetByNode", function(x, rowNode, colNode,
+                                    whichRowTree, whichColTree)
     standardGeneric("subsetByNode")
 )
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
 setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
-          function(x, rowNode, colNode){
+          function(x, rowNode, colNode, whichRowTree, whichColTree){
               x <- updateObject(x)
               # row link
               rl <- rowLinks(x)
+              rt <- rowTree(x, whichTree = NULL)
+              if (!missing(whichRowTree)) {
+                  rt <- rt[whichRowTree]
+                  rnam <- names(rt)
+                  x <- x[rl$whichTree %in% rnam,]
+                  x <- BiocGenerics:::replaceSlots(object = x, 
+                                                   rowTree = rt)
+                  rl <- rowLinks(x)
+              }
+              
+              if (!missing(whichRowTree) |
+                  !missing(rowNode)) {
+                  if (!length(rt)) {
+                      warning("The row tree is not available.", 
+                              call. = FALSE)}
+              }
+              
               if (!missing(rowNode)) {
                   if (!is.numeric(rowNode)) {
-                      rowNode <- convertNode(tree = rowTree(x), node = rowNode)
+                      rowNode <- unlist(lapply(rt, convertNode, node = rowNode))
                   }
                   x <- x[which(rl$nodeNum %in% rowNode),]
               }
-
+              
+              
+              
               # column link
               cl <- colLinks(x)
+              ct <- colTree(x, whichTree = NULL)
+              if (!missing(whichColTree)) {
+                  ct <- ct[whichColTree]
+                  cnam <- names(ct)
+                  x <- x[, cl$whichTree %in% cnam]
+                  x <- BiocGenerics:::replaceSlots(object = x, 
+                                                   colTree = ct)
+                  cl <- colLinks(x)
+              }
+              
+              if (!missing(whichColTree) |
+                  !missing(colNode)) {
+                  if (!length(ct)) {
+                      warning("The column tree is not available.", 
+                              call. = FALSE)}
+              }
+              
               if (!missing(colNode)) {
                   if (!is.numeric(colNode)) {
-                      colNode <- convertNode(tree = colTree(x), node = colNode)
+                      colNode <- unlist(lapply(ct, convertNode, node = colNode))
                   }
                   x <- x[, which(cl$nodeNum %in% colNode)]
               }
-              return(x)
+             return(x)
           }
 )
 

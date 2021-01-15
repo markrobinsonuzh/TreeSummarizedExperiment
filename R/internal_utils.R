@@ -467,7 +467,17 @@
     
     # 'value' takes the place of the first replaced tree
     # the new list of the tree
-    tr[[namRep[1]]] <- value
+    if (is.null(namRep[[1]])) {
+        if (!is.null(tr)) {
+            stop("TSE doesn't support a row/col to be mapped to multiple trees",
+                 call. = FALSE)
+        }
+        tr <- c(tr, list("phylo" = value))
+        names(tr) <- make.names(names(tr), unique = TRUE)
+    } else {
+        tr[[namRep[1]]] <- value
+    }
+    
     ntr <- tr[!names(tr) %in% namRep[-1]]
     
     # ---------------------------------------------------------------
@@ -475,8 +485,16 @@
     # ---------------------------------------------------------------
     # indicate rows links to the tree to be replaced
     ii <- which(lk$whichTree %in% namRep)
+    if (is.null(lk)) {
+        if (dim == "row") {
+            ii <- seq_len(nrow(x)) 
+        } else {
+            ii <- seq_len(ncol(x)) 
+        }
+    }
+        
     if (is.null(nodeLab)) {
-        olab <- nam[ii]
+        olab <- nam[ii]   
     } else {olab <- nodeLab}
     
     
@@ -499,14 +517,25 @@
     
     # update columns in the link data:
     nlk <- DataFrame(lk)
-    nlk$nodeLab[iRep] <- olab[olab %in% lab]
-    nlk$nodeNum[iRep] <- convertNode(tree = value, node = nlk$nodeLab[iRep])
-    nlk$nodeLab_alias[iRep] <- convertNode(tree = value, 
-                                           node = nlk$nodeNum[iRep], 
-                                           use.alias = TRUE)
-    nlk$isLeaf[iRep] <- isLeaf(tree = value, 
-                               node = nlk$nodeNum[iRep])
-    nlk$whichTree[iRep] <- namRep[1]
+    if (!nrow(nlk)) {
+        nlk <- DataFrame(
+            nodeLab = olab[olab %in% lab],
+            nodeNum = convertNode(tree = value, node = olab[olab %in% lab]))
+        nlk$nodeLab_alias <- convertNode(tree = value, node = nlk$nodeNum, 
+                                         use.alias = TRUE)
+        nlk$isLeaf <- isLeaf(tree = value, node = nlk$nodeNum)
+        nlk$whichTree <- names(ntr)
+    } else {
+        nlk$nodeLab[iRep] <- olab[olab %in% lab]
+        nlk$nodeNum[iRep] <- convertNode(tree = value, node = nlk$nodeLab[iRep])
+        nlk$nodeLab_alias[iRep] <- convertNode(tree = value, 
+                                               node = nlk$nodeNum[iRep], 
+                                               use.alias = TRUE)
+        nlk$isLeaf[iRep] <- isLeaf(tree = value, 
+                                   node = nlk$nodeNum[iRep])
+        nlk$whichTree[iRep] <- namRep[1]
+    }
+    
     
     # drop rows
     if (length(iDrop)) {nlk <- nlk[-iDrop, ]}
