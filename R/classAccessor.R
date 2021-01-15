@@ -38,6 +38,10 @@
 #' @param colNode A vector of nodes that are used to subset columns. One could
 #'   use the node number, the node label or the node alias to specify nodes, but
 #'   not a mixture of them.
+#' @param whichRowTree A numeric indicator or name character to specify which tree
+#'   in the \code{rowTree}.
+#' @param whichColTree A numeric indicator or name character to specify which tree
+#'   in the \code{colTree}.
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}
