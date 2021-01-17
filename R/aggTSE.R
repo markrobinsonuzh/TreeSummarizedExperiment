@@ -18,16 +18,21 @@
 #'   NULL}, and no aggregation is performed.
 #' @param colBlock A column name in the \code{colData} to separate the
 #'   aggregation.
-#' @param FUN A function to be applied on the aggregation. It's similar to the
-#'   \code{FUN} in \code{\link[base]{apply}}.
-#' @param whichAssay A integer scalar or string indicating which assay of \code{x} to
-#'   use in the aggregation. If NULL, all assay tables are used in aggregation.
+#' @param rowFun A function to be applied on the row aggregation. It's similar
+#'   to the \code{FUN} in \code{\link[base]{apply}}.
+#' @param colFun A function to be applied on the col aggregation. It's similar
+#'   to the \code{FUN} in \code{\link[base]{apply}}.
+#' @param whichAssay A integer scalar or string indicating which assay of
+#'   \code{x} to use in the aggregation. If NULL, all assay tables are used in
+#'   aggregation.
 #' @param whichRowTree A integer scalar or string indicating which row tree is
 #'   used in the aggregation. The first row tree is used as default.
 #' @param whichColTree A integer scalar or string indicating which row tree is
 #'   used in the aggregation. The first row tree is used as default.
 #' @param whichRowTree A integer scalar or string indicating which row tree is
 #'   used in the aggregation. The first row tree is used as default.
+#' @param rowDataCols The rowData columns to include.
+#' @param colDataCols The colData columns to include.
 #' @param rowFirst TRUE or FALSE. If the aggregation is in both dims., it is
 #'   performed firstly on the row dim for \code{rowFirst = TRUE} or on the
 #'   column dim for \code{rowFirst = FALSE}.
@@ -84,16 +89,19 @@
 #'                                 metadata = list(test = 1:4))
 #'
 #' aggCol <- aggTSE(x = tse, colLevel = c("GroupA", "GroupB"),
-#'                  FUN = sum)
+#'                  colFun = sum)
 #'
 #' assays(aggCol)[[1]]
 #'
 aggTSE <- function(x, 
                    rowLevel = NULL, rowBlock = NULL, 
                    colLevel = NULL, colBlock = NULL, 
-                   FUN = sum, whichAssay = NULL,
-                   message = FALSE,
+                   rowFun = sum, colFun = sum,
                    whichRowTree = 1, whichColTree = 1,
+                   whichAssay = NULL,
+                   message = FALSE,
+                   rowDataCols,
+                   colDataCols,
                    rowFirst = TRUE, BPPARAM = NULL) {
     ## --------------------- check input before run ---------------------------
     ## x is a TreeSummarizedExperiment
@@ -165,6 +173,12 @@ aggTSE <- function(x,
         }
     }
     
+    if (missing(rowDataCols)) {
+        rowDataCols <- colnames(rowData(x))
+    }
+    if (missing(colDataCols)) {
+        colDataCols <- colnames(colData(x))
+    }
     
     ## The assay tables
     mat <- assays(x)
@@ -174,7 +188,8 @@ aggTSE <- function(x,
     if (rowFirst) {
         x <- .agg_row(x = x, tree = rTree, assayTab = mat,
                       level = unique(rowLevel),
-                      block = rowBlock, FUN = FUN, 
+                      rowDataCols = rowDataCols,
+                      block = rowBlock, FUN = rowFun, 
                       message = message, onRow = onRow,
                       BPPARAM = BPPARAM)
         ## Update the assay tables for the aggregation on the other dim.
@@ -183,7 +198,8 @@ aggTSE <- function(x,
     ## -------------------- aggregation on column dimension ----------------
     x <- .agg_col(x = x, tree = cTree, assayTab = mat,
                   level = unique(colLevel),
-                  block = colBlock, FUN = FUN, 
+                  colDataCols = colDataCols,
+                  block = colBlock, FUN = colFun, 
                   message = message, onCol = onCol,
                   BPPARAM = BPPARAM)
     
@@ -192,7 +208,8 @@ aggTSE <- function(x,
         mat <- assays(x)
         x <- .agg_row(x = x, tree = rTree, assayTab = mat,
                       level = unique(rowLevel),
-                      block = rowBlock, FUN = FUN, 
+                      rowDataCols =rowDataCols,
+                      block = rowBlock, FUN = rowFun, 
                       message = message, onRow = onRow,
                       BPPARAM = BPPARAM)
     }
@@ -203,6 +220,7 @@ aggTSE <- function(x,
 
 
 .agg_row <- function(x, tree, assayTab, level,
+                     rowDataCols,
                      block, FUN, message, onRow, BPPARAM) {
     
     if (onRow) {
@@ -216,18 +234,19 @@ aggTSE <- function(x,
                         assayTab = assayTab,
                         dimData = rD,
                         linkData = rL,
+                        cols = rowDataCols,
                         level = level,
                         block = block,
                         FUN = FUN,
                         message = message,
                         BPPARAM = BPPARAM)
         nrD <- outR$newDD
-        nrD <- nrD[, setdiff(colnames(nrD), "nodeLab")]
+        nrD <- nrD[, setdiff(colnames(nrD), "nodeLab"), drop = FALSE]
         nLab <- outR$newDD$nodeLab
         mat <- outR$dataTab
     } else {
         mat <- assayTab
-        nrD <- rowData(x)
+        nrD <- rowData(x)[, rowDataCols, drop = FALSE]
         if (!is.null(tree)) {
             nLab <- rowLinks(x)$nodeLab
         } else {
@@ -253,6 +272,7 @@ aggTSE <- function(x,
 
 
 .agg_col <- function(x, tree, assayTab, level,
+                     colDataCols,
                      block, FUN, message, onCol,
                      BPPARAM) {
     
@@ -267,18 +287,19 @@ aggTSE <- function(x,
                         assayTab = lapply(assayTab, t),
                         dimData = cD,
                         linkData = cL,
+                        cols = colDataCols,
                         level = level,
                         block = block,
                         FUN = FUN, 
                         message = message,
                         BPPARAM = BPPARAM)
         ncD <- outC$newDD
-        ncD <- ncD[, setdiff(colnames(ncD), "nodeLab")]
+        ncD <- ncD[, setdiff(colnames(ncD), "nodeLab"), drop = FALSE]
         nLab <- outC$newDD$nodeLab
         mat <- lapply(outC$dataTab, t)
     } else {
         mat <- assayTab
-        ncD <- colData(x)
+        ncD <- colData(x)[, colDataCols, drop = FALSE]
         if (!is.null(tree)) {
             nLab <- colLinks(x)$nodeLab
         } else {nLab <- NULL}
@@ -300,6 +321,7 @@ aggTSE <- function(x,
 }
 
 .aggFun <- function(tree, assayTab, dimData, linkData,
+                    cols, 
                     level = NULL, block = NULL, FUN, 
                     message = FALSE, BPPARAM) {
     
@@ -313,6 +335,8 @@ aggTSE <- function(x,
     
     nodeBk <- data.frame(numR, bk, stringsAsFactors = FALSE)
     
+    # dimData
+    dimData <- dimData[, cols, drop = FALSE]
     
     # All node numbers on the tree
     ed <- tree$edge
@@ -382,6 +406,7 @@ aggTSE <- function(x,
     
     assayL <- do.call(rbind, lapply(res, FUN = function(x) {x$new_assays}))
     ll <- lapply(res, FUN = function(x) {x$new_n})
+    ll <- unlist(ll)
     annL <- lapply(res, FUN = function(x) {x$new_dimData})
     
     outR <- vector("list", length(assayTab))
@@ -396,6 +421,7 @@ aggTSE <- function(x,
     # use the same row names as outR
     if (ncol(dimData)) {
         newDD <- do.call(rbind, annL)
+        colnames(newDD) <- cols
     } else {
         newDD <- dimData[rep(1, sum(ll)), , drop = FALSE]
     }
@@ -440,12 +466,12 @@ aggTSE <- function(x,
             }
         })
         ru <- mapply(.rep_df, df = dl, n=li, SIMPLIFY = FALSE)
-        rrd <- do.call(rbind, ru)
+        dimData <- do.call(rbind, ru)
     }
     
     out <- list(new_assays = rax,
                 new_n = sli,
-                new_dimData = rrd)
+                new_dimData = dimData)
     return(out)
 }
 
