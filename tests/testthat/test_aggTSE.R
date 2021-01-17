@@ -41,24 +41,29 @@ test_that("aggTSE works correctly", {
     
     # aggregate on the row dim when one tree in 'rowTree'
     rlev <- printNode(tree = rowTree(tse_a), type = "all")$nodeNum
-    tse_R <- aggTSE(x = tse_a, rowLevel = rlev, FUN = sum)
+    tse_R <- aggTSE(x = tse_a, rowLevel = rlev, rowFun = sum)
     expect_equal(assays(tse_R)[[1]][14, ], 
                  setNames(c(6, 36, 66, 96), paste0("sample", 1:4)))
     
     # aggregate on the row dim when multiple trees in 'rowTree'
     rlev <- printNode(tree = rowTree(tse_ac, whichTree = 1), 
                       type = "all")$nodeNum
-    tse_RR <- aggTSE(x = tse_ac, rowLevel = rlev, FUN = sum, 
+    tse_RR <- aggTSE(x = tse_ac, rowLevel = rlev, rowFun = sum, 
                     whichRowTree = 1)
     expect_equal(dim(tse_RR), c(19, 4))
     expect_equal(assays(tse_RR)[[1]][14, ], 
                  setNames(c(6, 36, 66, 96), paste0("sample", 1:4)))
     expect_equal(tse_RR, tse_R)
+    expect_equal(colnames(rowData(tse_RR)), c("var1", "var2"))
+    
+    tse_RR <- aggTSE(x = tse_ac, rowLevel = rlev, rowFun = sum, 
+                     whichRowTree = 1, rowDataCols = "var1")
+    expect_equal(colnames(rowData(tse_RR)), "var1")
     
     # aggregate on the col dim when one tree in 'colTree'
-    tse_ac <- cbind(tse_a, tse_c)
+    expect_warning(tse_ac <- cbind(tse_a, tse_c))
     clev <- printNode(tree = colTree(tse_a), type = "all")$nodeNum
-    tse_C <- aggTSE(x = tse_a, colLevel = clev, FUN = sum)
+    tse_C <- aggTSE(x = tse_a, colLevel = clev, colFun = sum)
     expect_equal(assays(tse_C)[[1]][, 6], 
                  setNames(seq(from = 33, by = 3, length.out = 10), 
                           paste0("entity", 1:10)))
@@ -66,7 +71,7 @@ test_that("aggTSE works correctly", {
     # aggregate on the col dim when multiple trees in 'colTree'
     clev <- printNode(tree = colTree(tse_ac, whichTree = 1), 
                       type = "all")$nodeNum
-    tse_CC <- aggTSE(x = tse_ac, colLevel = clev, FUN = sum, 
+    tse_CC <- aggTSE(x = tse_ac, colLevel = clev, colFun = sum, 
                      whichColTree = 1)
     expect_equal(dim(tse_CC), c(10, 7))
     expect_equal(assays(tse_CC)[[1]][, 6], 
@@ -74,9 +79,14 @@ test_that("aggTSE works correctly", {
                           paste0("entity", 1:10)))
     expect_equal(tse_CC, tse_C)
     
+    tse_CC <- aggTSE(x = tse_ac, colLevel = clev, colFun = sum, 
+                     whichColTree = 1, colDataCols = c("ID"))
+    expect_equal(colnames(colData(tse_CC)), "ID")
+    
+    
     clev2 <- printNode(tree = colTree(tse_ac, whichTree = 2), 
                       type = "all")$nodeNum
-    tse_CC2 <- aggTSE(x = tse_ac, colLevel = clev2, FUN = sum, 
+    tse_CC2 <- aggTSE(x = tse_ac, colLevel = clev2, colFun = sum, 
                      whichColTree = 2)
     expect_equal(dim(tse_CC2), c(10, 7))
     expect_equal(assays(tse_CC2)[[1]][, 6], 
@@ -88,20 +98,22 @@ test_that("aggTSE works correctly", {
                     type = "internal")$nodeNum
     cl <- printNode(tree = colTree(tse_a, whichTree = 1), 
                     type = "internal")$nodeNum
-    tse_B <- aggTSE(tse_a, rowLevel = rl, colLevel = cl, FUN = sum)
+    tse_B <- aggTSE(tse_a, rowLevel = rl, colLevel = cl, 
+                    rowFun = sum, colFun = sum)
     count <- assays(tse_B)[[1]]
     expect_equal(count[1, 1], sum(assays(tse_a)[[1]]))
     
-    # Use FUN = median, rowFirst = TRUE & rowFirst = FALSE
+    # Use rowFUN = median, rowFirst = TRUE & rowFirst = FALSE
     set.seed(2)
     new_count <- matrix(rnorm(nrow(tse_a)*ncol(tse_a), mean = 10, sd = 2),
                         nrow = nrow(tse_a))
     rownames(new_count) <- rownames(tse_a)
     colnames(new_count) <- colnames(tse_a)
     assays(tse_a)[["new"]] <- new_count
-    tse_RF <- aggTSE(x = tse_a, rowLevel = rl, FUN = median, 
-                     colLevel = cl, rowFirst = TRUE, whichAssay = "new")
-    tse_CF <- aggTSE(x = tse_a, rowLevel = rl, FUN = median, 
+    tse_RF <- aggTSE(x = tse_a, rowLevel = rl, rowFun = median, 
+                     colLevel = cl, colFun = median, 
+                     rowFirst = TRUE, whichAssay = "new")
+    tse_CF <- aggTSE(x = tse_a, rowLevel = rl, rowFun = median, 
                      colLevel = cl, rowFirst = FALSE, whichAssay = "new")
     
     expect_false(identical(assays(tse_RF)[[1]], assays(tse_CF)[[1]]))
@@ -120,9 +132,6 @@ test_that("aggTSE works correctly", {
                      BPPARAM = BiocParallel::MulticoreParam(workers = 2, 
                                                             progressbar = TRUE))
     expect_equal(tse_D, tse_DD)
-    
-    
-    
 })
 
 

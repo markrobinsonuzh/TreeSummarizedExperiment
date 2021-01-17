@@ -10,11 +10,14 @@ aggTSE(
   rowBlock = NULL,
   colLevel = NULL,
   colBlock = NULL,
-  FUN = sum,
-  whichAssay = NULL,
-  message = FALSE,
+  rowFun = sum,
+  colFun = sum,
   whichRowTree = 1,
   whichColTree = 1,
+  whichAssay = NULL,
+  message = FALSE,
+  rowDataCols,
+  colDataCols,
   rowFirst = TRUE,
   BPPARAM = NULL
 )
@@ -38,20 +41,28 @@ NULL}, and no aggregation is performed.}
 \item{colBlock}{A column name in the \code{colData} to separate the
 aggregation.}
 
-\item{FUN}{A function to be applied on the aggregation. It's similar to the
-\code{FUN} in \code{\link[base]{apply}}.}
+\item{rowFun}{A function to be applied on the row aggregation. It's similar
+to the \code{FUN} in \code{\link[base]{apply}}.}
 
-\item{whichAssay}{A integer scalar or string indicating which assay of \code{x} to
-use in the aggregation. If NULL, all assay tables are used in aggregation.}
-
-\item{message}{A logical value. The default is TRUE. If TRUE, it will print
-out the running process.}
+\item{colFun}{A function to be applied on the col aggregation. It's similar
+to the \code{FUN} in \code{\link[base]{apply}}.}
 
 \item{whichRowTree}{A integer scalar or string indicating which row tree is
 used in the aggregation. The first row tree is used as default.}
 
 \item{whichColTree}{A integer scalar or string indicating which row tree is
 used in the aggregation. The first row tree is used as default.}
+
+\item{whichAssay}{A integer scalar or string indicating which assay of
+\code{x} to use in the aggregation. If NULL, all assay tables are used in
+aggregation.}
+
+\item{message}{A logical value. The default is TRUE. If TRUE, it will print
+out the running process.}
+
+\item{rowDataCols}{The rowData columns to include.}
+
+\item{colDataCols}{The colData columns to include.}
 
 \item{rowFirst}{TRUE or FALSE. If the aggregation is in both dims., it is
 performed firstly on the row dim for \code{rowFirst = TRUE} or on the
@@ -111,7 +122,7 @@ tse <- TreeSummarizedExperiment(assays = list(toyTable),
                                 metadata = list(test = 1:4))
 
 aggCol <- aggTSE(x = tse, colLevel = c("GroupA", "GroupB"),
-                 FUN = sum)
+                 colFun = sum)
 
 assays(aggCol)[[1]]
 
