@@ -1,0 +1,190 @@
+---
+title: "Combine TreeSummarizedExperiment objects"
+author: 
+- name: Ruizhu HUANG
+  affiliation: 
+  - Institute of Molecular Life Sciences, University of Zurich.
+  - SIB Swiss Institute of Bioinformatics.
+- name: Charlotte Soneson
+  affiliation: 
+  - Institute of Molecular Life Sciences, University of Zurich.
+  - SIB Swiss Institute of Bioinformatics.
+- name: Mark Robinson
+  affiliation: 
+  - Institute of Molecular Life Sciences, University of Zurich.
+  - SIB Swiss Institute of Bioinformatics.
+package: TreeSummarizedExperiment
+output: 
+  BiocStyle::html_document
+vignette: >
+  %\VignetteIndexEntry{Combine TSEs}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+bibliography: TreeSE_vignette.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE)
+```
+
+
+# Combine multiple `TreeSummarizedExperiment` objects 
+
+Multiple `TreeSummarizedExperiemnt` objects (**TSE**) can be combined by using `rbind` or `cbind`. 
+Here, we create a toy `TreeSummarizedExperiment` object using `makeTSE()`. As the tree in the row/column tree slot is generated randomly using `ape::rtree()`, `set.seed()` is used to create reproducible results.
+
+```{r}
+library(TreeSummarizedExperiment)
+
+set.seed(1)
+# TSE: without the column tree
+(tse_a <- makeTSE(include.colTree = FALSE))
+
+# combine two TSEs by row
+(tse_aa <- rbind(tse_a, tse_a))
+```
+The generated `tse_aa` has 20 rows, which is two times of that in `tse_a`. The row tree in `tse_aa` is the same as that in `tse_a`.
+
+```{r}
+identical(rowTree(tse_aa), rowTree(tse_a))
+```
+
+If we `rbind` two TSEs (e.g., `tse_a` and `tse_b`) that have different row trees, the obtained TSE (e.g., `tse_ab`) will have two row trees. 
+```{r}
+set.seed(2)
+tse_b <- makeTSE(include.colTree = FALSE)
+
+# different row trees
+identical(rowTree(tse_a), rowTree(tse_b))
+
+# 2 phylo tree(s) in rowTree
+(tse_ab <- rbind(tse_a, tse_b))
+```
+
+In the row link data, the `whichTree` column gives information about which tree the row is mapped to.
+For `tse_aa`, there is only one tree named as `phylo`. However, for `tse_ab`, there are two trees (`phylo` and `phylo.1`).
+```{r}
+rowLinks(tse_aa)
+rowLinks(tse_ab)
+```
+
+The name of trees can be accessed using `rowTreeNames`. If the input **TSE**s use the same name for trees, `rbind` will automatically create valid and unique names for trees by using `make.names`. `tse_a` and `tse_b` both use `phylo` as the name of their row trees. In `tse_ab`, the row tree that originates from `tse_b` is named as `phylo.1` instead.
+```{r}
+rowTreeNames(tse_aa)
+rowTreeNames(tse_ab)
+
+# The original tree names in the input TSEs
+rowTreeNames(tse_a)
+rowTreeNames(tse_b)
+```
+
+Once the name of trees is changed, the column `whichTree` in the `rowLinks()` is updated accordingly.
+```{r}
+rowTreeNames(tse_ab) <- paste0("tree", 1:2)
+rowLinks(tse_ab)
+```
+
+To run `cbind`, **TSE**s should agree in the row dimension. If **TSE**s only differ in the row tree, the row tree and the row link data are dropped.
+```{r}
+cbind(tse_a, tse_a)
+cbind(tse_a, tse_b)
+```
+
+
+# Subset a **TSE** object
+
+We obtain a subset of `tse_ab` by extracting the data on rows `11:15`. These rows are mapped to the same tree named as `phylo.1`. So, the `rowTree` slot of `sse` has only one tree.
+```{r}
+(sse <- tse_ab[11:15, ])
+rowLinks(sse)
+```
+
+`[` works not only as a getter but also a setter to replace a subset of `sse`.
+```{r}
+set.seed(3)
+tse_c <- makeTSE(include.colTree = FALSE)
+rowTreeNames(tse_c) <- "new_tree"
+
+# the first two rows are from tse_c, and are mapped to 'new_tree'
+sse[1:2, ] <- tse_c[5:6, ]
+rowLinks(sse)
+```
+
+The **TSE** object can be subset also by nodes or/and trees using `subsetByNodes`
+```{r}
+# by tree
+sse_a <- subsetByNode(x = sse, whichRowTree = "new_tree")
+rowLinks(sse_a)
+
+# by node
+sse_b <- subsetByNode(x = sse, rowNode = 5)
+rowLinks(sse_b)
+
+# by tree and node
+sse_c <- subsetByNode(x = sse, rowNode = 5, whichRowTree = "tree2")
+rowLinks(sse_c)
+```
+
+# Change specific trees of **TSE**
+
+By using `colTree`, we can add a column tree to `sse` that has no column tree before.
+```{r}
+colTree(sse)
+
+library(ape)
+set.seed(1)
+col_tree <- rtree(ncol(sse))
+
+# To use 'colTree` as a setter, the input tree should have node labels matching
+# with column names of the TSE.
+col_tree$tip.label <- colnames(sse)
+
+colTree(sse) <- col_tree
+colTree(sse)
+```
+
+`sse` has two row trees. We can replace one of them with a new tree by
+specifying `whichTree` of the `rowTree`.
+```{r}
+# the original row links
+rowLinks(sse)
+
+# the new row tree
+set.seed(1)
+row_tree <- rtree(4)
+row_tree$tip.label <- paste0("entity", 5:7)
+
+# replace the tree named as the 'new_tree'
+nse <- sse
+rowTree(nse, whichTree = "new_tree") <- row_tree
+rowLinks(nse)
+```
+
+
+In the row links, the first two rows now have new values in `nodeNum` and
+`nodeLab_alias`. The name in `whichTree` is not changed but the tree is actually
+updated.
+
+```{r}
+# FALSE is expected
+identical(rowTree(sse, whichTree = "new_tree"),
+          rowTree(nse, whichTree = "new_tree"))
+
+# TRUE is expected
+identical(rowTree(nse, whichTree = "new_tree"),
+          row_tree)
+```
+
+If nodes of the input tree and rows of the **TSE** are named differently, users
+can match rows with nodes via `changeTree` with `rowNodeLab` provided.
+
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+# Reference
