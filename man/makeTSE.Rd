@@ -2,7 +2,7 @@
 % Please edit documentation in R/makeTSE.R
 \name{makeTSE}
 \alias{makeTSE}
-\title{A toy TreeSummarizedExperiment}
+\title{A toy TreeSummarizedExperiment object}
 \usage{
 makeTSE(nrow = 10, ncol = 4, include.rowTree = TRUE, include.colTree = TRUE)
 }
@@ -25,7 +25,18 @@ makeTSE(nrow = 10, ncol = 4, include.rowTree = TRUE, include.colTree = TRUE)
 A TreeSummarizedExperiment object
 }
 \description{
-\code{makeTSE} creates a toy TreeSummarizedExperiment
+\code{makeTSE} creates a toy TreeSummarizedExperiment object.
+}
+\details{
+The \code{assays} contains a matrix with values from
+  \code{1:(nrow*ncol)}. The \code{rowData} has two columns, \code{var1} and
+  \code{var2}. \code{var1} is created with \code{rep_len(letters, nrow)}.
+  \code{var2} is created with \code{rep_len(c(TRUE, FALSE), nrow)}. The
+  \code{colData} has two columns, \code{ID} and \code{group}. \code{ID} is
+  created with \code{seq_len(ncol)}. \code{group} is created with
+  \code{rep_len(LETTERS[1:2], ncol)}. The row/col tree is generated with
+  \code{ape::rtree()}. So, to generate reproducible trees, \code{set.seed()}
+  is required.
 }
 \examples{
 

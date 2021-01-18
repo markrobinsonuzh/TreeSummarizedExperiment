@@ -1,6 +1,6 @@
-#' A toy TreeSummarizedExperiment
+#' A toy TreeSummarizedExperiment object
 #' 
-#' \code{makeTSE} creates a toy TreeSummarizedExperiment
+#' \code{makeTSE} creates a toy TreeSummarizedExperiment object. 
 #' 
 #' @param include.rowTree TRUE or FALSE. Default is TRUE, so the output
 #'   \code{TreeSummarizedExperiment} has a \code{phylo} object in
@@ -15,6 +15,15 @@
 #' @importFrom ape rtree
 #' @export
 #' @return A TreeSummarizedExperiment object
+#' @details The \code{assays} contains a matrix with values from
+#'   \code{1:(nrow*ncol)}. The \code{rowData} has two columns, \code{var1} and
+#'   \code{var2}. \code{var1} is created with \code{rep_len(letters, nrow)}.
+#'   \code{var2} is created with \code{rep_len(c(TRUE, FALSE), nrow)}. The
+#'   \code{colData} has two columns, \code{ID} and \code{group}. \code{ID} is
+#'   created with \code{seq_len(ncol)}. \code{group} is created with
+#'   \code{rep_len(LETTERS[1:2], ncol)}. The row/col tree is generated with
+#'   \code{ape::rtree()}. So, to generate reproducible trees, \code{set.seed()}
+#'   is required.
 #' @author Ruizhu Huang
 #' @examples 
 #' 
