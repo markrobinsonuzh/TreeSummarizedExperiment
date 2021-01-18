@@ -32,8 +32,11 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE)
 
 # Combine multiple `TreeSummarizedExperiment` objects 
 
-Multiple `TreeSummarizedExperiemnt` objects (**TSE**) can be combined by using `rbind` or `cbind`. 
-Here, we create a toy `TreeSummarizedExperiment` object using `makeTSE()`. As the tree in the row/column tree slot is generated randomly using `ape::rtree()`, `set.seed()` is used to create reproducible results.
+Multiple `TreeSummarizedExperiemnt` objects (**TSE**) can be combined by using
+`rbind` or `cbind`. Here, we create a toy `TreeSummarizedExperiment` object
+using `makeTSE()` (see `?makeTSE()`). As the tree in the row/column tree slot is
+generated randomly using `ape::rtree()`, `set.seed()` is used to create
+reproducible results.
 
 ```{r}
 library(TreeSummarizedExperiment)
