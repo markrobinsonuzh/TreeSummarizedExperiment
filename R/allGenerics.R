@@ -245,9 +245,9 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
               }
               
               nnx <- .bind_link_tree(x = nx, args = args,
-                                        drop.rowLinks = drop.rowLinks,
-                                        drop.colLinks = drop.colLinks,
-                                        bind = "rbind")
+                                     drop.rowLinks = drop.rowLinks,
+                                     drop.colLinks = drop.colLinks,
+                                     bind = "rbind")
               
               # rbind on the referenceSeq slot
               refSeq <- .rbind_refSeq(args)

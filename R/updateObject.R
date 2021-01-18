@@ -31,6 +31,37 @@ setMethod("updateObject", "TreeSummarizedExperiment",
             }
             object@referenceSeq <- NULL
         }
+        
+        # the row links
+        if (.lack_whichTree(object, "rowLinks")) {
+            lk <- DataFrame(rowLinks(object))
+            nam <- rowTreeNames(object)
+            if (length(nam) > 1) {
+                stop("Multiple trees are detected.",
+                     " Don't know how to update the TSE object",
+                     call. = FALSE)
+            }
+            lk$whichTree <- nam
+            nlk <- as(lk, "LinkDataFrame")
+           object <- BiocGenerics:::replaceSlots(object,
+                                                 rowLinks = nlk) 
+        }
+        
+        # the col links
+        if (.lack_whichTree(object, "colLinks")) {
+            lk <- DataFrame(colLinks(object))
+            nam <- colTreeNames(object)
+            if (length(nam) > 1) {
+                stop("Multiple trees are detected.",
+                     " Don't know how to update the TSE object",
+                     call. = FALSE)
+            }
+            lk$whichTree <- nam
+            nlk <- as(lk, "LinkDataFrame")
+            object <- BiocGenerics:::replaceSlots(object,
+                                                  colLinks = nlk) 
+        }
+        
         object
     }
 )
