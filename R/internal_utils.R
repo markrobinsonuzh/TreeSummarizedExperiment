@@ -547,8 +547,13 @@
     
 }
 
-
-
-
+# This is to update old TSE objects saved using version older than 1.6.3.
+# check whether the rowLinks/colLinks has the 'whichTree' column.
+.lack_whichTree <- function(object, slot) {
+    if (slot == "rowLinks") {lk <- rowLinks(object)}
+    if (slot == "colLinks") {lk <- colLinks(object)}
+    if (is.null(lk)) {return(FALSE)}
+    is.null(lk$whichTree)
+}
 
 
