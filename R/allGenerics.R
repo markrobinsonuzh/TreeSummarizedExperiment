@@ -57,6 +57,13 @@ setGeneric("rowTree<-", function(x, whichTree = 1, value)
 #' @export
 setMethod("rowTree<-", signature("TreeSummarizedExperiment"),
           function(x, whichTree = 1, value) {
+              if (is.null(value)) {
+                  out <- BiocGenerics:::replaceSlots(x, 
+                                                     rowTree = NULL, 
+                                                     rowLinks = NULL)
+                  return(out)
+              }
+              
               # 1) replace specified trees (e.g., whichTree = 1) 
               # 2) replace all trees (whichTree = NULL)
               
@@ -107,6 +114,14 @@ setGeneric("colTree<-", function(x, whichTree = 1, value)
 #' @export
 setMethod("colTree<-", signature("TreeSummarizedExperiment"),
           function(x, whichTree = 1, value) {
+              
+              if (is.null(value)) {
+                  out <- BiocGenerics:::replaceSlots(x, 
+                                                     colTree = NULL, 
+                                                     colLinks = NULL)
+                  return(out)
+              }
+              
               # 1) replace specified trees (e.g., whichTree = 1) 
               # 2) replace all trees (whichTree = NULL)
               
