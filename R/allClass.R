@@ -242,19 +242,19 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
 
     if (!is.null(rowNodeLab)) {
         if (!is.character(rowNodeLab)) {
-            stop("rowNodeLab should be a character vector")
+            stop("rowNodeLab should be a character vector", call. = FALSE)
         }
         if (is.null(rowTree)) {
-            stop("rowTree is not available")
+            stop("rowTree is not available", call. = FALSE)
         }
     }
 
     if (!is.null(colNodeLab)) {
         if (!is.character(colNodeLab)) {
-            stop("colNodeLab should be a character vector")
+            stop("colNodeLab should be a character vector", call. = FALSE)
         }
         if (is.null(colTree)) {
-            stop("colTree is not available")
+            stop("colTree is not available", call. = FALSE)
         }
     }
 
@@ -279,28 +279,32 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     if (isRow) {
         # the tree should be a phylo object
         if(!is(rowTree, "phylo")) {
-            stop("A phylo object is required for the rowTree", "\n")
+            stop("A phylo object is required for the rowTree", "\n",
+                 call. = FALSE)
         }
 
         # the tree should have unique leaf labels
         tipLab <- rowTree$tip.label
         anyDp <- any(duplicated(tipLab))
         if (anyDp) {
-            stop("rowTree should have unique leaf labels. \n")
+            stop("rowTree should have unique leaf labels. \n",
+                 call. = FALSE)
         }
     }
 
     if (isCol) {
         # the tree should be a phylo object
         if(!is(colTree, "phylo")) {
-            stop("A phylo object is required for the colTree", "\n")
+            stop("A phylo object is required for the colTree", "\n",
+                 call. = FALSE)
         }
 
         # the tree should have unique leaf labels
         tipLab <- colTree$tip.label
         anyDp <- any(duplicated(tipLab))
         if (anyDp) {
-            stop("colTree should have unique leaf labels. \n")
+            stop("colTree should have unique leaf labels. \n",
+                 call. = FALSE)
         }
     }
 
@@ -366,7 +370,7 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     if (is.null(lab)) {
         lab <- rownames(annDat)
         if (is.null(lab)) {
-            stop(kw, "NodeLab should be provided. \n")}
+            stop(kw, "NodeLab should be provided. \n", call. = FALSE)}
         }
 
     # decide whether treeLab or treeLab_alias should be used
@@ -376,7 +380,8 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     sw2 <- startsWith(treeLab, "alias_")
     notALL <- !all(sw2)
     if (any(sw2, na.rm = TRUE) & notALL) {
-        warning("The tree has some node labels starting with 'alias_'. ")
+        warning("The tree has some node labels starting with 'alias_'. ",
+                call. = FALSE)
     }
 
     # Match lab with the alias of the node labels on the tree
@@ -392,7 +397,8 @@ TreeSummarizedExperiment <- function(..., rowTree = NULL, colTree = NULL,
     isOut <- !isIn
     if (sum(isOut) > 0) {
         warning(sum(isOut), " ", kw,
-                "(s) couldn't be matched to the tree and are/is removed. \n")}
+                "(s) couldn't be matched to the tree and are/is removed. \n",
+                call. = FALSE)}
 
     if (onRow) {
         sce <- sce[isIn, ]

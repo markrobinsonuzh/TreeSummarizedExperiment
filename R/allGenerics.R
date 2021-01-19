@@ -247,7 +247,8 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
               isEq <- .is_equal_link(args, dim = "col")
               if (!isEq) {
                   warning("colTree & colLinks differ in the provided TSEs.",
-                          "\n colTree & colLinks are dropped after 'rbind'")
+                          "\n colTree & colLinks are dropped after 'rbind'", 
+                          call. = FALSE)
                   drop.colLinks <- TRUE
               }
               
@@ -255,7 +256,8 @@ setMethod("rbind", signature = "TreeSummarizedExperiment",
               tList <- lapply(args, rowTree, whichTree = NULL)
               if (.any_null_in_list(tList) & !.all_null_in_list(tList)) {
                   warning("rowTree should be all NULL or non-NULL in TSEs.",
-                          "\n rowTree & rowLinks are dropped after 'rbind'")
+                          "\n rowTree & rowLinks are dropped after 'rbind'",
+                          call. = FALSE)
                   drop.rowLinks <- TRUE
               }
               
