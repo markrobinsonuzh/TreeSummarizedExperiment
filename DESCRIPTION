@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment: a S4 Class for Data with Tree Structures 
-Version: 1.99.5
+Version: 1.99.6
 Date: 2021-01-01
 Authors@R: 
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
@@ -64,11 +64,11 @@ Collate:
     'tree_findDescendant.R'
     'tree_findSibling.R'
     'tree_isLeaf.R'
+    'tree_joinNode.R'
     'tree_matTree.R'
     'tree_printNode.R'
     'tree_shareNode.R'
     'tree_showNode.R'
-    'tree_signalNode.R'
     'tree_toTree.R'
     'tree_trackNode.R'
     'tree_unionLeaf.R'

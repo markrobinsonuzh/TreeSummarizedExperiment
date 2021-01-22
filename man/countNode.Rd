@@ -21,12 +21,12 @@ library(ggtree)
 data(tinyTree)
 
 ggtree(tinyTree, branch.length = 'none') +
-geom_text2(aes(label = label), hjust = -0.3) +
-geom_text2(aes(label = node), vjust = -0.8,
-hjust = -0.3, color = 'blue')
+       geom_text2(aes(label = label), hjust = -0.3) +
+       geom_text2(aes(label = node), vjust = -0.8,
+       hjust = -0.3, color = 'blue')
 
 
-(n <- countLeaf(tinyTree))
+(n <- countNode(tinyTree))
 
 }
 \author{

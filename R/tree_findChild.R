@@ -35,11 +35,11 @@
 findChild <- function(tree, node = 11, use.alias = FALSE) {
     
     if (!is(tree, "phylo")) {
-        stop("tree requires a phylo object. \n")
+        stop("tree requires a phylo object.", call. = FALSE)
     }
     
     if (is.factor(node)) {
-        stop("node requires character or numeric.")
+        stop("node requires character or numeric.", call. = FALSE)
     }
     
     if (is.character(node)) {

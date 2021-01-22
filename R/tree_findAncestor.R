@@ -33,11 +33,11 @@ findAncestor <- function(tree, node, level,
                          use.alias = FALSE) {
 
     if (!inherits(tree, "phylo")) {
-        stop("tree: should be a phylo object")
+        stop("tree: should be a phylo object", call. = FALSE)
     }
 
     if (!length(node)) {
-        stop("Please provide at least one node on the tree.")
+        stop("Please provide at least one node on the tree.", call. = FALSE)
     }
     # convert a tree to a matrix
     # each row is a path connecting the root and a leaf
@@ -56,7 +56,8 @@ findAncestor <- function(tree, node, level,
         if (length(level) == length(node)) {
             level <- level
         } else {
-            stop("the length of level is not equal to the length of node")
+            stop("the length of level is not equal to the length of node",
+                 call. = FALSE)
         }
     }
 

@@ -44,8 +44,9 @@ convertNode <- function(tree, node, use.alias = FALSE,
 
     if (is.factor(node)) {
         node <- as.character(node)
-        warning("node: factor is converted to character")
-        warning("The input 'node' is considered as labels of nodes.")
+        warning("node: factor is converted to character", call. = FALSE)
+        warning("The input 'node' is considered as labels of nodes.", 
+                call. = FALSE)
     }
     # node number & tip number
     mat <- tree$edge
@@ -58,7 +59,7 @@ convertNode <- function(tree, node, use.alias = FALSE,
     if (!is.null(tree$node.label)) {
         if (length(tree$node.label) != length(nodI)) {
             stop("The length of internal node label isn't equal to
-                 the length of the internal nodes. \n")
+                 the length of the internal nodes. \n", call. = FALSE)
         }
         }
 
@@ -67,8 +68,8 @@ convertNode <- function(tree, node, use.alias = FALSE,
     nodeLab_alias <- paste("alias_", c(tip, nodI), sep = "")
     
     if (any(duplicated(nodeLab))) {
-        warnings("Multiple nodes use the same label or
-                have no label.\n")
+        warning("Multiple nodes use the same label or
+                have no label.\n", call. = FALSE )
         }
         
 
@@ -77,7 +78,7 @@ convertNode <- function(tree, node, use.alias = FALSE,
         if (!all(node %in% nodeA)) {
             stop("The node number ", node[!node %in% nodeA],
                  " can't be found in the ",
-                 deparse(substitute(tree)), "\n")
+                 deparse(substitute(tree)), call. = FALSE)
         }
     }
     # check whether the input label exists in the provided tree
@@ -88,10 +89,11 @@ convertNode <- function(tree, node, use.alias = FALSE,
         if (!any(inLab, inAlias)) {
             wrongNode <- setdiff(node, nodeLab)
             if (any(startsWith(wrongNode, "alias_"))) {
-                message("Not allowed to mix using node labels and alias labels")
+                message("Not allowed to mix using node labels and alias labels",
+                        call. = FALSE)
             }
             stop(length(wrongNode), " nodes mismatch with the tree: ",
-                    head(wrongNode), " ...")
+                    head(wrongNode), " ...", call. = FALSE)
             
 
         }

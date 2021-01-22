@@ -26,7 +26,7 @@
 distNode <- function(tree, node) {
     
     if (!inherits(tree, "phylo")) {
-        stop("tree: should be a phylo object. \n")
+        stop("tree: should be a phylo object.", call. = FALSE)
     }
     
     if (is.character(node)) {
