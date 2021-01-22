@@ -14,4 +14,6 @@ test_that("joinNode works properly", {
     expect_join_equal(node = c(5, 10), c("t4" = 5, "t3" = 10))
     expect_error(joinNode(node = c('t4','t9', 't11'), tree = tinyTree,
                            use.alias = FALSE))
+    expect_warning(signalNode(node = 4:5, tree = tinyTree),
+                   "'signalNode' is deprecated.")
 })
