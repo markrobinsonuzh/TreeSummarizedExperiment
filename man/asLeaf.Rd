@@ -28,7 +28,7 @@ ggtree(tinyTree, ladderize = FALSE) +
            hjust = -0.1, vjust = -0.7) +
     geom_text2(aes(label = node), color = "darkblue",
                hjust = -0.5, vjust = 0.7) +
-    geom_hilight(node = 18) +
+    geom_hilight(node = 16) +
     geom_point2()
 
 # remove the blue branch
@@ -41,9 +41,7 @@ ggtree(NT1, ladderize = FALSE) +
 
 # if mergeSingle = TRUE, the node (Node_17) is removed.
 NT2 <- asLeaf(tree = tinyTree, node = c(15, 13))
-# or use the ape::drop.tip
-# NT3 <-  ape::drop.tip(phy = tinyTree, tip = 4:5)
-# all.equal(NT2, NT3)
+
 
 ggtree(NT2, ladderize = FALSE) +
     geom_text2(aes(label = label), color = "darkorange",
