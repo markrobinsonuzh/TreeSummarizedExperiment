@@ -4,21 +4,24 @@
 \alias{addLabel}
 \title{add labels to nodes of a tree}
 \usage{
-addLabel(tree, label = NULL)
+addLabel(tree, label = NULL, on = c("all", "leaf", "internal"))
 }
 \arguments{
 \item{tree}{A phylo object}
 
-\item{label}{A character vector as the label of tree. The label is passed to
+\item{label}{A character vector to provide node labels. The label is passed to
 nodes that are sorted by their node number in ascending order. The default
-is NULL, and nodes are labeled by using their node numbers (convert node
-numbers from numeric values to characters)}
+is NULL, nodes are labeled by adding a prefix \code{Node_} to their node number.}
+
+\item{on}{Chosen from "all", "leaf", "internal". If "all", all nodes are
+labeled; if "leaf", leaves are labeled; if "internal", internal nodes are
+labeled.}
 }
 \value{
 a phylo object
 }
 \description{
-\code{addLabel} adds labels to the node of a tree (\code{phylo} object)
+\code{addLabel} label nodes of a tree (\code{phylo} object)
 }
 \examples{
  
@@ -27,7 +30,7 @@ library(ggtree)
 
 # PLOT tree
 # The node labels are in orange texts and the node numbers are in blue
-ggtree(tinyTree,branch.length = 'none')+
+ggtree(tinyTree, branch.length = 'none')+
     geom_text2(aes(label = label), color = "darkorange",
            hjust = -0.1, vjust = -0.7) +
     geom_text2(aes(label = node), color = "darkblue",
@@ -35,7 +38,8 @@ ggtree(tinyTree,branch.length = 'none')+
 
 # change labels
 nodes <- showNode(tree = tinyTree, only.leaf = FALSE)
-tt <- addLabel(tree = tinyTree, label = LETTERS[nodes])
+tt <- addLabel(tree = tinyTree, label = LETTERS[nodes],
+               on = "all")
 
 ggtree(tt, branch.length = 'none')+
     geom_text2(aes(label = label), color = "darkorange",

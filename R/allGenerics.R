@@ -368,6 +368,7 @@ setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
     }
 )
 
+#' @importFrom IRanges relist
 .set_referenceSeq <- function(x, value){
     if(is(value,"DNAStringSetList")){
         value <- relist(unname(unlist(value)),value)
