@@ -328,7 +328,17 @@ setGeneric("referenceSeq", signature = c("x"),
 #' @export
 setMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
     function(x){
-        x@referenceSeq
+        seq <- x@referenceSeq
+        if(!is.null(seq)){
+            if(is(seq,"DNAStringSetList")){
+                seq_u <- unlist(seq)
+                names(seq_u) <- unlist(rep(rownames(x),length(seq)))
+                seq <- relist(seq_u,seq)
+            } else {
+                names(seq) <- rownames(x)
+            }
+        }
+        seq
     }
 )
 
@@ -343,14 +353,14 @@ setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
     function(x, value){
         x <- updateObject(x)
         if(is.null(value)){
-         value <- value
+            value <- value
         } else if(!is(value,"DNAStringSet") &&
                !is.list(value) &&
                !is(value,"DNAStringSetList")){
-         value <- as(value,"DNAStringSet")
+            value <- as(value,"DNAStringSet")
         } else if(!is(value,"DNAStringSetList") &&
                is.list(value)){
-         value <- DNAStringSetList(value)
+            value <- DNAStringSetList(value)
         }
         x <- .set_referenceSeq(x, value)
         validObject(x)
@@ -359,6 +369,11 @@ setReplaceMethod("referenceSeq", signature = c(x = "TreeSummarizedExperiment"),
 )
 
 .set_referenceSeq <- function(x, value){
+    if(is(value,"DNAStringSetList")){
+        value <- relist(unname(unlist(value)),value)
+    } else {
+        value <- unname(value)
+    }
     x@referenceSeq <- value
     x
 }

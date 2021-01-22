@@ -189,6 +189,8 @@ test_that("other accessors/setters work", {
     referenceSeq(tse) <- as.character(refSeq[[1L]])
     expect_s4_class(referenceSeq(tse),"DNAStringSet")
     
-   
-    })
-
+    expect_true(all(rownames(tse) == names(referenceSeq(tse))))
+    rownames(tse) <- NULL
+    expect_true(is.null(names(referenceSeq(tse))))
+    
+})
