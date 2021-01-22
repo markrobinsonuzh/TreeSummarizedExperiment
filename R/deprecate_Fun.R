@@ -22,6 +22,12 @@ transNode <- function(tree, node, use.alias = FALSE,
                 message = message)
 }
 
+#' @rdname joinNode
+#' @export
+signalNode <- function(tree, node, use.alias = FALSE){
+    .Deprecated("joinNode")
+    joinNode(tree = tree, node = node, use.alias = use.alias)
+}
 
 #' Perform data aggregations based on the available tree structures
 #'

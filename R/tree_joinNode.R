@@ -1,8 +1,8 @@
 #' find the optimal nodes to short result.
 #'
-#' \code{signalNode} is to represent some nodes with their ancestor to make
-#' result as short as possible. The ancestors share exactly the same leaves as
-#' the original nodes.
+#' \code{joinNode} is to use as few as possible nodes to represent the provided
+#' nodes so that descendant leaves covered by the input nodes and output nodes
+#' are exactly the same.
 #'
 #' @param tree A tree (phylo object)
 #' @param node A vector of node numbers or node labels
@@ -30,20 +30,20 @@
 #'                hjust = -0.5, vjust = 0.7)
 #'
 #' ## find the node shared by provided node labels
-#' signalNode(node = c('t4','t9'), tree = tinyTree)
-#' signalNode(node = c('t4','t9'), tree = tinyTree)
-#' signalNode(node = c('t10','Node_18', 't8'), tree = tinyTree,
-#'  use.alias = FALSE)
-#' signalNode(node = c('t10','Node_18', 't8'), tree = tinyTree,
-#'  use.alias = TRUE)
+#' joinNode(node = c('t4','t9'), tree = tinyTree)
+#' joinNode(node = c('t4','t9'), tree = tinyTree)
+#' joinNode(node = c('t10','Node_18', 't8'), 
+#'          tree = tinyTree,
+#'          use.alias = FALSE)
+#' joinNode(node = c('t10','Node_18', 't8'), 
+#'          tree = tinyTree,
+#'          use.alias = TRUE)
 #'
 #' ## find the node shared by provided node numbers
-#' signalNode(node = c(2, 3), tree = tinyTree)
-#' signalNode(node = c(2, 3, 16), tree = tinyTree)
+#' joinNode(node = c(2, 3), tree = tinyTree)
+#' joinNode(node = c(2, 3, 16), tree = tinyTree)
 #'
-
-signalNode <- function(tree, node,
-                       use.alias = FALSE) {
+joinNode <- function(tree, node, use.alias = FALSE) {
 
     if (!inherits(tree, "phylo")) {
         stop("tree is not a phylo object.")
