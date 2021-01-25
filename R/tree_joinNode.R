@@ -1,4 +1,4 @@
-#' find the optimal nodes to short result.
+#' Join nodes
 #'
 #' \code{joinNode} is to use as few as possible nodes to represent the provided
 #' nodes so that descendant leaves covered by the input nodes and output nodes

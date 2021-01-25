@@ -3,7 +3,7 @@
 \name{signalNode}
 \alias{signalNode}
 \alias{joinNode}
-\title{find the optimal nodes to short result.}
+\title{Join nodes.}
 \usage{
 signalNode(tree, node, use.alias = FALSE)
 

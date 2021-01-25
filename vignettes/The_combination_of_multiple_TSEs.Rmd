@@ -17,7 +17,7 @@ package: TreeSummarizedExperiment
 output: 
   BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{Combine TSEs}
+  %\VignetteIndexEntry{2. Combine TSEs}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
