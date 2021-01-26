@@ -3,7 +3,7 @@
 \name{signalNode}
 \alias{signalNode}
 \alias{joinNode}
-\title{Join nodes.}
+\title{Join nodes}
 \usage{
 signalNode(tree, node, use.alias = FALSE)
 

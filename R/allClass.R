@@ -145,6 +145,7 @@ setClass("TreeSummarizedExperiment",
          prototype = list(referenceSeq = NULL))
 
 #' @rdname TreeSummarizedExperiment-internal
+#' @importMethodsFrom S4Vectors vertical_slot_names
 #' @export
 setMethod("vertical_slot_names", "TreeSummarizedExperiment",
           function(x) c("referenceSeq", callNextMethod())
