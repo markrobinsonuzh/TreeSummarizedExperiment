@@ -13,7 +13,17 @@ new_tree1$tip.label <- rownames(tse_a)
 new_tree2 <- ape::rtree(n/2)
 new_tree2$tip.label <- rownames(tse_a)[seq_len(n/2)]
 
+
+tse_o <- makeTSE(nrow = n, include.colTree = FALSE, include.rowTree = FALSE)
+tree_o <- ape::rtree(n+2)
+tree_o$tip.label[seq_len(n/2)] <- rownames(tse_o)[seq_len(n/2)]
+
+
 test_that("Repace the row tree successfully", {
+    # no tree in the slot rowTree
+    # rownames & tip.label partially matched
+    expect_warning(rowTree(tse_o) <- tree_o)
+    
     # Only one tree in the slot rowTree
     tse_x <- tse_a
     rowTree(x = tse_x, whichTree = 1) <- new_tree1
@@ -63,8 +73,17 @@ new_tree1$tip.label <- colnames(tse_a)
 new_tree2 <- ape::rtree(n/2)
 new_tree2$tip.label <- colnames(tse_a)[seq_len(n/2)]
 
+
+tse_o <- makeTSE(ncol = n, include.colTree = FALSE, include.rowTree = FALSE)
+tree_o <- ape::rtree(n+2)
+tree_o$tip.label[seq_len(n/2)] <- colnames(tse_o)[seq_len(n/2)]
+
 test_that("Repace the column tree successfully", {
-    # Only one tree in the slot rowTree
+    # no tree in the slot colTree
+    # colnames & tip.label partially matched
+    expect_warning(colTree(tse_o) <- tree_o)
+    
+    # Only one tree in the slot colTree
     tse_x <- tse_a
     colTree(x = tse_x, whichTree = 1) <- new_tree1
     expect_equal(colTree(tse_x, whichTree = 1), new_tree1)
