@@ -534,11 +534,11 @@
         nlk$isLeaf[iRep] <- isLeaf(tree = value, 
                                    node = nlk$nodeNum[iRep])
         nlk$whichTree[iRep] <- namRep[1]
+        if (length(iDrop)) {nlk <- nlk[-iDrop, ]}
     }
     
     
     # drop rows
-    if (length(iDrop)) {nlk <- nlk[-iDrop, ]}
     nlk <- as(nlk, "LinkDataFrame")
     
     out <- list(new_links = nlk, new_tree = ntr, drop = iDrop)
