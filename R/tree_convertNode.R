@@ -67,9 +67,11 @@ convertNode <- function(tree, node, use.alias = FALSE,
     nodeLab <- c(tree$tip.label, tree$node.label)
     nodeLab_alias <- paste("alias_", c(tip, nodI), sep = "")
     
-    if (any(duplicated(nodeLab))) {
-        warning("Multiple nodes use the same label or
-                have no label.\n", call. = FALSE )
+    if (any(duplicated(nodeLab)) & message) {
+        # use message instead of warning to avoid 
+        # multiple warnings in TSE construction.
+        message("Multiple nodes use the same label or
+                have no label.\n")
         }
         
 
@@ -94,11 +96,22 @@ convertNode <- function(tree, node, use.alias = FALSE,
             }
             stop(length(wrongNode), " nodes mismatch with the tree: ",
                     head(wrongNode), " ...", call. = FALSE)
-            
-
-        }
+            }
     }
 
+    if (inLab) {
+        nhit <- sum(nodeLab %in% node)
+        if (nhit != length(node)) {
+            warning("Multiple nodes are found to have the same label.")
+        }
+    }
+    
+    if (inAlias) {
+        nhit <- sum(nodeLab_alias %in% node)
+        if (length(nhit) != length(node)) {
+            warnings("Multiple nodes are found to have the same label.")
+        }
+    }
     # =============== Transformation ======================
     # transfer from the label to the number
     if (is.character(node)) {
