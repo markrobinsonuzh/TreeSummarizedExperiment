@@ -29,7 +29,8 @@ Imports:
     dplyr,
     SummarizedExperiment,
     BiocParallel,
-    IRanges
+    IRanges,
+    treeio
 VignetteBuilder: knitr
 Suggests: 
     ggtree,
@@ -45,6 +46,7 @@ Collate:
     'allClass.R'
     'aggTSE.R'
     'allGenerics.R'
+    'asPhylo.R'
     'changeTree.R'
     'classAccessor.R'
     'classValid.R'
