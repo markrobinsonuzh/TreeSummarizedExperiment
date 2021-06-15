@@ -92,5 +92,5 @@ geom_nodepoint() +
                size = 4) 
 }
 \author{
-Ruizhu HUANG
+Ruizhu Huang
 }
