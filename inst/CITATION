@@ -1,0 +1,25 @@
+citHeader("To cite TreeSummarizedExperiment in publications use:")
+
+citEntry(
+  entry    = "Article",
+  title    = "TreeSummarizedExperiment: a S4 class for data with hierarchical structure",
+  author   = personList(
+      as.person("Ruizhu Huang"),
+      as.person("Charlotte Soneson"),
+      as.person("Felix G.M. Ernst"),
+      as.person("Kevin C. Rue-Albrecht"),
+      as.person("Guangchuang Yu"),
+      as.person("Stephanie C. Hicks"),
+      as.person("Mark D. Robinson")
+  ),
+  journal  = "F1000Research",
+  year     = "2021",
+  volume   = "9",
+  number   = "",
+  pages    = "1246",
+  url      = "https://f1000research.com/articles/9-1246",
+  textVersion = paste("Huang R, Soneson C, Ernst FGM et al.",
+  "TreeSummarizedExperiment: a S4 class for data with hierarchical structure.",
+  "F1000Research 2021, 9:1246 (https://doi.org/10.12688/f1000research.26669.2)"
+  )
+)
