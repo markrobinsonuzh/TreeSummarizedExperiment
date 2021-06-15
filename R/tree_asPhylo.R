@@ -13,7 +13,7 @@
 #' @importFrom treeio as.phylo
 #' @importFrom rlang .data
 #' @return a phylo object
-#' @author Ruizhu HUANG
+#' @author Ruizhu Huang
 #' @export
 #' @examples
 #' 
