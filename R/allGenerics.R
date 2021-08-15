@@ -572,6 +572,73 @@ setReplaceMethod("colnames", signature(x = "TreeSummarizedExperiment"),
                  }
 )
 
+#' @rdname TreeSummarizedExperiment-accessor
+#' @export
+setGeneric("subsetByLeaf", 
+           function(x, rowLeaf, colLeaf, whichRowTree, whichColTree,
+                    updateTree = TRUE)
+    standardGeneric("subsetByLeaf")
+)
+
+#' @rdname TreeSummarizedExperiment-accessor
+#' @importFrom ape keep.tip
+#' @export
+setMethod("subsetByLeaf", signature(x = "TreeSummarizedExperiment"),
+          function(x, rowLeaf, colLeaf, whichRowTree, whichColTree, 
+                   updateTree = TRUE){
+              x <- updateObject(x)
+              # row link
+              rl <- rowLinks(x)
+              rt <- rowTree(x, whichTree = NULL)
+              if (!missing(whichRowTree)) {
+                  rt <- rt[whichRowTree]
+                  rnam <- names(rt)
+                  x <- x[rl$whichTree %in% rnam,]
+                  x <- BiocGenerics:::replaceSlots(object = x, 
+                                                   rowTree = rt)
+                  rl <- rowLinks(x)
+              }
+              
+              if (!missing(whichRowTree) |
+                  !missing(rowLeaf)) {
+                  if (!length(rt)) {
+                      warning("The row tree is not available.", 
+                              call. = FALSE)}
+              }
+              ## keep rows corresponding to the specified rowLeaf
+              if (!missing(rowLeaf)) {
+              x <- .subset_leaf(x = x, leaf = rowLeaf, dim = "row", 
+                                updateTree = updateTree)
+              }
+              
+              
+              # column link
+              cl <- colLinks(x)
+              ct <- colTree(x, whichTree = NULL)
+              if (!missing(whichColTree)) {
+                  ct <- ct[whichColTree]
+                  cnam <- names(ct)
+                  x <- x[, cl$whichTree %in% cnam]
+                  x <- BiocGenerics:::replaceSlots(object = x, 
+                                                   colTree = ct)
+                  cl <- colLinks(x)
+              }
+              
+              if (!missing(whichColTree) |
+                  !missing(colLeaf)) {
+                  if (!length(ct)) {
+                      warning("The column tree is not available.", 
+                              call. = FALSE)}
+              }
+              
+              ## keep cols corresponding to the specified colLeaf
+              if (!missing(colLeaf)) {
+                  x <- .subset_leaf(x = x, leaf = colLeaf, dim = "col", 
+                                    updateTree = updateTree)
+              }
+              return(x)
+          }
+)
 
 #' @rdname TreeSummarizedExperiment-accessor
 #' @export
@@ -604,14 +671,16 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
                               call. = FALSE)}
               }
               
+              # if (!missing(rowNode)) {
+              #     if (!is.numeric(rowNode)) {
+              #         rowNode <- unlist(lapply(rt, convertNode, node = rowNode))
+              #     }
+              #     x <- x[which(rl$nodeNum %in% rowNode),]
+              # }
               if (!missing(rowNode)) {
-                  if (!is.numeric(rowNode)) {
-                      rowNode <- unlist(lapply(rt, convertNode, node = rowNode))
-                  }
-                  x <- x[which(rl$nodeNum %in% rowNode),]
+                  x <- .subset_leaf(x = x, leaf = rowNode, dim = "row", 
+                                    updateTree = FALSE)
               }
-              
-              
               
               # column link
               cl <- colLinks(x)
@@ -632,11 +701,16 @@ setMethod("subsetByNode", signature(x = "TreeSummarizedExperiment"),
                               call. = FALSE)}
               }
               
+              # if (!missing(colNode)) {
+              #     if (!is.numeric(colNode)) {
+              #         colNode <- unlist(lapply(ct, convertNode, node = colNode))
+              #     }
+              #     x <- x[, which(cl$nodeNum %in% colNode)]
+              # }
+              
               if (!missing(colNode)) {
-                  if (!is.numeric(colNode)) {
-                      colNode <- unlist(lapply(ct, convertNode, node = colNode))
-                  }
-                  x <- x[, which(cl$nodeNum %in% colNode)]
+                  x <- .subset_leaf(x = x, leaf = colNode, dim = "col", 
+                                    updateTree = FALSE)
               }
              return(x)
           }

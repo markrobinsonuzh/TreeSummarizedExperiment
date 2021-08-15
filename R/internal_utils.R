@@ -556,4 +556,71 @@
     is.null(lk$whichTree)
 }
 
+#' update dimLinks and dimTree (used in subsetByLeaf)
+#' @keywords internal
+#' @author Ruizhu Huang
+.subset_leaf <- function(x, leaf, dim = "row", updateTree = TRUE) {
+    if (dim == "row") {
+        dimTree <- rowTree(x, whichTree = NULL)
+        dimLink <- rowLinks(x)
+    } else {
+        dimTree <- colTree(x, whichTree = NULL)
+        dimLink <- colLinks(x)
+    }
+    if (!missing(leaf)) {
+        df <- lapply(seq_along(dimTree), FUN = function(ii) {
+            ti <- dimTree[[ii]]
+            nti <- names(dimTree)[ii]
+            out <- NULL
+            if (!is.numeric(leaf)) {
+                lab <- intersect(leaf, c(ti$tip.label, ti$node.label))
+                nd <- convertNode(tree = ti, node = lab)
+            } else {
+                nd <- intersect(leaf, unique(as.vector(ti$edge)))
+            }
+            if (length(nd)) {
+                out <- data.frame(node = nd, whichTree = nti) 
+            } 
+            
+            return(out)
+        })
+        df <- do.call(rbind, df)
+    }
+    
+    ind <- which(dimLink$nodeNum %in% df$node & dimLink$whichTree %in% df$whichTree)
+    if (dim == "row") { 
+        x <- x[ind, ] 
+        dimLink <- rowLinks(x)
+        dimTree <- rowTree(x, whichTree = NULL)
+    } else { 
+        x <- x[, ind] 
+        dimLink <- colLinks(x)
+        dimTree <- colTree(x, whichTree = NULL)
+    }
+    
+    if (!updateTree) {
+        return(x)
+    }
+    ## update dimTree
+    nam <- names(dimTree)
+    new_dimTree <- lapply(nam, FUN = function(tt){
+        node <- dimLink$nodeNum[dimLink$whichTree == tt]
+        keep.tip(phy = dimTree[[tt]], tip = node)
+    })
+    names(new_dimTree) <- nam
+    for (i in nam) {
+        ti <- new_dimTree[[i]]
+        if (dim == "row") {
+            x <- changeTree(x = x, rowTree = ti, whichRowTree = i, 
+                            rowNodeLab = ti$tip.label)
+        } else {
+            x <- changeTree(x = x, colTree = ti, whichColTree = i, 
+                            colNodeLab = ti$tip.label)
+        }
+    }
+    
+    return(x)
+}
+
+
 
