@@ -32,6 +32,12 @@
 #'   extract the first tree. If \code{whichTree = NULL}, a list of all trees is
 #'   extracted.
 #' @param ... The argument from the subset function \code{[]}
+#' @param rowLeaf A vector of leaves that are used to subset rows. One could use
+#'   the leaf number, or the leaf label to specify nodes, but not a mixture of
+#'   them.
+#' @param colLeaf A vector of leaves that are used to subset columns. One could
+#'   use the leaf number, or the leaf label to specify nodes, but not a mixture
+#'   of them.
 #' @param rowNode A vector of nodes that are used to subset rows. One could use
 #'   the node number, the node label or the node alias to specify nodes, but not
 #'   a mixture of them.
@@ -42,6 +48,8 @@
 #'   in the \code{rowTree}.
 #' @param whichColTree A numeric indicator or name character to specify which tree
 #'   in the \code{colTree}.
+#' @param updateTree TRUE or FALSE. Default is TRUE, which updates tree
+#'   structures after subsetting.
 #' @name TreeSummarizedExperiment-accessor
 #' @return Elements from \code{TreeSummarizedExperiment}.
 #' @seealso \code{\link{TreeSummarizedExperiment}}
@@ -100,4 +108,35 @@
 #'                            two = DNAStringSet(rep("B",nrow(toy_tse))))
 #' referenceSeq(toy_tse) <- refSeq
 #' toy_tse
+#' 
+#' # subset treeSE by leaves
+#' library(ape)
+#' set.seed(1)
+#' z <- makeTSE(nrow = 5, ncol = 4, include.rowTree = TRUE, include.colTree = FALSE)
+#' y <- makeTSE(nrow = 4, ncol = 4, include.rowTree = TRUE, include.colTree = FALSE)
+#' tr <- ape::rtree(4)
+#' zy <- rbind(z, y)
+#' x <- changeTree(x = zy, rowTree = tr, whichRowTree = 2, rowNodeLab = tr$tip.label)
+#' rowLinks(zy)
+#' rowLinks(x)
+#' ## 1) rowLeaf exist only in one of trees
+#' rf <- c("t1", "t3")
+#' sx <- subsetByLeaf(x = x, rowLeaf = rf)
+#' rowLinks(sx)
+#' 
+#' sx <- subsetByLeaf(x = x, rowLeaf = rf, updateTree = FALSE)
+#' rowLinks(sx)
+#' 
+#' ## 2) rowLeaf exist in all trees
+#' rf <- 1:3
+#' sxx <- subsetByLeaf(x = x, rowLeaf = rf)
+#' rowLinks(sxx)
+#' 
+#' 
+#' 
+#' ## 3) rowLeaf exist in all trees, but subset and update only the specified
+#' trees
+#' rf <- c(3:4)
+#' sxx <- subsetByLeaf(x = x, rowLeaf = rf, whichRowTree = "phylo")
+#' rowLinks(sxx)
 NULL

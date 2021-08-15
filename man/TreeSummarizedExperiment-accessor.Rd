@@ -29,6 +29,8 @@
 \alias{[<-,TreeSummarizedExperiment,ANY,ANY,TreeSummarizedExperiment-method}
 \alias{rownames<-,TreeSummarizedExperiment-method}
 \alias{colnames<-,TreeSummarizedExperiment-method}
+\alias{subsetByLeaf}
+\alias{subsetByLeaf,TreeSummarizedExperiment-method}
 \alias{subsetByNode}
 \alias{subsetByNode,TreeSummarizedExperiment-method}
 \alias{TreeSummarizedExperiment-accessor}
@@ -90,6 +92,24 @@ referenceSeq(x) <- value
 
 \S4method{colnames}{TreeSummarizedExperiment}(x) <- value
 
+subsetByLeaf(
+  x,
+  rowLeaf,
+  colLeaf,
+  whichRowTree,
+  whichColTree,
+  updateTree = TRUE
+)
+
+\S4method{subsetByLeaf}{TreeSummarizedExperiment}(
+  x,
+  rowLeaf,
+  colLeaf,
+  whichRowTree,
+  whichColTree,
+  updateTree = TRUE
+)
+
 subsetByNode(x, rowNode, colNode, whichRowTree, whichColTree)
 
 \S4method{subsetByNode}{TreeSummarizedExperiment}(x, rowNode, colNode, whichRowTree, whichColTree)
@@ -117,6 +137,23 @@ subset function \code{[]}}
 \item{drop}{A logical value, TRUE or FALSE. The argument from the subset
 function \code{[]}}
 
+\item{rowLeaf}{A vector of leaves that are used to subset rows. One could use
+the leaf number, or the leaf label to specify nodes, but not a mixture of
+them.}
+
+\item{colLeaf}{A vector of leaves that are used to subset columns. One could
+use the leaf number, or the leaf label to specify nodes, but not a mixture
+of them.}
+
+\item{whichRowTree}{A numeric indicator or name character to specify which tree
+in the \code{rowTree}.}
+
+\item{whichColTree}{A numeric indicator or name character to specify which tree
+in the \code{colTree}.}
+
+\item{updateTree}{TRUE or FALSE. Default is TRUE, which updates tree
+structures after subsetting.}
+
 \item{rowNode}{A vector of nodes that are used to subset rows. One could use
 the node number, the node label or the node alias to specify nodes, but not
 a mixture of them.}
@@ -124,12 +161,6 @@ a mixture of them.}
 \item{colNode}{A vector of nodes that are used to subset columns. One could
 use the node number, the node label or the node alias to specify nodes, but
 not a mixture of them.}
-
-\item{whichRowTree}{A numeric indicator or name character to specify which tree
-in the \code{rowTree}.}
-
-\item{whichColTree}{A numeric indicator or name character to specify which tree
-in the \code{colTree}.}
 }
 \value{
 Elements from \code{TreeSummarizedExperiment}.
@@ -193,6 +224,37 @@ refSeq <- DNAStringSetList(one = DNAStringSet(rep("A",nrow(toy_tse))),
                            two = DNAStringSet(rep("B",nrow(toy_tse))))
 referenceSeq(toy_tse) <- refSeq
 toy_tse
+
+# subset treeSE by leaves
+library(ape)
+set.seed(1)
+z <- makeTSE(nrow = 5, ncol = 4, include.rowTree = TRUE, include.colTree = FALSE)
+y <- makeTSE(nrow = 4, ncol = 4, include.rowTree = TRUE, include.colTree = FALSE)
+tr <- ape::rtree(4)
+zy <- rbind(z, y)
+x <- changeTree(x = zy, rowTree = tr, whichRowTree = 2, rowNodeLab = tr$tip.label)
+rowLinks(zy)
+rowLinks(x)
+## 1) rowLeaf exist only in one of trees
+rf <- c("t1", "t3")
+sx <- subsetByLeaf(x = x, rowLeaf = rf)
+rowLinks(sx)
+
+sx <- subsetByLeaf(x = x, rowLeaf = rf, updateTree = FALSE)
+rowLinks(sx)
+
+## 2) rowLeaf exist in all trees
+rf <- 1:3
+sxx <- subsetByLeaf(x = x, rowLeaf = rf)
+rowLinks(sxx)
+
+
+
+## 3) rowLeaf exist in all trees, but subset and update only the specified
+trees
+rf <- c(3:4)
+sxx <- subsetByLeaf(x = x, rowLeaf = rf, whichRowTree = "phylo")
+rowLinks(sxx)
 }
 \seealso{
 \code{\link{TreeSummarizedExperiment}}
