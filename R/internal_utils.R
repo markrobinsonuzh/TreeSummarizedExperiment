@@ -610,12 +610,13 @@
     names(new_dimTree) <- nam
     for (i in nam) {
         ti <- new_dimTree[[i]]
+        link_i <- dimLink[dimLink[["whichTree"]] == i, "nodeLab"]
         if (dim == "row") {
-            x <- changeTree(x = x, rowTree = ti, whichRowTree = i, 
-                            rowNodeLab = ti$tip.label)
+            x <- changeTree(x = x, rowTree = ti, whichRowTree = i,
+                            rowNodeLab = link_i)
         } else {
-            x <- changeTree(x = x, colTree = ti, whichColTree = i, 
-                            colNodeLab = ti$tip.label)
+            x <- changeTree(x = x, colTree = ti, whichColTree = i,
+                            colNodeLab = link_i)
         }
     }
     
