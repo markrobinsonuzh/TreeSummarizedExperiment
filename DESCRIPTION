@@ -7,7 +7,9 @@ Authors@R:
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
       role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3285-1945")),
       person("Felix G.M.", "Ernst", email = "felix.gm.ernst@outlook.com",
-      role = c("ctb"), comment = c(ORCID = "0000-0001-5064-0928")))
+      role = c("ctb"), comment = c(ORCID = "0000-0001-5064-0928")),
+      person(given = "Tuomas", family = "Borman", role = c("ctb"),
+             comment = c(ORCID = "0000-0002-8563-8884")))
 Description: TreeSummarizedExperiment has extended SingleCellExperiment to 
     include hierarchical information on the rows or columns of the rectangular 
     data.
