@@ -1,7 +1,7 @@
 Package: TreeSummarizedExperiment
 Type: Package
 Title: TreeSummarizedExperiment: a S4 Class for Data with Tree Structures 
-Version: 2.15.1
+Version: 2.16.0
 Date: 2025-03-10
 Authors@R: 
     c(person("Ruizhu", "Huang", email = "ruizhuRH@gmail.com",
