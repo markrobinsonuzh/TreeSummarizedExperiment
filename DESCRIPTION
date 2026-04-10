@@ -30,11 +30,11 @@ Imports:
     rlang,
     dplyr,
     SummarizedExperiment,
-    BiocParallel,
     IRanges,
     treeio
 VignetteBuilder: knitr
 Suggests: 
+    BiocParallel,
     ggtree,
     ggplot2,
     BiocStyle,

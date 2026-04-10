@@ -46,7 +46,6 @@
 #'   calls to \strong{BiocParallel} functions.
 #' @import SingleCellExperiment
 #' @importFrom utils flush.console
-#' @importFrom BiocParallel bplapply
 #' @include allClass.R
 #' @export
 #' @author Ruizhu HUANG
@@ -392,7 +391,11 @@ aggTSE <- function(x,
                        dimData = dimData, FUN = FUN)})
     } else {
         # The computation is run in parallel
-        res <- bplapply(desR, FUN = function(x) {
+        if (!requireNamespace("BiocParallel", quietly = TRUE)) {
+            stop("The 'BiocParallel' package is required when providing a 'BPPARAM' argument for parallel execution.\n",
+                 "Please install it or leave 'BPPARAM' as NULL to run sequentially.", call. = FALSE)
+        }
+        res <- BiocParallel::bplapply(desR, FUN = function(x) {
             .agg_assay(desd = x, nodeRow = numR, 
                        nodeBlock = nodeBk, assayTab = mtab,
                        dimData = dimData, FUN = FUN)},
